@@ -10,6 +10,7 @@
 
 int main(int argc, char* argv[]) {
   if (argc <= 1) {
+    // hrc
     fprintf(stderr, "Usage: ./example \"SELECT * FROM test;\"\n");
     return -1;
   }
