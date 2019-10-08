@@ -2,18 +2,18 @@
 
 目录结构：
 /storage 
-	storage.h 存储总管理
-	storage.cpp
-	buffer.h  缓冲区管理
-	buffer.cpp
-	file.h    文件管理
-	file.cpp
-	page.h    页管理
-	page.cpp
-	segment.h 段管理
-	segment.cpp
-	config.h  参数配置
-	main.cpp  主函数
+    storage.h 存储总管理
+    storage.cpp
+    buffer.h  缓冲区管理
+    buffer.cpp
+    file.h    文件管理
+    file.cpp
+    page.h    页管理
+    page.cpp
+    segment.h 段管理
+    segment.cpp
+    config.h  参数配置
+    main.cpp  主函数
 
 数据结构：
 Storage:
@@ -26,32 +26,32 @@ Storage:
 |     |___isChanged
 |
 |___dbMeta
-	  |___blockNum
-	  |___blockSize
-	  |___blockFree
-	  |___dataSize
-	  |___dataAddr
-	  |___bitMapSize
-	  |___bitMapAddr
-	  |___currFileNum
-	  |___FileMeta
-		    |___id
-		    |___name
-		    |___state
-		    |___segNum
-		    |___segList
-			     |___state
-			     |___id
-			     |___type
-			     |___firstPageNo
-			     |___pageNum  |
-			                  |
-				     page     |
-				      |___pageNo
-				      |___prePageNo
-				      |___nextPageNo
-				      |___recordNum
-				      |___freeSpace
+      |___blockNum
+      |___blockSize
+      |___blockFree
+      |___dataSize
+      |___dataAddr
+      |___bitMapSize
+      |___bitMapAddr
+      |___currFileNum
+      |___FileMeta
+            |___id
+            |___name
+            |___state
+            |___segNum
+            |___segList
+                 |___state
+                 |___id
+                 |___type
+                 |___firstPageNo
+                 |___pageNum  |
+                              |
+                     page     |
+                      |___pageNo
+                      |___prePageNo
+                      |___nextPageNo
+                      |___recordNum
+                      |___freeSpace
 
 函数结构
 StorageMgr
