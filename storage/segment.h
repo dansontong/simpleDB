@@ -1,6 +1,7 @@
-#ifdef STORAGE_SEGMENT_H
+#ifndef STORAGE_SEGMENT_H
 #define STORAGE_SEGMENT_H
 
+#include "config.h"
 
 // ==================== data structure ====================
 struct Segment{

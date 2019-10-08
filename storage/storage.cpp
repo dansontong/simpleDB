@@ -1,4 +1,3 @@
-
 #include "storage.h"
 
 void initial(struct Storage *storage, char *fileName){
@@ -28,7 +27,7 @@ void createDbFile(char *fileName){
 	storage.dbMeta.bitMapAddr = BIT_MAP_ADDR;
 	storage.dbMeta.dataSize = FILE_DATA_SIZE;
 	storage.dbMeta.dataAddr = FILE_DATA_ADDR;
-	storage.dbMeta.currFileNum = 1;
+	storage.dbMeta.currFileNum = 0;
 	//storage.dbMeta.fileMeta[MAX_FILE_NUM] = new FileMeta[MAX_FILE_NUM];
 
 	storage.dbMeta.fileMeta[0].id = 0;
