@@ -1,5 +1,14 @@
-#ifndef STORAGE_UTIL_H
-#define STORAGE_UTIL_H
+#ifndef STORAGE_CONFIG_H
+#define STORAGE_CONFIG_H
+
+#include <iostream>
+#include <cstdio>
+#include <time.h>
+#include <vector> 
+#include <fstream>
+#include <string>
+#include <string.h>
+using namespace std; 
 
 // configuration配置参数
 
@@ -12,7 +21,10 @@
 //TODO: 需测试确保dbMeta不会超出1024，否则位示图数据将会与之重叠，会出现未知错误
 
 // file 配置参数
-#define MAX_FILE_NUM 1      //最大文件数量
+#define MAX_FILE_NUM 30      //最大文件数量
+#define MAP_FILE         0
+#define NORMAL_FILE      1
+#define INDEX_FILE_BTREE 2
 
 // page 配置参数
 #define PAGE_SIZE BLOCK_SIZE//页大小==文件块大小
@@ -22,5 +34,11 @@
 
 // segment
 #define SEGMENT_NUM 5       //文件的段数
+
+class Config{
+public:
+	Config();
+	~Config();
+};
 
 #endif

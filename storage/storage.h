@@ -1,9 +1,11 @@
 #ifndef STORAGE_H
 #define STORAGE_H
 
-#include "buffer.h"
+#include "config.h"
 #include "file.h"
+#include "buffer.h"
 #include "page.h"
+#include "segment.h"
 
 // ==================== data structure ====================
 // 数据库文件的描述信息
@@ -43,7 +45,7 @@ public:
 	void initial(struct Storage *storage, char *fileName);
 	void showDbInfo(struct Storage *storage);
 	void showSegList(struct Storage *storage, int fileID); 
-}
+};
 
 //定时把内存中缓冲区的所有数据写到磁盘
 int memToDisk(struct Storage *storage);

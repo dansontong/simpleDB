@@ -1,7 +1,6 @@
-#ifdef STORAGE_BUFFER_H
+#ifndef STORAGE_BUFFER_H
 #define STORAGE_BUFFER_H
 
-#include <string>
 #include "config.h"
 
 // buf初始化
@@ -14,13 +13,13 @@ struct BufMeta{
 	long pageNo;   //页号
 	long visitTime;//访问时间
 	bool isChanged;//是否更改
-}
+};
 
 // 缓冲池数据
 struct BufPool{
 	char *data[BUFFER_NUM][PAGE_SIZE];
 	struct BufMeta bufMeta[BUFFER_NUM];
-}
+};
 
 // ==================== manager function ====================
 // 缓冲池管理
