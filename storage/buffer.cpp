@@ -3,18 +3,18 @@
 using std::string;
 
 // ==================== data structure ====================
-typedef struct
-{
-    /* data */
-    int *p;
-} BufBlock;
+// typedef struct
+// {
+//     /* data */
+//     int *p;
+// } BufBlock;
 
-typedef struct
-{
-    /* data */
-    BufBlock block;
-    int id;
-} Buffer;
+// typedef struct
+// {
+//     /* data */
+//     BufBlock block;
+//     int id;
+// } Buffer;
 
 // ==================== extern api ====================
 void BufInit(void)
