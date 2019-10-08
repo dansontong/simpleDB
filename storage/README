@@ -1,0 +1,78 @@
+
+
+目录结构：
+/storage 
+	storage.h 存储总管理
+	storage.cpp
+	buffer.h  缓冲区管理
+	buffer.cpp
+	file.h    文件管理
+	file.cpp
+	page.h    页管理
+	page.cpp
+	segment.h 段管理
+	segment.cpp
+	config.h  参数配置
+	main.cpp  主函数
+
+数据结构：
+Storage:
+|___freeSpaceBitMap
+|___bufPool
+|     |___data
+|     |___BufMeta
+|     |___pageNo
+|     |___visitTime
+|     |___isChanged
+|
+|___dbMeta
+	  |___blockNum
+	  |___blockSize
+	  |___blockFree
+	  |___dataSize
+	  |___dataAddr
+	  |___bitMapSize
+	  |___bitMapAddr
+	  |___currFileNum
+	  |___FileMeta
+		    |___id
+		    |___name
+		    |___state
+		    |___segNum
+		    |___segList
+			     |___state
+			     |___id
+			     |___type
+			     |___firstPageNo
+			     |___pageNum  |
+			                  |
+				     page     |
+				      |___pageNo
+				      |___prePageNo
+				      |___nextPageNo
+				      |___recordNum
+				      |___freeSpace
+
+函数结构
+StorageMgr
+|___initial
+|___
+|___
+|___bufMgr
+|    |___
+|    |___
+|
+|___fileMgr
+|    |___
+|    |___
+|
+|___pageMgr
+     |___
+     |___
+
+
+命名规范:
+1, 磁盘中的数据块block，对应内存中的页page
+2, file没有特别说明，均指虚拟文件，一个文件对应一个表。目前实现在磁盘上只有一个文件
+3, 类名、结构体类型首字母大写，实例首字母小写，文件名小写
+
