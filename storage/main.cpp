@@ -4,10 +4,13 @@
 
 int main(int argc, char* argv[]) {
 	//初始化数据库
+	printf("DB manager start. \n");
 	Storage dbMeta;
 	char dbFile[30] = "/opt/mydb/db_meta";
 	StorageMgr storageMgr;
+	printf("DB initial begin.\n");
 	storageMgr.initial(&dbMeta, dbFile);
+	printf("DB initial done.\n");
 
 	//展示数据库
 	storageMgr.showDbInfo(&dbMeta);
