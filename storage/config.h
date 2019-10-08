@@ -15,7 +15,7 @@ using namespace std;
 // 磁盘中的数据库文件 配置参数
 #define BLOCK_SIZE (4*1024)            // 磁盘中数据块的大小，也等于buffer中的PAGE_SIZE
 #define FILE_DATA_SIZE (1024*1024*1024)// 文件数据区大小1G，单位字节
-#define FILE_DATA_ADDR (BITMAP_ADDR + BIT_MAP_SIZE)         // 数据区起始位置
+#define FILE_DATA_ADDR (BIT_MAP_ADDR + BIT_MAP_SIZE)         // 数据区起始位置
 #define BIT_MAP_SIZE (FILE_DATA_SIZE / BLOCK_SIZE / 8) // 位示图大小
 #define BIT_MAP_ADDR 1024               // 位示图起始位置   
 //TODO: 需测试确保dbMeta不会超出1024，否则位示图数据将会与之重叠，会出现未知错误
