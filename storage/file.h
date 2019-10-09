@@ -24,11 +24,11 @@ public:
 	FileMgr();
 	~FileMgr();
 
-	void writeFile(struct Storage *dbHead, int fileID, int length, char *str);
-	int createFile(struct Storage *dbHead, int type, long requestPageNum);
+	void writeFile(struct Storage *storage, int fileID, int length, char *str);
+	void NewFile(struct Storage *DB,int type, long NeededPageNum);
+	void readFile(struct Storage *DB,int FileID,char *str);
+	void deleteFile(struct Storage *DB,int FileID);
 
-	PageMgr pageMgr;
-	BufMgr bufMgr; 
 };
 
 #endif

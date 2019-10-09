@@ -1,4 +1,3 @@
-#ifndef STORAGE_PAGE_H
 #define STORAGE_PAGE_H
 
 #include "config.h"
@@ -20,7 +19,12 @@ public:
 	PageMgr();
 	~PageMgr();
 
-	void RequestPage(void);
+	int bool_empty(unsigned long bit_map,int position);
+	void setbitmap(unsigned long *bit_map,int position，int value);
+	void RequestPage(struct Storage *DB, long NeededPageNum);
+	void recove_onepage(struct Storage *DB,int PageNo);
+	void recover_allpages(struct Storage *DB);
+
 };
 
 #endif
