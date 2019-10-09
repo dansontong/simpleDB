@@ -1,3 +1,4 @@
+#ifndef STORAGE_PAGE_H
 #define STORAGE_PAGE_H
 
 #include "config.h"
