@@ -1,7 +1,10 @@
-#ifdef STORAGE_FILE_H
+#ifndef STORAGE_FILE_H
 #define STORAGE_FILE_H
 
 #include "config.h"
+#include "page.h"
+#include "segment.h"
+#include "buffer.h"
 
 // ==================== data structure ====================
 //文件描述信息
@@ -25,6 +28,7 @@ public:
 	void NewFile(struct Storage *DB,int type, long NeededPageNum);
 	void readFile(struct Storage *DB,int FileID,char *str);
 	void deleteFile(struct Storage *DB,int FileID);
+
 };
 
 #endif
