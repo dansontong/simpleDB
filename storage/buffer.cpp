@@ -2,41 +2,128 @@
 #include <string>
 using std::string;
 
-// ==================== data structure ====================
-// typedef struct
-// {
-//     /* data */
-//     int *p;
-// } BufBlock;
-
-// typedef struct
-// {
-//     /* data */
-//     BufBlock block;
-//     int id;
-// } Buffer;
-
 // ==================== extern api ====================
-void BufInit(void)
+BufMgr::BufMgr(void)
 {
-    //完成内存的初始化，请求分配空间
-    return;
+    this->freeBlockHead = 0;
+    // 初始化缓冲区描述数据
+    int i;
+    for (i = 0; i < BUFFER_NUM - 1; i++)
+    {
+        BufPool *bp_p = &(this->bufpool.bufMeta[i]);
+        bp_p->bufTd = i;
+        bp_p->pageNo = -1;
+        bp_p->visitTime = UTC();
+        bp_p->fNext = i + 1;
+        bp_p->bufMode = BM_free;
+    }
 }
 
-void ReadBuffer(string tag)
+long BufMgr::BufQuickLookup(BufTag btag)
 {
-    // step1 - 检查buffer的合法性
+    return -1;
+}
+
+char *BufMgr::BufGetBlock(long bufId)
+{
+    return this->bufpool.data[bufId];
+}
+
+char *BufMgr::ReadBuffer(BUfTag btag)
+{
+    // step1 - 检查btag的合法性
+    // BufCheckTag(btag);
+
+    long resId;
     // step2 - 查询tag和buf id的映射转换
-    // step3 - 如果buf id不为空即为该数据块在buffer内，将此块返回
-    // step4 - 如果step3失败去调用调度算法，完成后返回
+    resId = this->BufQuickLookup(btag);
+    if (resId == -1)
+    {
+        // 该缓存页不存在，发出load动作
+        resId = this->BufLoadPage(btag);
+    }
+
+    assert(resId >= 0 && resId < BUFFER_NUM);
+
+    return this->BufGetBlock(resId);
 }
 
 // ==================== internal func ====================
 // 这一部分主要是buffer的调度策略，LRU、FIFO等调页淘汰算法的实现
-void BufSchedule(void)
+void BufMgr::BufSchedule(void)
 {
-    // step 1 - 查看buf当前的空间，如果有空间直接调新的快进来
-    // step 2 -如果空间不够则调用淘汰算法空出空间来调页
+    // 调用淘汰算法
+    // loserId = strategy();
+    // this->BufRemove(loserId);
+}
+
+bool BufMgr::BufRemove(long bufId)
+{
+    if (bufId < 0 || bufId > BUFFER_NUM)
+    {
+        // TODO: debug log
+        return false;
+    }
+
+    BUfMeta *bmeta = &(this->bufpool.bufMeta[index]);
+
+    // 检查缓存块能否删除
+    // BufMode不为空、不在io_progress等状态
+    if (bmeta->bufMode == BM_free || bmeta->bufMode == BM_ioProgress)
+    {
+        // TODO: debug log
+        return false;
+    }
+
+    // 当前块符合释放条件，将该块放回freelist里
+    bmeta->bufMode = BM_free;
+    bmeta->visitTime = 0;
+
+    if (this->freeBlockHead == BUF_FREE_END)
+    {
+        this->freeBlockHead = bufId;
+        bmeta->fNext == BUF_FREE_END;
+    }
+    else
+    {
+        bmeta->fNext = this->freeBlockHead;
+        this->freeBlockHead = bufId;
+    }
+
+    // TODO : debug log
+    return true;
+}
+
+long BufMgr::BufLoadPage(BufTag btag)
+{
+    // 检查Buftag的合法性
+    // BufCheckTag(btag);
+
+    // 查看是否有空闲的缓存块
+    // 如果没有则调用淘汰算法
+
+    // TODO 加锁控制
+
+    if (this->freeBlockHead == BUF_FREE_END)
+    {
+        this->BufShedule();
+    }
+
+    // 此时一定有空闲块可以使用
+    long newBufId = this->freeBlockHead;
+    assert(resId >= 0 && resId < BUFFER_NUM);
+
+    BufMeta *newbmeta = &(this->bufpool.bufMeta[newBufId]);
+    this->freeBlockHead = newbmeta->fNext;
+
+    newbmeta->fNext = BUF_FREE_END;
+    newbmeta->bufMode = BM_ioProgress;
+    // TODO 释放锁
+
+    // TODO: 调用OS接口，从disk调用目标page
+    // load_disk_page(btag);
+    newbmeta->bufMode = BM_isValid;
+    return newBufId;
 }
 
 // ==================== OS call ====================
