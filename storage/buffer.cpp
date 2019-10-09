@@ -130,3 +130,7 @@ long BufMgr::BufLoadPage(BufTag btag)
 // 这一部分主要和操作系统交互，包括读取块、内存的基本操作
 // 如追加、清空、删除等，查看PG的bufmgr
 // 以及一些内部的加锁（待定）
+
+BufMgr::BufMgr(){}
+
+BufMgr::~BufMgr(){}

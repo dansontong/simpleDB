@@ -1,7 +1,10 @@
-#ifdef STORAGE_FILE_H
+#ifndef STORAGE_FILE_H
 #define STORAGE_FILE_H
 
 #include "config.h"
+#include "page.h"
+#include "segment.h"
+#include "buffer.h"
 
 // ==================== data structure ====================
 //文件描述信息
@@ -21,7 +24,11 @@ public:
 	FileMgr();
 	~FileMgr();
 
-	void writeFile(struct Storage *storage, int fileID, int length, char *str);
+	void writeFile(struct Storage *dbHead, int fileID, int length, char *str);
+	int createFile(struct Storage *dbHead, int type, long requestPageNum);
+
+	PageMgr pageMgr;
+	BufMgr bufMgr; 
 };
 
 #endif

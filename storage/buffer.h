@@ -1,7 +1,6 @@
-#ifdef STORAGE_BUFFER_H
+#ifndef STORAGE_BUFFER_H
 #define STORAGE_BUFFER_H
 
-#include <string>
 #include "config.h"
 
 #define BUF_FREE_END -1
@@ -24,6 +23,7 @@ struct BufTag
 }
 
 //缓冲块描述数据
+
 struct BufMeta
 {
 	BufTag bTag;	 // buf的数据tag
@@ -39,6 +39,19 @@ struct BufPool
 	char data[BUFFER_NUM][BLOCK_SIZE]; // 不采用二维数组的形式，直接分配blocksize * buffer_num 的大小，自行管理
 	BufMeta bufMeta[BUFFER_NUM];
 }
+=======
+struct BufMeta{
+	long pageNo;   //页号
+	long visitTime;//访问时间
+	bool isChanged;//是否更改
+};
+
+// 缓冲池数据
+struct BufPool{
+	char *data[BUFFER_NUM][PAGE_SIZE];
+	struct BufMeta bufMeta[BUFFER_NUM];
+};
+
 
 // ==================== manager function ====================
 // 缓冲池管理

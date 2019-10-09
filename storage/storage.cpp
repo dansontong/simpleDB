@@ -1,7 +1,7 @@
-
+#include <stdlib.h>
 #include "storage.h"
 
-void initial(struct Storage *storage, char *fileName){
+void StorageMgr::initial(struct Storage *storage, char *fileName){
 	FILE *dbFile = fopen(fileName, "rb");
 	if(dbFile == NULL){
 		printf("DataBase isn't exist, creating new dataBase.\n");
@@ -19,7 +19,7 @@ void initial(struct Storage *storage, char *fileName){
 	fclose(dbFile);
 }
 
-void createDbFile(char *fileName){
+void StorageMgr::createDbFile(char *fileName){
 	struct Storage storage;
 	storage.dbMeta.blockSize = BLOCK_SIZE;
 	storage.dbMeta.blockNum = FILE_DATA_SIZE / BLOCK_SIZE; // 256*1024
@@ -28,11 +28,11 @@ void createDbFile(char *fileName){
 	storage.dbMeta.bitMapAddr = BIT_MAP_ADDR;
 	storage.dbMeta.dataSize = FILE_DATA_SIZE;
 	storage.dbMeta.dataAddr = FILE_DATA_ADDR;
-	storage.dbMeta.currFileNum = 1;
+	storage.dbMeta.currFileNum = 0;
 	//storage.dbMeta.fileMeta[MAX_FILE_NUM] = new FileMeta[MAX_FILE_NUM];
 
 	storage.dbMeta.fileMeta[0].id = 0;
-	storage.dbMeta.fileMeta[0].name = "0";
+	strcpy(storage.dbMeta.fileMeta[0].name, "0");
 	storage.dbMeta.fileMeta[0].segNum = SEGMENT_NUM;
 	storage.dbMeta.fileMeta[0].state = 1;
 	memset(storage.dbMeta.fileMeta[0].segList, -1, sizeof(struct Segment) * SEGMENT_NUM);
@@ -51,8 +51,13 @@ void createDbFile(char *fileName){
 	fclose(dbFile);
 }
 
-void showDbInfo(struct Storage *storage){
+void StorageMgr::showDbInfo(struct Storage *storage){
 
+}
+
+int memToDisk(struct Storage *storage){
+
+	return 0;
 }
 
 StorageMgr::StorageMgr(){}
