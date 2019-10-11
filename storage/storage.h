@@ -34,7 +34,7 @@ struct Storage{
 // 存储管理
 
 void createDbFile(char *fileName); 
-void initial(struct Storage *storage, char *fileName);
+void initDB(struct Storage *storage, char *fileName);
 void showDbInfo(struct Storage *storage);
 void showSegList(struct Storage *storage, int fileID); 
 
