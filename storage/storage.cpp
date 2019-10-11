@@ -1,11 +1,11 @@
 #include <stdlib.h>
 #include "storage.h"
 
-void initial(struct Storage *storage, char *fileName){
+void initDB(struct Storage *storage, char *fileName){
 	FILE *dbFile = fopen(fileName, "rb");
 	if(dbFile == NULL){
 		printf("DataBase isn't exist, creating new dataBase.\n");
-		this->createDbFile(fileName);
+		createDbFile(fileName);
 		dbFile = fopen(fileName, "rb");
 	}
 
