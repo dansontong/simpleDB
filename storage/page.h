@@ -18,7 +18,9 @@ struct PageMeta{
 
 int bool_empty(unsigned long bit_map,int position);
 void setbitmap(unsigned long *bit_map,int position,int value);
-void RequestPage(struct Storage *DB, long NeededPageNum);
+
+int RequestPage(struct Storage *DB, long NeededPageNum);
+
 void recove_onepage(struct Storage *DB,int PageNo);
 void recover_allpages(struct Storage *DB);
 
