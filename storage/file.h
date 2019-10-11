@@ -19,16 +19,11 @@ struct FileMeta{
 
 // ==================== manager function ====================
 // 文件管理
-class FileMgr{
-public:
-	FileMgr();
-	~FileMgr();
 
-	void writeFile(struct Storage *storage, int fileID, int length, char *str);
-	void NewFile(struct Storage *DB,int type, long NeededPageNum);
-	void readFile(struct Storage *DB,int FileID,char *str);
-	void deleteFile(struct Storage *DB,int FileID);
+void writeFile(struct Storage *storage, int fileID, int length, char *str);
+void NewFile(struct Storage *DB,int type, long NeededPageNum);
+void readFile(struct Storage *DB,int FileID,char *str);
+void deleteFile(struct Storage *DB,int FileID);
 
-};
 
 #endif

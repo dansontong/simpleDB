@@ -13,12 +13,7 @@ struct Segment{
 };
 
 // ==================== manager function ====================
-class SegmentMgr
-{
-public:
-	SegmentMgr();
-	~SegmentMgr();
-	
-};
+
+
 
 #endif
