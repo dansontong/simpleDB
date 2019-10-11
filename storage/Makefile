@@ -64,11 +64,11 @@ ver = debug
 ifeq ($(ver), debug)
 ALL: storage_d
 target = storage_d
-CXXFLAGS = -g -Ddebug
+CXXFLAGS = -pthread -g -Ddebug
 else
 ALL: storage_r
 target = storage_r
-CXXFLAGS = -O3
+CXXFLAGS = -pthread -O3
 endif
 
 head = $(shell find ./ -name "*.h")

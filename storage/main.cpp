@@ -5,9 +5,8 @@
 
 int main(int argc, char* argv[]) {
 	//初始化数据库
+	initLog();//初始化日志系统
 	logInfo("logging.h test success!, this is a Info.");
-	init_mutex();//初始化多进程信号量，实现log文件互斥访问。为以后多进程做准备
-	printf("DB manager start. \n");
 	Storage dbMeta;
 	char dbFile[30] = "/opt/mydb/db_meta";
 	StorageMgr storageMgr;
