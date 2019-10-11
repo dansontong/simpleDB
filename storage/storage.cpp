@@ -1,11 +1,11 @@
 #include <stdlib.h>
 #include "storage.h"
 
-void StorageMgr::initial(struct Storage *storage, char *fileName){
+void initDB(struct Storage *storage, char *fileName){
 	FILE *dbFile = fopen(fileName, "rb");
 	if(dbFile == NULL){
 		printf("DataBase isn't exist, creating new dataBase.\n");
-		this->createDbFile(fileName);
+		createDbFile(fileName);
 		dbFile = fopen(fileName, "rb");
 	}
 
@@ -19,7 +19,7 @@ void StorageMgr::initial(struct Storage *storage, char *fileName){
 	fclose(dbFile);
 }
 
-void StorageMgr::createDbFile(char *fileName){
+void createDbFile(char *fileName){
 	struct Storage storage;
 	storage.dbMeta.blockSize = BLOCK_SIZE;
 	storage.dbMeta.blockNum = FILE_DATA_SIZE / BLOCK_SIZE; // 256*1024
@@ -51,7 +51,7 @@ void StorageMgr::createDbFile(char *fileName){
 	fclose(dbFile);
 }
 
-void StorageMgr::showDbInfo(struct Storage *storage){
+void showDbInfo(struct Storage *storage){
 
 }
 
@@ -60,6 +60,3 @@ int memToDisk(struct Storage *storage){
 	return 0;
 }
 
-StorageMgr::StorageMgr(){}
-
-StorageMgr::~StorageMgr(){}

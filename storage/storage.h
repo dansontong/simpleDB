@@ -32,20 +32,12 @@ struct Storage{
 
 // ==================== manager function ====================
 // 存储管理
-class StorageMgr{
-public:
-	StorageMgr();
-	~StorageMgr();
 
-	BufMgr bufMgr;
-	FileMgr fileMgr;
-	PageMgr pageMgr;
+void createDbFile(char *fileName); 
+void initDB(struct Storage *storage, char *fileName);
+void showDbInfo(struct Storage *storage);
+void showSegList(struct Storage *storage, int fileID); 
 
-	void createDbFile(char *fileName); 
-	void initial(struct Storage *storage, char *fileName);
-	void showDbInfo(struct Storage *storage);
-	void showSegList(struct Storage *storage, int fileID); 
-};
 
 //定时把内存中缓冲区的所有数据写到磁盘
 int memToDisk(struct Storage *storage);

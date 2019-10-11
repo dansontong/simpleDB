@@ -14,8 +14,8 @@
 	}
 }
 
-
 void setbitmap(unsigned long *bit_map,int position,int value){
+
 	if(value!=0&&value!=1){
 		printf("value的值不符合规则!/n");
 		return ;
@@ -36,8 +36,10 @@ void setbitmap(unsigned long *bit_map,int position,int value){
 }
 
 
-int RequestPage(struct Storage *DB, long NeededPageNum){
+int RequestPage(struct Storage *DB, long NeededPageNum)
+{
 	int flag = 0;
+
 	for(int i=0;i<DB->dbMeta.blockNum;i++){
 		int p_num = i/(8*sizeof(long));
 		int position = i- p_num*8*sizeof(long)+1;
@@ -76,7 +78,9 @@ int RequestPage(struct Storage *DB, long NeededPageNum){
 }
 
 void recove_onepage(struct Storage *DB,int PageNo){
+
 	int p_num = PageNo/(8*sizeof(long));
+
 	int position = PageNo - p_num*8*sizeof(long)+1;
 	setbitmap(DB->freeSpaceBitMap+p_num,position,0);
 }

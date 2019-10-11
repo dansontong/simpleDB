@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <cstdio>
+#include <stdlib.h>
 #include <time.h>
 #include <vector> 
 #include <fstream>
@@ -35,10 +36,5 @@ using namespace std;
 // segment
 #define SEGMENT_NUM 5       //文件的段数
 
-class Config{
-public:
-	Config();
-	~Config();
-};
 
 #endif
