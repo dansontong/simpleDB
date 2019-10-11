@@ -1,15 +1,9 @@
 #include "file.h"
 #include "storage.h"
 
-FileMgr::FileMgr(){
-	
-}
 
-FileMgr::~FileMgr(){
-	
-}
 //-1表示文件创建失败
-FileMgr::NewFile(struct Storage *DB,int type, long NeededPageNum){
+void NewFile(struct Storage *DB,int type, long NeededPageNum){
 	if(DB->dbMeta.currFileNum>=MAX_FILE_NUM||DB->dbMeta.blockFree<NeededPageNum){
 		printf("空闲空间不足，文件创建失败！/n");
 		exit(0);	
@@ -59,7 +53,7 @@ FileMgr::NewFile(struct Storage *DB,int type, long NeededPageNum){
 	
 }
 
-FileMgr::writeFile(struct Storage *DB,int length,char *str,int FileID){
+void writeFile(struct Storage *DB,int length,char *str,int FileID){
 	int querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){
@@ -153,7 +147,7 @@ FileMgr::writeFile(struct Storage *DB,int length,char *str,int FileID){
 	}
 	
 }
-FileMgr::readFile(struct Storage *DB,int FileID,char *str){
+void readFile(struct Storage *DB,int FileID,char *str){
 	int i;
 	for(i=0;i<MAX_FILE_NUM;i++){
 		if(DB->dbMeta.dbMeta.fileMeta[0].segList[i]==FileID){
@@ -206,7 +200,8 @@ FileMgr::readFile(struct Storage *DB,int FileID,char *str){
 		}
 	}
 }
-FileMgr::deleteFile(struct Storage *DB,int FileID){
+
+void deleteFile(struct Storage *DB,int FileID){
 	int i;
 	for(i=0;i<MAX_FILE_NUM;i++){
 		if(DB->dbMeta.dbMeta.fileMeta[0].segList[i]==FileID){

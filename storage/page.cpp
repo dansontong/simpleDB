@@ -1,15 +1,8 @@
 #include "page.h"
 #include "storage.h"
 
-PageMgr::PageMgr(){
-	
-}
-PageMgr::~PageMgr(){
-	
-}
 
-
-PageMgr::bool_empty(unsigned long bit_map,int position){
+ int bool_empty(unsigned long bit_map,int position){
 	unsigned long result = 0x00000001;
 	result = result<<(32-position);
 	result = result & bit_map;
@@ -22,7 +15,7 @@ PageMgr::bool_empty(unsigned long bit_map,int position){
 }
 
 
-PageMgr::setbitmap(unsigned long *bit_map,int position，int value){
+int setbitmap(unsigned long *bit_map,int position，int value){
 	if(value!=0&&value!=1){
 		printf("value的值不符合规则!/n");
 		return ;
@@ -43,7 +36,7 @@ PageMgr::setbitmap(unsigned long *bit_map,int position，int value){
 }
 
 
-PageMgr::RequestPage(struct Storage *DB, long NeededPageNum){
+int RequestPage(struct Storage *DB, long NeededPageNum){
 	for(int i=0;i<DB->dbMeta.blockNum;i++){
 		int p_num = i/(8*sizeof(long));
 		int position = i- p_num*8*sizeof(long)+1;
@@ -81,12 +74,13 @@ PageMgr::RequestPage(struct Storage *DB, long NeededPageNum){
 	}
 }
 
-PageMgr::recove_onepage(struct Storage *DB,int PageNo){
+void recove_onepage(struct Storage *DB,int PageNo){
 	int p_num = PageNo/(8*sizeof(long);
 	int position = PageNo - p_num*8*sizeof(long)+1;
 	setbitmap(*(DB->freeSpaceBitMap)+p_num,position,0);
 }
-PageMgr::recover_allpages(struct Storage *DB){
+
+void recover_allpages(struct Storage *DB){
 	for(int i= 0;i<DB->dbMeta.blockNum;i++){
 		int p_num = i/(8*sizeof(long));
 		int position = i- p_num*8*sizeof(long)+1;

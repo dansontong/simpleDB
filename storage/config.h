@@ -35,10 +35,5 @@ using namespace std;
 // segment
 #define SEGMENT_NUM 5       //文件的段数
 
-class Config{
-public:
-	Config();
-	~Config();
-};
 
 #endif
