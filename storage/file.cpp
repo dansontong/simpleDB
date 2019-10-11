@@ -9,8 +9,8 @@ void NewFile(struct Storage *DB,int type, long NeededPageNum){
 		exit(0);	
 	}
 	int id = DB->dbMeta.currFileNum;
-	DB->currFileNum++;
-	long NewPages = PageMgr.RequestPage(struct Storage *DB,long NeededPageNum);
+	DB->dbMeta.currFileNum++;
+	long NewPages = RequestPage(struct Storage *DB,long NeededPageNum);
 	if(NewPages>=0){
 		for(int i=0,int j =NewPages;i<NeededPageNum,j<DB->blockNum;i++,j++){
 			struct PageMeta pagemeta;
@@ -48,7 +48,7 @@ void NewFile(struct Storage *DB,int type, long NeededPageNum){
 	}
 	else{
 		printf("未有足够的连续存储空间，文件创建失败！/n");
-		exit(0)；
+		exit(0);
 	}
 	
 }
