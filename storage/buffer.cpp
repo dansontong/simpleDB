@@ -1,64 +1,124 @@
 #include <assert.h>
 #include <string>
-using std::string;
 
 #include "buffer.h"
+#include "log.h"
+using std::string;
 
-// ==================== init func ====================
-BufMgr::BufMgr(void)
+// ==================== buffer global variable ====================
+char *bufBlocks;    /* buffer data */
+BufMeta *bufMetas;  /* 每一个缓存块对应的参数信息 */
+long freeBlockHead; /* 空闲块组成的链表的起始节点 */
+
+// ==================== public func ====================
+void Buf_Init(void)
 {
-    // 申请缓存区空间
-    bufpool.data = (char *)MemAllocNoThrow(BUFFER_NUM * BLOCK_SIZE);
-    bufpool.bufMeta = (BufMeta *)MemAllocNoThrow(BUFFER_NUM * sizeof(BufMeta));
+    // temp
+    log_init();
 
-    if (bufpool.data && bufpool.bufMeta)
+    char *newbufblocks = NULL;
+    BufMeta *newbufmeta = NULL;
+    // 申请缓存区空间
+    newbufblocks = (char *)MemAllocNoThrow(BUFFER_NUM * BLOCK_SIZE);
+    newbufmeta = (BufMeta *)MemAllocNoThrow(BUFFER_NUM * sizeof(BufMeta));
+
+    if (newbufblocks == NULL || newbufmeta == NULL)
     {
         // 没有申请到内存空间
-        // TODO error log
-        assert(bufpool.data && bufpool.bufMeta);
+        log_Error("malloc memory for buffer error.");
+        assert(newbufmeta && newbufblocks);
     }
     // 初始化缓冲区描述数据
-    this->freeBlockHead = 0;
+    freeBlockHead = 0;
+    bufBlocks = newbufblocks;
+    bufMetas = newbufmeta;
+
     int i;
     for (i = 0; i < BUFFER_NUM - 1; i++)
     {
-        BufMeta *bp_p = &(this->bufpool.bufMeta[i]);
+        BufMeta *bp_p = &(bufMetas[i]);
+        bp_p->bTag.pageNo = -1;
         bp_p->bufId = i;
         bp_p->visitTime = UTCNowTimestamp();
         bp_p->fNext = i + 1;
         bp_p->bufMode = BM_free;
     }
+    log_Info("buffer ready for work.");
 }
 
-BufMgr::~BufMgr()
+void Buf_Free()
 {
-    MemFree(this->bufpool.bufMeta);
-    MemFree(this->bufpool.data);
+    MemFree(bufMetas);
+    MemFree(bufBlocks);
 }
 
-// ==================== public func ====================
-char *BufMgr::buf_ReadBuffer(BufTag btag)
+char *Buf_ReadBuffer(BufTag btag)
+{
+    // TODO 多进程控制
+    return Buf_ReadBuffer_inner(btag);
+}
+
+char *Buf_AllocBlock(BufTag tag)
+{
+    long id = Buf_AllocBlock_inner(tag);
+    return Buf_GetBlock(id);
+}
+
+void Buf_WriteBuffer(BufTag tag, char *data)
+{
+    // TODO 多进程控制
+    Buf_WriteBuffer_inner(tag, data);
+}
+
+// ==================== private func ====================
+void Buf_WriteBuffer_inner(BufTag tag, char *data)
+{
+    if (data == NULL)
+    {
+        log_Error("writing to buffer can't be NULL");
+        return;
+    }
+    long bufid = Buf_QuickLookup(tag);
+
+    if (bufid == -1)
+    { // buffer不存在
+        // TODO 我先想一想，如果写缓存块时块不存在怎么办
+
+        return;
+    }
+
+    BufMeta *bmeta = &(bufMetas[bufid]);
+    bmeta->bufMode = BM_isDirty;
+
+    char *buf = Buf_GetBlock(bufid);
+    memcpy(buf, data, BLOCK_SIZE);
+}
+
+char *Buf_ReadBuffer_inner(BufTag btag)
 {
     // step1 - 检查btag的合法性
     // BufCheckTag(btag);
 
     long buf_id;
     // step2 - 查询tag和buf id的映射转换
-    buf_id = this->buf_QuickLookup(btag);
+    buf_id = Buf_QuickLookup(btag);
+    cout << "[debug] quick lookup res: " << buf_id << endl;
     if (buf_id == -1)
     {
         // 该缓存页不存在，发出load动作
-        buf_id = this->buf_LoadPage(btag);
+        cout << "[debug] prepare to load page" << endl;
+        buf_id = Buf_LoadPage(btag);
     }
 
     assert(buf_id >= 0 && buf_id < BUFFER_NUM);
 
-    return this->buf_GetBlock(buf_id);
+    // TODO 如果当前的缓存块被标记为脏数据，如何处理
+
+    Buf_HitBlockById(buf_id);
+    return Buf_GetBlock(buf_id);
 }
 
-// ==================== private func ====================
-// 从外存中加载一个页进入缓存中
-long BufMgr::buf_LoadPage(BufTag btag)
+long Buf_AllocBlock_inner(BufTag btag)
 {
     // 检查Buftag的合法性
     // BufCheckTag(btag);
@@ -68,48 +128,70 @@ long BufMgr::buf_LoadPage(BufTag btag)
 
     // TODO 加锁控制
 
-    if (this->freeBlockHead == BUF_FREE_LIST_EMPTY)
+    if (freeBlockHead == BUF_FREE_LIST_EMPTY)
     {
-        this->buf_Schedule();
+        Buf_Schedule();
     }
+    long newBufId = freeBlockHead;
 
     // 此时一定有空闲块可以使用
-    long newBufId = this->freeBlockHead;
     assert(newBufId >= 0 && newBufId < BUFFER_NUM);
 
-    BufMeta *newbmeta = &(this->bufpool.bufMeta[newBufId]);
-    this->freeBlockHead = newbmeta->fNext == BUF_FREE_END ? BUF_FREE_LIST_EMPTY : newbmeta->fNext;
+    char logs[255];
+    sprintf(logs, "alloc new buffer block success. the new block id: %ld", newBufId);
+    log_Info(logs);
 
+    BufMeta *newbmeta = &(bufMetas[newBufId]);
+    // 维护空闲链表
+    freeBlockHead = newbmeta->fNext == BUF_FREE_END ? BUF_FREE_LIST_EMPTY : newbmeta->fNext;
+    newbmeta->bufMode = BM_isValid;
     newbmeta->fNext = BUF_FREE_END;
-    newbmeta->bufMode = BM_ioProgress;
+
+    // buf tag 的拷贝
+    newbmeta->bTag.pageNo = btag.pageNo;
     // TODO 释放锁
 
+    return newBufId;
+}
+
+// 从外存中加载一个页进入缓存中
+long Buf_LoadPage(BufTag btag)
+{
+    long newBufId = Buf_AllocBlock_inner(btag);
+    BufMeta *newbmeta = &(bufMetas[newBufId]);
+
+    newbmeta->bufMode = BM_ioProgress;
     // TODO: 调用OS接口，从disk调用目标page
     // char *page = load_disk_page(btag);
-    // char *blockStart = this->buf_GetBlock(newBufId);
     // memcpy(blockStart, page, BLOCK_SIZE * sizeof(char) );
+    char *blockStart = Buf_GetBlock(newBufId);
+    assert(blockStart != NULL);
+
+    // just for test
+    TestLoad(blockStart);
     newbmeta->bufMode = BM_isValid;
     return newBufId;
 }
 
 // 这一部分主要是buffer的调度策略，LRU、FIFO等调页淘汰算法的实现
 // 暂时实现LRU算法
-void BufMgr::buf_Schedule(void)
+void Buf_Schedule(void)
 {
     // 调用淘汰算法
-    long loserId = buf_StrategyLRU();
-    this->Buf_Remove(loserId);
+    long loserId = Buf_StrategyLRU();
+    Buf_Remove(loserId);
 }
 
 // LRU算法
-long BufMgr::buf_StrategyLRU()
+long Buf_StrategyLRU()
 {
     long buf_id = -1;
     long minVisit = UTCNowTimestamp();
     int i;
     for (i = 0; i < BUFFER_NUM; i++)
     {
-        BufMeta bmeta = bufpool.bufMeta[i];
+        BufMeta bmeta = bufMetas[i];
+        // 只有处于valid状态的缓存块才会被删除
         if (bmeta.bufMode != BM_isValid)
         {
             continue;
@@ -125,21 +207,21 @@ long BufMgr::buf_StrategyLRU()
 }
 
 // 删除指定id的缓存块，将该块返回free list中
-bool BufMgr::Buf_Remove(long bufId)
+bool Buf_Remove(long bufId)
 {
     if (bufId < 0 || bufId > BUFFER_NUM)
     {
-        // TODO: debug log
+        log_Error("buffer id needed removed is ivalid.");
         return false;
     }
 
-    BufMeta *bmeta = &(this->bufpool.bufMeta[bufId]);
+    BufMeta *bmeta = &(bufMetas[bufId]);
 
     // 检查缓存块能否删除
     // BufMode不为空、不在io_progress等状态
     if (bmeta->bufMode == BM_free || bmeta->bufMode == BM_ioProgress)
     {
-        // TODO: debug log
+        log_Error("buffer needed remove mode is free or in io process.");
         return false;
     }
 
@@ -147,19 +229,22 @@ bool BufMgr::Buf_Remove(long bufId)
     bmeta->bufMode = BM_free;
     bmeta->visitTime = 0;
 
-    if (this->freeBlockHead == BUF_FREE_LIST_EMPTY)
+    if (freeBlockHead == BUF_FREE_LIST_EMPTY)
     {
         // 如果当前空闲list为空
-        this->freeBlockHead = bufId;
+        freeBlockHead = bufId;
         bmeta->fNext == BUF_FREE_END;
     }
     else
     {
-        bmeta->fNext = this->freeBlockHead;
-        this->freeBlockHead = bufId;
+        bmeta->fNext = freeBlockHead;
+        freeBlockHead = bufId;
     }
 
-    // TODO : debug log
+    char logs[255];
+    sprintf(logs, "%ld buffer already removed.", bufId);
+    log_Info(logs);
+
     return true;
 }
 
@@ -167,16 +252,16 @@ bool BufMgr::Buf_Remove(long bufId)
 // 如果找到这样的缓存块则返回该块的下标
 // 否则返回-1
 // TODO : opt 目前实现顺序查找 太low了
-long BufMgr::buf_QuickLookup(BufTag btag)
+long Buf_QuickLookup(BufTag btag)
 {
     int i;
     for (i = 0; i < BUFFER_NUM; i++)
     {
-        BufMeta bmeta = bufpool.bufMeta[i];
-        if (bmeta.bufMode != BM_isValid)
-        {
-            continue;
-        }
+        BufMeta bmeta = bufMetas[i];
+        // if (bmeta.bufMode != BM_isValid)
+        // {
+        //     continue;
+        // }
         if (CMPBufTag(btag, bmeta.bTag) == true)
         {
             return i;
@@ -186,12 +271,43 @@ long BufMgr::buf_QuickLookup(BufTag btag)
 }
 
 // 根据bufid返回缓存块的起始地址
-char *BufMgr::buf_GetBlock(long bufId)
+char *Buf_GetBlock(long bufId)
 {
     assert(bufId >= 0 && bufId < BUFFER_NUM);
     char *p;
-    p = this->bufpool.data + BLOCK_SIZE * bufId;
+    p = bufBlocks + BLOCK_SIZE * bufId;
     return p;
+}
+
+void Buf_HitBlockById(long bufid)
+{
+    BufMeta *bmeta;
+
+    bmeta = &(bufMetas[bufid]);
+    bmeta->visitTime = UTCNowTimestamp();
+}
+
+void Buf_HitBlockByTag(BufTag btag)
+{
+    long bufid = Buf_QuickLookup(btag);
+    Buf_HitBlockById(bufid);
+}
+
+void Buf_PrintInfo()
+{
+    char logs[1024];
+    int used = 0;
+    int i;
+    for (i = 0; i < BUFFER_NUM; i++)
+    {
+        if (bufMetas[i].bufMode != BM_free)
+        {
+            used++;
+        }
+    }
+    sprintf(logs, "blocks: %p, metas: %p, used: %d, freehead: %ld", bufBlocks, bufMetas, used, freeBlockHead);
+
+    log_Info(logs);
 }
 
 // ==================== OS call ====================
@@ -213,19 +329,24 @@ bool CMPBufTag(const BufTag tag1, const BufTag tag2)
     return tag1.pageNo == tag2.pageNo;
 }
 
+void TestLoad(char *dest)
+{
+    char data[] = {"this is a test for load page."};
+    memcpy(dest, data, BLOCK_SIZE);
+}
 // ==================== mem func ====================
 void *MemAllocNoThrow(std::size_t alloc_size)
 {
     void *newMem = NULL;
-    newMem = std::malloc(alloc_size);
+    newMem = malloc(alloc_size);
     return newMem;
 }
 
-void MemFree(void *start)
+void MemFree(void *addr)
 {
-    if (start == NULL)
+    if (addr == NULL)
     {
         return;
     }
-    free(start);
+    free(addr);
 }
