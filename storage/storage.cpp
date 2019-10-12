@@ -21,14 +21,14 @@ void storage_initDB(struct Storage *DB, char *fileName)
 	fclose(dbFile);
 
 	//加载 数据字典
-	int fid = DB.DbMeta.dataDictFid;
+	int fid = DB->dbMeta.dataDictFid;
 	if(fid < 0)
 	{
 		printf("dataDictionary file doesn't exist.\n");
 		fid = file_newFile(DB, DATA_DICT_FILE, 1);
-		DB.DbMeta.dataDictFid = fid;
+		DB->dbMeta.dataDictFid = fid;
 	}
-	
+
 }
 
 void storage_createDbFile(char *fileName)

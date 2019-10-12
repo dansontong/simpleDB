@@ -40,15 +40,15 @@ using namespace std;
 #define SEGMENT_NUM 5       //文件的段数
 
 typedef enum{
-	INT_TYPE = 0;
-	LONG_TYPE = 1;
-	FLOAT_TYPE = 2;
-	DOUBLE_TYPE = 3;
-	CHAR_TYPE = 4;
-	VARCHAR_TYPE = 5;
-	DATE_TYPE = 6;
+	INT_TYPE = 0,
+	LONG_TYPE = 1,
+	FLOAT_TYPE = 2,
+	DOUBLE_TYPE = 3,
+	CHAR_TYPE = 4,
+	VARCHAR_TYPE = 5,
+	DATE_TYPE = 6,
 }DATA_TYPE;
 
-const static char dataTypeName[6][10]={"INT","LONG","FLOAT","DOUBLE","CHAR","VARCHAR","DATE"};
+const static char dataTypeName[7][10]={"INT","LONG","FLOAT","DOUBLE","CHAR","VARCHAR","DATE"};
 
 #endif

@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
 
 	//读入数据，插入记录
 	char tupleFile[30] = "./supplier.tbl";
-	fp = fopen(tupleFile, "rb");
+	FILE *fp = fopen(tupleFile, "rb");
 	// int fileID = file_createFile(&dbMeta, TABLE_FILE, 1);
 	// printf("创建文件%d成功！\n", fileID);
 	// //int fileID = 0;
