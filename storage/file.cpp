@@ -10,9 +10,7 @@ void file_newFile(struct Storage *DB,int type, long NeededPageNum){
 	}
 	int id = DB->dbMeta.currFileNum;
 	DB->dbMeta.currFileNum++;
-
 	long NewPages = page_requestPage( DB,NeededPageNum);
-
 	if(NewPages>=0){
 		int i,j;
 		for(i=0,j =NewPages;i<NeededPageNum,j<(DB->dbMeta.blockNum);i++,j++){
@@ -69,16 +67,14 @@ void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
 		exit(0);
 	}
 
-	int mapNo = page_requestPage(DB,querypage);
 	long CurpageNo = DB->dbMeta.fileMeta[0].segList[i].firstPageNo;
 	long pagenum = DB->dbMeta.fileMeta[0].segList[i].pageNum;
-
 	int sizeofpagehead = sizeof(struct PageMeta);
 	int sizeofrecord = sizeof(struct OffsetInPage);
 	rewind(DB->dataPath);
 	bool isfound = false;
 	struct PageMeta pagehead;
-	memcpy(&pagehead,DB->bufPool.data[mapNo],sizeofpagehead);
+	memcpy(&pagehead,ReadBuffer(CurpageNo),sizeofpagehead);
 	OffsetInPage preoffset,curoffset;
 	long currecordpos,curoffsetpos;
 	for(int i=0;i<pagenum;i++){
@@ -87,14 +83,12 @@ void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
 				break;
 			}
 			CurpageNo = pagehead.nextPageNo;
-
-			mapNo = page_requestPage(DB,CurpageNo);
-			memcpy(&pagehead,DB->bufPool.data[mapNo],sizeofpagehead);
-
+			
+			memcpy(&pagehead,ReadBuffer(CurpageNo),sizeofpagehead);
 			continue;	
 		}
 		else{
-			memcpy(&preoffset,DB->bufPool.data[mapNo]+sizeofpagehead,sizeofrecord);
+			memcpy(&preoffset,ReadBuffer(CurpageNo)+sizeofpagehead,sizeofrecord);
 			isfound = true;
 			if(pagehead.recordNum==0){
 				curoffset.recordID = 0;
@@ -105,7 +99,7 @@ void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
 				
 			}
 			else{
-				memcpy(&preoffset,DB->bufPool.data[mapNo]+sizeofpagehead+(pagehead.recordNum-1)*sizeof,sizeofrecord);
+				memcpy(&preoffset,ReadBuffer(CurpageNo)+sizeofpagehead+(pagehead.recordNum-1)*sizeof,sizeofrecord);
 				curoffset.recordID = pagehead.recordNum;
 				curoffset.offset = preoffset.offset+length;
 				curoffset.isDeleted = false;
@@ -117,10 +111,10 @@ void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
 		}
 		pagehead.recordNum++;
 		pagehead.freeSpace=pagehead.freeSpace-length;
-		memcpy(DB->bufPool.data[mapNo],&pagehead,sizeofpagehead);
-		memcpy(DB->bufPool.data[mapNo]+currecordpos,&curoffset,sizeofrecord);
-		memcpy(DB->bufPool.data[mapNo]+curoffsetpos,str,length);
-		DB->bufPool.data[mapNo].isChanged = true;
+		memcpy(ReadBuffer(CurpageNo),&pagehead,sizeofpagehead);
+		memcpy(ReadBuffer(CurpageNo)+currecordpos,&curoffset,sizeofrecord);
+		memcpy(ReadBuffer(CurpageNo)+curoffsetpos,str,length);
+		
 		break;
 	}
 	if(!isfound){
@@ -137,15 +131,14 @@ void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
 			currecordpos = sizeofpagehead;
 			curoffset.recordID = 0;
 			curoffset.offset = length;
-			curoffset.isChanged = false;
-
-			mapNo = page_requestPage(DB,pagenumber);
-			memcpy(DB->bufPool.data[mapNo],&pagemeta,sizeofpagehead);
-			memcpy(DB->bufPool.data[mapNo]+currecordpos,&curoffset,sizeofrecord);
-			memcpy(DB->bufPool.data[mapNo]+curoffsetpos,str,length);
-			DB->bufPool.data[mapNo].isChanged = true;
-			mapNo = page_requestPage(DB,pagehead.pageNo);
-			memcpy(DB->bufPool.data[mapNo],&pagehead,sizeofpagehead);
+			curoffset.isDeleted = false;
+			
+			memcpy(ReadBuffer(CurpageNo),&pagemeta,sizeofpagehead);
+			memcpy(ReadBuffer(CurpageNo)+currecordpos,&curoffset,sizeofrecord);
+			memcpy(ReadBuffer(CurpageNo)+curoffsetpos,str,length);
+			
+			
+			memcpy(ReadBuffer(CurpageNo),&pagehead,sizeofpagehead);
 			
 		}
 		
@@ -168,9 +161,8 @@ void file_readFile(struct Storage *DB,int FileID,char *str){
 	OffsetInPage preoffset,curoffset;
 	struct PageMeta pagehead;
 	for(i=0;i<pagenum;i++){
-		int mapNo = page_requestPage(DB,CurpageNo);
-		memcpy(&pagehead,DB->bufPool.data[mapNo],sizeofpagehead);
-
+		
+		memcpy(&pagehead,ReadBuffer(CurpageNo),sizeofpagehead);
 		printf("第%d号文件中的第%d个页面\n",FileID,i+1);
 		printf("页号：%ld\n",pagehead.pageNo);
 		printf("前继页号：%ld\n",pagehead.prePageNo);
@@ -181,18 +173,18 @@ void file_readFile(struct Storage *DB,int FileID,char *str){
 			for(int j=0;j<pagehead.recordNum;j++){
 				int readlength;
 				if(j==0){
-					memcpy(&curoffset,DB->bufPool.data[mapNo]+sizeofpagehead,sizeofrecord);
+					memcpy(&curoffset,ReadBuffer(CurpageNo)+sizeofpagehead,sizeofrecord);
 					readlength = curoffset.offset;
-					memcpy(str,DB->bufPool.data[mapNo]+PAGE_SIZE-curoffset.offset,readlength);
+					memcpy(str,ReadBuffer(CurpageNo)+PAGE_SIZE-curoffset.offset,readlength);
 					str[readlength] = '\0';
 					printf("该页面中第%d记录\n",j+1);
 					printf("%s\n",str);
 				}
 				else{
 					preoffset = curoffset;
-					memcpy(&curoffset,DB->bufPool.data[mapNo]+sizeofpagehead+sizeofrecord*j,sizeofrecord);
+					memcpy(&curoffset,ReadBuffer(CurpageNo)+sizeofpagehead+sizeofrecord*j,sizeofrecord);
 					readlength = curoffset.offset-preoffset.offset;
-					memcpy(str,DB->bufPool.data[mapNo]+PAGE_SIZE-curoffset.offset,readlength);
+					memcpy(str,ReadBuffer(CurpageNo)+PAGE_SIZE-curoffset.offset,readlength);
 					str[readlength] = '\0';
 					printf("该页面中第%d记录\n",j+1);
 					printf("%s\n",str);
@@ -243,4 +235,14 @@ void file_deleteFile(struct Storage *DB,int FileID){
 	DB->dbMeta.fileMeta[0].segList[i].firstPageNo = -1;
 	DB->dbMeta.fileMeta[0].segList[i].pageNum = -1;
 	
+}
+void file_read_sd(struct Storage *DB,long pageno,char *bufferpath){
+	rewind(DB->dataPath);
+	fseek(DB->dataPath,DB->dbMeta.dataAddr+pageno*PAGE_SIZE,SEEK_SET);
+	fread(bufferpath,PAGE_SIZE,1,DB->dataPath);
+}
+void file_write_sd(struct Storage *DB,long pageno,char *bufferpath){
+	rewind(DB->dataPath);
+	fseek(DB->dataPath,DB->dbMeta.dataAddr+pageno*PAGE_SIZE,SEEK_SET);
+	fwrite(bufferpath,PAGE_SIZE,1,DB->dataPath);
 }
