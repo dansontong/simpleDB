@@ -12,16 +12,20 @@ struct PageMeta{
 	int recordNum;    // 该页存储的记录个数
 	long freeSpace;   // 该页的空闲空间大小
 };
-
+struct OffsetInPage{
+	int recordID;
+	int offset;         //该记录相对于块尾地址的偏移量
+	bool isDeleted;
+};
 // ==================== manager function ====================
 // 页管理
 
-int bool_empty(unsigned long bit_map,int position);
-void setbitmap(unsigned long *bit_map,int position,int value);
+int page_isEmpty(unsigned long bit_map,int position);
+void page_setbitmap(unsigned long *bit_map,int position,int value);
 
-int RequestPage(struct Storage *DB, long NeededPageNum);
+int page_requestPage(struct Storage *DB, long NeededPageNum);
 
-void recove_onepage(struct Storage *DB,int PageNo);
-void recover_allpages(struct Storage *DB);
+void page_recove_onepage(struct Storage *DB,int PageNo);
+void page_recover_allpages(struct Storage *DB);
 
 #endif
