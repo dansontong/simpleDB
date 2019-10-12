@@ -41,30 +41,24 @@ struct BufPool
 
 // ==================== manager function ====================
 // 缓冲池管理
-class BufMgr
-{
-public:
-	BufMgr();
-	~BufMgr();
 
-	// void BufInit(void);
+// void BufInit(void);
 
-	// buf 对外提供buf的读取函数
-	// 参数待定
-	// 基本思路：根据tag去返回一个块的数据
-	// tag与数据相关，确保唯一性
-	char *ReadBuffer(BufTag tag);
+// buf 对外提供buf的读取函数
+// 参数待定
+// 基本思路：根据tag去返回一个块的数据
+// tag与数据相关，确保唯一性
+char *buf_ReadBuffer(BufTag tag);
 
-private:
-	BufPool bufpool;
-	long freeBlockHead;
+// BufPool bufpool;
+long freeBlockHead;
 
-	void BufSchedule();
-	long BufLoadPage(BufTag btag);
-	bool BufRemove(long bufId);		  // bufId取值为[0, BUFFER_NUM)
-	long BufQuickLookup(BufTag btag); // 根据buf tag 迅速查询是否有缓存,如果不存则返回-1
-	char *BufGetBlock(long bufId);	// 根据下标获取缓存内容
-	long StrategyLRU();			// 淘汰算法LRU
-};
+void buf_Schedule();
+long buf_LoadPage(BufTag btag);
+bool Buf_Remove(long bufId);		  // bufId取值为[0, BUFFER_NUM)
+long buf_QuickLookup(BufTag btag); // 根据buf tag 迅速查询是否有缓存,如果不存则返回-1
+char *buf_GetBlock(long bufId);	// 根据下标获取缓存内容
+long buf_StrategyLRU();			// 淘汰算法LRU
+
 
 #endif

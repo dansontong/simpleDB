@@ -1,5 +1,5 @@
-#ifndef LOGGING_H
-#define LOGGING_H
+#ifndef LOG_H_INCLUDE
+#define LOG_H_INCLUDE
 
 // #include <unistd.h>
 #include <stdio.h>
@@ -121,22 +121,25 @@ void LogWrite(LOGLEVEL logLevel, const char *string)
     }
 }
 
-void logError(const char *string)
+/*
+ * 对外函数接口 log_Error log_Warn log_Info log_Debug
+ */
+void log_Error(const char *string)
 {
     LogWrite(ERROR, string);
 }
 
-void logWarn(const char *string)
+void log_Warn(const char *string)
 {
     LogWrite(WARN, string);
 }
 
-void logInfo(const char *string)
+void log_Info(const char *string)
 {
     LogWrite(INFO, string);
 }
 
-void logDebug(const char *string)
+void log_Debug(const char *string)
 {
     LogWrite(DEBUG, string);
 }
