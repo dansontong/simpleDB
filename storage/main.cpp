@@ -10,20 +10,22 @@ int main(int argc, char* argv[]) {
 	Storage dbMeta;
 	char dbFile[30] = "./simpleDb";
 
-	log_Debug("DB initial begin.\n");
-
-	storege_initDB(&dbMeta, dbFile);
+	storage_initDB(&dbMeta, dbFile);
 
 	log_Debug("DB initial done.\n");
 
 	//展示数据库
-	storege_showDbInfo(&dbMeta);
-	storege_memToDisk(&dbMeta);
+	storage_showDbInfo(&dbMeta);
+	storage_memToDisk(&dbMeta);
+	
 	//创建表
+	char tableFile[30] = "./table_list";
 
 
-	//读入数据
-	// int fileID = file_createFile(&dbMeta, NORMAL_FILE, 1);
+	//读入数据，插入记录
+	char tupleFile[30] = "./supplier.tbl";
+	fp = fopen(tupleFile, "rb");
+	// int fileID = file_createFile(&dbMeta, TABLE_FILE, 1);
 	// printf("创建文件%d成功！\n", fileID);
 	// //int fileID = 0;
 	// int num = 2000;

@@ -18,6 +18,7 @@ struct DbMeta{
 	long dataSize; //数据区大小,默认1G
 	long dataAddr; //数据区的起始位置
 	int currFileNum; //当前的文件数，currFileNum < MAX_FILE_NUM
+	int dataDictFid; // 数据字典文件号
 
 	struct FileMeta fileMeta[MAX_FILE_NUM];
 };
@@ -30,16 +31,38 @@ struct Storage{
 	unsigned long *freeSpaceBitMap;
 };
 
+struct Attribute{
+	char name[MAX_NAME_LENGTH]; //属性名
+	int length; 
+	DATA_TYPE type;//数据类型
+};
+
+struct Table{
+	int fileID;   //表文件的文件号
+	char tableName[MAX_NAME_LENGTH];   //表名
+	Attribute attr[MAX_ATTRIBUTE_NUM]; //属性列表
+	int attrNum;  //属性个数
+	int recordNum;//记录个数
+};
+
 // ==================== manager function ====================
 // 存储管理
 
-void storege_createDbFile(char *fileName); 
-void storege_initDB(struct Storage *storage, char *fileName);
-void storege_showDbInfo(struct Storage *storage);
-void storege_showSegList(struct Storage *storage, int fileID); 
+void storage_createDbFile(char *fileName); 
+void storage_initDB(struct Storage *storage, char *fileName);
+void storage_showDbInfo(struct Storage *storage);
+void storage_showSegList(struct Storage *storage, int fileID); 
 
 
 //定时把内存中缓冲区的所有数据写到磁盘
-int storege_memToDisk(struct Storage *storage);
+int storage_memToDisk(struct Storage *storage);
+
+
+// 记录相关
+bool recordInsert(char *str);
+
+
+// 表相关
+bool creatTable(char *str);
 
 #endif
