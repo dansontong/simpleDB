@@ -70,6 +70,12 @@ void Buf_WriteBuffer(BufTag tag, char *data)
     Buf_WriteBuffer_inner(tag, data);
 }
 
+BufTag Buf_GenerateTag(long pageNo)
+{
+    BufTag btag;
+    btag.pageNo = pageNo;
+    return btag;
+}
 // ==================== private func ====================
 void Buf_WriteBuffer_inner(BufTag tag, char *data)
 {

@@ -56,6 +56,7 @@ void Buf_WriteBuffer(BufTag tag, char *data);
 // 在空闲的缓存块中申请一块空白的缓存块，返回缓存块的起始地址
 char *Buf_AllocBlock(BufTag tag);
 
+BufTag Buf_GenerateTag(long pageNo);
 // ==================== inner function ====================
 void Buf_Schedule();					// 调用淘汰算法并且删除被淘汰的缓存块
 long Buf_LoadPage(BufTag btag);			// 从外部文件中加载指定块
