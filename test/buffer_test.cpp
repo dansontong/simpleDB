@@ -8,10 +8,10 @@ int main()
     Buf_Init();
     cout << "Buffer init success." << endl;
 
-    BufTag btag;
-    btag.pageNo = 101;
+    cout << "======= test generate buftag =======" << endl;
+    BufTag btag = Buf_GenerateTag(101);
+    
     Buf_PrintInfo();
-
     cout << "======= test alloc =======" << endl;
     Buf_AllocBlock(btag);
     Buf_PrintInfo();
