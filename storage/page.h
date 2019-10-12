@@ -12,7 +12,11 @@ struct PageMeta{
 	int recordNum;    // 该页存储的记录个数
 	long freeSpace;   // 该页的空闲空间大小
 };
-
+struct OffsetInPage{
+	int recordID;
+	int offset;         //该记录相对于块尾地址的偏移量
+	bool isDeleted;
+};
 // ==================== manager function ====================
 // 页管理
 
