@@ -1,21 +1,21 @@
 #include "storage.h"
 #include "Test.h" 
-#include "logging.h"
+#include "log.h"
 
 
 int main(int argc, char* argv[]) {
 	//初始化数据库
 	initLog();//初始化日志系统
-	logInfo("logging.h test success!, this is a Info.");
+	log_Info("logging.h test success!, this is a Info.");
 	Storage dbMeta;
 	char dbFile[30] = "/opt/mydb/db_meta";
 	printf("DB initial begin.\n");
-	initDB(&dbMeta, dbFile);
+	storege_initDB(&dbMeta, dbFile);
 	printf("DB initial done.\n");
 
 	//展示数据库
-	showDbInfo(&dbMeta);
-	memToDisk(&dbMeta);
+	storege_showDbInfo(&dbMeta);
+	storege_memToDisk(&dbMeta);
 	//创建表
 
 
@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
 		strcat(str, tmp);
 		if (i % 10 == 0)
 			printf("str: %s\n", str);
-		writeFile(&dbMeta, fileID, strlen(str), str);
+		file_writeFile(&dbMeta, fileID, strlen(str), str);
 	}
 
 }

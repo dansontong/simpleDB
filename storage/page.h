@@ -16,12 +16,12 @@ struct PageMeta{
 // ==================== manager function ====================
 // 页管理
 
-int bool_empty(unsigned long bit_map,int position);
-void setbitmap(unsigned long *bit_map,int position,int value);
+int page_isEmpty(unsigned long bit_map,int position);
+void page_setbitmap(unsigned long *bit_map,int position,int value);
 
-int RequestPage(struct Storage *DB, long NeededPageNum);
+int page_requestPage(struct Storage *DB, long NeededPageNum);
 
-void recove_onepage(struct Storage *DB,int PageNo);
-void recover_allpages(struct Storage *DB);
+void page_recove_onepage(struct Storage *DB,int PageNo);
+void page_recover_allpages(struct Storage *DB);
 
 #endif

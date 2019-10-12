@@ -37,28 +37,28 @@ BufMgr::~BufMgr()
 }
 
 // ==================== public func ====================
-char *BufMgr::ReadBuffer(BufTag btag)
+char *BufMgr::buf_ReadBuffer(BufTag btag)
 {
     // step1 - 检查btag的合法性
     // BufCheckTag(btag);
 
     long buf_id;
     // step2 - 查询tag和buf id的映射转换
-    buf_id = this->BufQuickLookup(btag);
+    buf_id = this->buf_QuickLookup(btag);
     if (buf_id == -1)
     {
         // 该缓存页不存在，发出load动作
-        buf_id = this->BufLoadPage(btag);
+        buf_id = this->buf_LoadPage(btag);
     }
 
     assert(buf_id >= 0 && buf_id < BUFFER_NUM);
 
-    return this->BufGetBlock(buf_id);
+    return this->buf_GetBlock(buf_id);
 }
 
 // ==================== private func ====================
 // 从外存中加载一个页进入缓存中
-long BufMgr::BufLoadPage(BufTag btag)
+long BufMgr::buf_LoadPage(BufTag btag)
 {
     // 检查Buftag的合法性
     // BufCheckTag(btag);
@@ -70,7 +70,7 @@ long BufMgr::BufLoadPage(BufTag btag)
 
     if (this->freeBlockHead == BUF_FREE_LIST_EMPTY)
     {
-        this->BufSchedule();
+        this->buf_Schedule();
     }
 
     // 此时一定有空闲块可以使用
@@ -86,7 +86,7 @@ long BufMgr::BufLoadPage(BufTag btag)
 
     // TODO: 调用OS接口，从disk调用目标page
     // char *page = load_disk_page(btag);
-    // char *blockStart = this->BufGetBlock(newBufId);
+    // char *blockStart = this->buf_GetBlock(newBufId);
     // memcpy(blockStart, page, BLOCK_SIZE * sizeof(char) );
     newbmeta->bufMode = BM_isValid;
     return newBufId;
@@ -94,15 +94,15 @@ long BufMgr::BufLoadPage(BufTag btag)
 
 // 这一部分主要是buffer的调度策略，LRU、FIFO等调页淘汰算法的实现
 // 暂时实现LRU算法
-void BufMgr::BufSchedule(void)
+void BufMgr::buf_Schedule(void)
 {
     // 调用淘汰算法
-    long loserId = StrategyLRU();
-    this->BufRemove(loserId);
+    long loserId = buf_StrategyLRU();
+    this->Buf_Remove(loserId);
 }
 
 // LRU算法
-long BufMgr::StrategyLRU()
+long BufMgr::buf_StrategyLRU()
 {
     long buf_id = -1;
     long minVisit = UTCNowTimestamp();
@@ -125,7 +125,7 @@ long BufMgr::StrategyLRU()
 }
 
 // 删除指定id的缓存块，将该块返回free list中
-bool BufMgr::BufRemove(long bufId)
+bool BufMgr::Buf_Remove(long bufId)
 {
     if (bufId < 0 || bufId > BUFFER_NUM)
     {
@@ -167,7 +167,7 @@ bool BufMgr::BufRemove(long bufId)
 // 如果找到这样的缓存块则返回该块的下标
 // 否则返回-1
 // TODO : opt 目前实现顺序查找 太low了
-long BufMgr::BufQuickLookup(BufTag btag)
+long BufMgr::buf_QuickLookup(BufTag btag)
 {
     int i;
     for (i = 0; i < BUFFER_NUM; i++)
@@ -186,7 +186,7 @@ long BufMgr::BufQuickLookup(BufTag btag)
 }
 
 // 根据bufid返回缓存块的起始地址
-char *BufMgr::BufGetBlock(long bufId)
+char *BufMgr::buf_GetBlock(long bufId)
 {
     assert(bufId >= 0 && bufId < BUFFER_NUM);
     char *p;

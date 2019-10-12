@@ -1,9 +1,9 @@
-#include "logging.h"
+#include "log.h"
 
 int main(int argc, char* argv[]) {
 	initLog();
 	printf("hhhhhh\n");
-	logInfo("logging.h test success!, this is a Info.");
+	log_Info("logging.h test success!, this is a Info.");
 }
 
 // 使用说明：

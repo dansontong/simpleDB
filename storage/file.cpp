@@ -3,14 +3,14 @@
 
 
 //-1表示文件创建失败
-void NewFile(struct Storage *DB,int type, long NeededPageNum){
+void file_newFile(struct Storage *DB,int type, long NeededPageNum){
 	if(DB->dbMeta.currFileNum>=MAX_FILE_NUM||DB->dbMeta.blockFree<NeededPageNum){
 		printf("空闲空间不足，文件创建失败！/n");
 		exit(0);	
 	}
 	int id = DB->dbMeta.currFileNum;
 	DB->dbMeta.currFileNum++;
-	long NewPages = RequestPage(struct Storage *DB,long NeededPageNum);
+	long NewPages = page_requestPage(struct Storage *DB,long NeededPageNum);
 	if(NewPages>=0){
 		for(int i=0,int j =NewPages;i<NeededPageNum,j<DB->blockNum;i++,j++){
 			struct PageMeta pagemeta;
@@ -53,7 +53,7 @@ void NewFile(struct Storage *DB,int type, long NeededPageNum){
 	
 }
 
-void writeFile(struct Storage *DB,int length,char *str,int FileID){
+void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
 	int querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){
@@ -66,7 +66,7 @@ void writeFile(struct Storage *DB,int length,char *str,int FileID){
 		printf("该文件id对应的文件不存在！");
 		exit(0);
 	}
-	int mapNo = BufMgr.requestPage(DB,querypage);
+	int mapNo = BufMgr.page_requestPage(DB,querypage);
 	long CurpageNo = DB->dbMeta.fileMeta.segList[i].firstPagpageNumeNo;
 	long pagenum = DB->dbMeta.fileMeta.segList[i].pageNum;
 	int sizeofpagehead = sizeof(struct PageMeta);
@@ -83,7 +83,7 @@ void writeFile(struct Storage *DB,int length,char *str,int FileID){
 				break;
 			}
 			CurpageNo = pagehead.nextPageNo;
-			mapNo = BufMgr.requestPage(DB,CurpageNo);
+			mapNo = BufMgr.page_requestPage(DB,CurpageNo);
 			memcpy(&pagehead,DB->bufpool.data[mapNo],sizeofpagehead);
 			continue;	
 		}
@@ -118,7 +118,7 @@ void writeFile(struct Storage *DB,int length,char *str,int FileID){
 		break;
 	}
 	if(!isfound){
-		long pagenumber = RequestPage(DB,1);
+		long pagenumber = page_requestPage(DB,1);
 		if(pagenumber>=0){
 			struct PageMeta pagemeta;
 			pagemeta->nextPageNo=-1;
@@ -132,12 +132,12 @@ void writeFile(struct Storage *DB,int length,char *str,int FileID){
 			curoffset.recordID = 0;
 			curoffset.offset = length;
 			curoffset.isChanged = false;
-			mapNo = BufMgr.requestPage(DB,pagenumber);
+			mapNo = BufMgr.page_requestPage(DB,pagenumber);
 			memcpy(DB->bufpool.data[mapNo],&pagemeta,sizeofpagehead);
 			memcpy(DB->bufpool.data[mapNo]+currecordpos,&curoffset,sizeofrecord);
 			memcpy(DB->bufpool.data[mapNo]+curoffsetpos,str,length);
 			DB->bufpool.data[mapNo].isChanged = true;
-			mapNo = BufMgr.requestPage(DB,pagehead.pageNo);
+			mapNo = BufMgr.page_requestPage(DB,pagehead.pageNo);
 			memcpy(DB->bufpool.data[mapNo],&pagehead,sizeofpagehead);
 			
 		}
@@ -147,7 +147,7 @@ void writeFile(struct Storage *DB,int length,char *str,int FileID){
 	}
 	
 }
-void readFile(struct Storage *DB,int FileID,char *str){
+void file_readFile(struct Storage *DB,int FileID,char *str){
 	int i;
 	for(i=0;i<MAX_FILE_NUM;i++){
 		if(DB->dbMeta.dbMeta.fileMeta[0].segList[i]==FileID){
@@ -161,7 +161,7 @@ void readFile(struct Storage *DB,int FileID,char *str){
 	OffsetInPage preoffset,curoffet;
 	struct PageMeta pagehead;
 	for(i=0;i<pagenum;i++){
-		int mapNo = BufMgr.requestPage(DB,CurpageNo);
+		int mapNo = BufMgr.page_requestPage(DB,CurpageNo);
 		memcpy(&pagehead,DB->bufpool.data[mapNo],sizeofpagehead);
 		printf("第%d号文件中的第%d个页面\n",FileID,i+1);
 		printf("页号：%ld\n",pagehead.pageNo);
@@ -201,7 +201,7 @@ void readFile(struct Storage *DB,int FileID,char *str){
 	}
 }
 
-void deleteFile(struct Storage *DB,int FileID){
+void file_deleteFile(struct Storage *DB,int FileID){
 	int i;
 	for(i=0;i<MAX_FILE_NUM;i++){
 		if(DB->dbMeta.dbMeta.fileMeta[0].segList[i]==FileID){
@@ -220,7 +220,7 @@ void deleteFile(struct Storage *DB,int FileID){
 		fseek(DB->datapath,pageAddr,SEEK_SET);
 		fread(&pagehead,sizeofpagehead,1,DB->datapath);
 		nextPage = pagehead.nextPageNo;
-		PageMgr.recove_onepage(DB,pagehead.pageNo);
+		PageMgr.page_recove_onepage(DB,pagehead.pageNo);
 		if(nextPage>0){
 			pageAddr = DB->dbMeta.dataAddr +nextPage * PAGE_SIZE;
 		}
