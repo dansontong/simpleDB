@@ -30,12 +30,13 @@ void storege_createDbFile(char *fileName){
 	storage.dbMeta.dataAddr = FILE_DATA_ADDR;
 	storage.dbMeta.currFileNum = 0;
 	//storage.dbMeta.fileMeta[MAX_FILE_NUM] = new FileMeta[MAX_FILE_NUM];
-
 	storage.dbMeta.fileMeta[0].id = 0;
 	strcpy(storage.dbMeta.fileMeta[0].name, "0");
 	storage.dbMeta.fileMeta[0].segNum = SEGMENT_NUM;
 	storage.dbMeta.fileMeta[0].state = 1;
 	memset(storage.dbMeta.fileMeta[0].segList, -1, sizeof(struct Segment) * SEGMENT_NUM);
+
+	printf("dbMeta set done.\n");
 
 	// 为空闲空间映射表分配空间，所有的初始化为-1，表示空闲
 	storage.freeSpaceBitMap = (unsigned long *)malloc(storage.dbMeta.bitMapSize);

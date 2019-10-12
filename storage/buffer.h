@@ -51,7 +51,7 @@ struct BufPool
 char *buf_ReadBuffer(BufTag tag);
 
 // BufPool bufpool;
-long freeBlockHead;
+// long freeBlockHead;
 
 void buf_Schedule();
 long buf_LoadPage(BufTag btag);
