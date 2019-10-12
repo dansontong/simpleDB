@@ -1,5 +1,5 @@
-#ifndef LOGGING_H
-#define LOGGING_H
+#ifndef LOG_H_INCLUDE
+#define LOG_H_INCLUDE
 
 // #include <unistd.h>
 #include <stdio.h>
@@ -12,9 +12,10 @@
 #include <string.h>
 
 // log文件路径
-#define logFilePath "./ps_com_log.log"
+#define logFilePath "./DBrun.log"
 
-typedef enum{
+typedef enum
+{
     FATAL=0,
     ERROR=1,
     WARN=2,
@@ -29,7 +30,8 @@ pthread_mutex_t* mutex_log;
 static LOGLEVEL logLevelSet = INFO;//设置日志记录级别，高于该级别则输出,0为最高级
 
 //设定时间
-static char * settime(char * time_s){
+static char * settime(char * time_s)
+{
     time_t timer=time(NULL);
     strftime(time_s, 20, "%Y-%m-%d %H:%M:%S",localtime(&timer));
     return time_s;
@@ -61,22 +63,19 @@ void initMutex(void)
     pthread_mutex_init(mutex_log, &attr);
 }
 
-void initLog(void)
-{
-    initMutex();//初始化多进程信号量，实现log文件互斥访问。为以后多进程做准备
-}
-
 /*
  *打印
  * */
-static int PrintfLog(LOGLEVEL logLevel, const char *string){
+static int PrintfLog(LOGLEVEL logLevel, const char *string)
+{
     FILE * fd = NULL;
     char headStr[1024];
     char tmp[256];
 
     //使用追加方式打开文件
     fd = fopen(logFilePath,"a+");
-    if(fd == NULL){
+    if(fd == NULL)
+    {
         return -1;
     }
     
@@ -121,22 +120,30 @@ void LogWrite(LOGLEVEL logLevel, const char *string)
     }
 }
 
-void logError(const char *string)
+/*
+ * 对外函数接口 log_init log_Error log_Warn log_Info log_Debug
+ */
+void log_init(void)
+{
+    initMutex();//初始化多进程信号量，实现log文件互斥访问。为以后多进程做准备
+}
+
+void log_Error(const char *string)
 {
     LogWrite(ERROR, string);
 }
 
-void logWarn(const char *string)
+void log_Warn(const char *string)
 {
     LogWrite(WARN, string);
 }
 
-void logInfo(const char *string)
+void log_Info(const char *string)
 {
     LogWrite(INFO, string);
 }
 
-void logDebug(const char *string)
+void log_Debug(const char *string)
 {
     LogWrite(DEBUG, string);
 }

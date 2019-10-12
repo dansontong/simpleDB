@@ -33,13 +33,13 @@ struct Storage{
 // ==================== manager function ====================
 // 存储管理
 
-void createDbFile(char *fileName); 
-void initDB(struct Storage *storage, char *fileName);
-void showDbInfo(struct Storage *storage);
-void showSegList(struct Storage *storage, int fileID); 
+void storege_createDbFile(char *fileName); 
+void storege_initDB(struct Storage *storage, char *fileName);
+void storege_showDbInfo(struct Storage *storage);
+void storege_showSegList(struct Storage *storage, int fileID); 
 
 
 //定时把内存中缓冲区的所有数据写到磁盘
-int memToDisk(struct Storage *storage);
+int storege_memToDisk(struct Storage *storage);
 
 #endif

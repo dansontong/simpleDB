@@ -20,10 +20,10 @@ struct FileMeta{
 // ==================== manager function ====================
 // 文件管理
 
-void writeFile(struct Storage *storage, int fileID, int length, char *str);
-void NewFile(struct Storage *DB,int type, long NeededPageNum);
-void readFile(struct Storage *DB,int FileID,char *str);
-void deleteFile(struct Storage *DB,int FileID);
+void file_writeFile(struct Storage *storage, int fileID, int length, char *str);
+void file_newFile(struct Storage *DB,int type, long NeededPageNum);
+void file_readFile(struct Storage *DB,int FileID,char *str);
+void file_deleteFile(struct Storage *DB,int FileID);
 
 
 #endif

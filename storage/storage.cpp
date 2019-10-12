@@ -1,11 +1,11 @@
 #include <stdlib.h>
 #include "storage.h"
 
-void initDB(struct Storage *storage, char *fileName){
+void storege_initDB(struct Storage *storage, char *fileName){
 	FILE *dbFile = fopen(fileName, "rb");
 	if(dbFile == NULL){
 		printf("DataBase isn't exist, creating new dataBase.\n");
-		createDbFile(fileName);
+		storege_createDbFile(fileName);
 		dbFile = fopen(fileName, "rb");
 	}
 
@@ -19,7 +19,7 @@ void initDB(struct Storage *storage, char *fileName){
 	fclose(dbFile);
 }
 
-void createDbFile(char *fileName){
+void storege_createDbFile(char *fileName){
 	struct Storage storage;
 	storage.dbMeta.blockSize = BLOCK_SIZE;
 	storage.dbMeta.blockNum = FILE_DATA_SIZE / BLOCK_SIZE; // 256*1024
@@ -51,11 +51,11 @@ void createDbFile(char *fileName){
 	fclose(dbFile);
 }
 
-void showDbInfo(struct Storage *storage){
+void storege_showDbInfo(struct Storage *storage){
 
 }
 
-int memToDisk(struct Storage *storage){
+int storege_memToDisk(struct Storage *storage){
 
 	return 0;
 }
