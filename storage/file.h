@@ -21,9 +21,9 @@ struct FileMeta{
 // 文件管理
 
 void file_writeFile(struct Storage *storage, int fileID, int length, char *str);
-void file_newFile(struct Storage *DB,int type, long NeededPageNum);
+int file_newFile(struct Storage *DB,int type, long NeededPageNum);
 void file_readFile(struct Storage *DB,int FileID,char *str);
 void file_deleteFile(struct Storage *DB,int FileID);
-
-
+void file_read_sd(struct Storage *DB,long pageno,char *bufferpath);
+void file_write_sd(struct Storage *DB,long pageno,char *bufferpath);
 #endif

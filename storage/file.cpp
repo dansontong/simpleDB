@@ -1,9 +1,9 @@
 #include "file.h"
 #include "storage.h"
-
+#include "buffer.h"
 
 //-1表示文件创建失败
-void file_newFile(struct Storage *DB,int type, long NeededPageNum){
+int file_newFile(struct Storage *DB,int type, long NeededPageNum){
 	if(DB->dbMeta.currFileNum>=MAX_FILE_NUM||DB->dbMeta.blockFree<NeededPageNum){
 		printf("空闲空间不足，文件创建失败！/n");
 		exit(0);	
@@ -48,8 +48,9 @@ void file_newFile(struct Storage *DB,int type, long NeededPageNum){
 	}
 	else{
 		printf("未有足够的连续存储空间，文件创建失败！/n");
-		exit(0);
+		return -1;//-1表示创建失败
 	}
+	return id;
 	
 }
 
@@ -74,7 +75,7 @@ void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
 	rewind(DB->dataPath);
 	bool isfound = false;
 	struct PageMeta pagehead;
-	memcpy(&pagehead,BufMgr.ReadBuffer(CurpageNo),sizeofpagehead);
+	memcpy(&pagehead,buf_ReadBuffer(CurpageNo),sizeofpagehead);
 	OffsetInPage preoffset,curoffset;
 	long currecordpos,curoffsetpos;
 	for(int i=0;i<pagenum;i++){
@@ -84,11 +85,11 @@ void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
 			}
 			CurpageNo = pagehead.nextPageNo;
 			
-			memcpy(&pagehead,BufMgr.ReadBuffer(CurpageNo),sizeofpagehead);
+			memcpy(&pagehead,buf_ReadBuffer(CurpageNo),sizeofpagehead);
 			continue;	
 		}
 		else{
-			memcpy(&preoffset,BufMgr.ReadBuffer(CurpageNo)+sizeofpagehead,sizeofrecord);
+			memcpy(&preoffset,buf_ReadBuffer(CurpageNo)+sizeofpagehead,sizeofrecord);
 			isfound = true;
 			if(pagehead.recordNum==0){
 				curoffset.recordID = 0;
@@ -99,7 +100,7 @@ void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
 				
 			}
 			else{
-				memcpy(&preoffset,BufMgr.ReadBuffer(CurpageNo)+sizeofpagehead+(pagehead.recordNum-1)*sizeof,sizeofrecord);
+				memcpy(&preoffset,buf_ReadBuffer(CurpageNo)+sizeofpagehead+(pagehead.recordNum-1)*sizeof,sizeofrecord);
 				curoffset.recordID = pagehead.recordNum;
 				curoffset.offset = preoffset.offset+length;
 				curoffset.isDeleted = false;
@@ -111,9 +112,9 @@ void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
 		}
 		pagehead.recordNum++;
 		pagehead.freeSpace=pagehead.freeSpace-length;
-		memcpy(BufMgr.ReadBuffer(CurpageNo),&pagehead,sizeofpagehead);
-		memcpy(BufMgr.ReadBuffer(CurpageNo)+currecordpos,&curoffset,sizeofrecord);
-		memcpy(BufMgr.ReadBuffer(CurpageNo)+curoffsetpos,str,length);
+		memcpy(buf_ReadBuffer(CurpageNo),&pagehead,sizeofpagehead);
+		memcpy(buf_ReadBuffer(CurpageNo)+currecordpos,&curoffset,sizeofrecord);
+		memcpy(buf_ReadBuffer(CurpageNo)+curoffsetpos,str,length);
 		
 		break;
 	}
@@ -133,12 +134,12 @@ void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
 			curoffset.offset = length;
 			curoffset.isDeleted = false;
 			
-			memcpy(BufMgr.ReadBuffer(CurpageNo),&pagemeta,sizeofpagehead);
-			memcpy(BufMgr.ReadBuffer(CurpageNo)+currecordpos,&curoffset,sizeofrecord);
-			memcpy(BufMgr.ReadBuffer(CurpageNo)+curoffsetpos,str,length);
+			memcpy(buf_ReadBuffer(CurpageNo),&pagemeta,sizeofpagehead);
+			memcpy(buf_ReadBuffer(CurpageNo)+currecordpos,&curoffset,sizeofrecord);
+			memcpy(buf_ReadBuffer(CurpageNo)+curoffsetpos,str,length);
 			
 			
-			memcpy(BufMgr.ReadBuffer(CurpageNo),&pagehead,sizeofpagehead);
+			memcpy(buf_ReadBuffer(CurpageNo),&pagehead,sizeofpagehead);
 			
 		}
 		
@@ -162,7 +163,7 @@ void file_readFile(struct Storage *DB,int FileID,char *str){
 	struct PageMeta pagehead;
 	for(i=0;i<pagenum;i++){
 		
-		memcpy(&pagehead,BufMgr.ReadBuffer(CurpageNo),sizeofpagehead);
+		memcpy(&pagehead,buf_ReadBuffer(CurpageNo),sizeofpagehead);
 		printf("第%d号文件中的第%d个页面\n",FileID,i+1);
 		printf("页号：%ld\n",pagehead.pageNo);
 		printf("前继页号：%ld\n",pagehead.prePageNo);
@@ -173,18 +174,18 @@ void file_readFile(struct Storage *DB,int FileID,char *str){
 			for(int j=0;j<pagehead.recordNum;j++){
 				int readlength;
 				if(j==0){
-					memcpy(&curoffset,BufMgr.ReadBuffer(CurpageNo)+sizeofpagehead,sizeofrecord);
+					memcpy(&curoffset,buf_ReadBuffer(CurpageNo)+sizeofpagehead,sizeofrecord);
 					readlength = curoffset.offset;
-					memcpy(str,BufMgr.ReadBuffer(CurpageNo)+PAGE_SIZE-curoffset.offset,readlength);
+					memcpy(str,buf_ReadBuffer(CurpageNo)+PAGE_SIZE-curoffset.offset,readlength);
 					str[readlength] = '\0';
 					printf("该页面中第%d记录\n",j+1);
 					printf("%s\n",str);
 				}
 				else{
 					preoffset = curoffset;
-					memcpy(&curoffset,BufMgr.ReadBuffer(CurpageNo)+sizeofpagehead+sizeofrecord*j,sizeofrecord);
+					memcpy(&curoffset,buf_ReadBuffer(CurpageNo)+sizeofpagehead+sizeofrecord*j,sizeofrecord);
 					readlength = curoffset.offset-preoffset.offset;
-					memcpy(str,BufMgr.ReadBuffer(CurpageNo)+PAGE_SIZE-curoffset.offset,readlength);
+					memcpy(str,buf_ReadBuffer(CurpageNo)+PAGE_SIZE-curoffset.offset,readlength);
 					str[readlength] = '\0';
 					printf("该页面中第%d记录\n",j+1);
 					printf("%s\n",str);
