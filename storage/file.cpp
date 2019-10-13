@@ -16,6 +16,7 @@ int file_newFile(struct Storage *DB,int type, long NeededPageNum){
 		int i,j;
 		for(i=0,j =NewPages;i<NeededPageNum,j<(DB->dbMeta.blockNum);i++,j++){
 			struct PageMeta pagemeta;
+			pagemeta.recordNum = 0;
 			pagemeta.pageNo = j;
 			if(i==0){
 				pagemeta.prePageNo=-1;//-1表示没有前页
