@@ -28,11 +28,13 @@ int main(int argc, char* argv[])
 	char buff[1000];
 	FILE *fp = fopen(tupleFile, "rb");
 	
+	int count = 0;
 	while(NULL != fgets(buff, 1000, fp))
 	{
 		strtok(buff, "\n");//使用换行符分割，相当于去掉换行符
 		//char *str = strtok(buff, "|");//使用|分割
 		recordInsert(&DB, sup_dictID, buff);
+		printf("num:%d\n", count++);
 		//printf("%s\n", buff);
 	}
 	// int fileID = file_createFile(&dbMeta, TABLE_FILE, 1);

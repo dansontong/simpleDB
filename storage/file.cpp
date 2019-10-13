@@ -32,6 +32,7 @@ int file_newFile(struct Storage *DB,int type, long NeededPageNum){
 					pagemeta.nextPageNo = j+1;
 				}
 			}
+			pagemeta.freeSpace = PAGE_SIZE - sizeof(pagemeta);
 			rewind(DB->dbFile);
 			fseek(DB->dbFile,DB->dbMeta.dataAddr+pagemeta.pageNo*PAGE_SIZE,SEEK_SET);
 			fwrite(&pagemeta,sizeof(pagemeta),1,DB->dbFile);
@@ -81,9 +82,9 @@ void file_writeFile(struct Storage *DB, int FileID, int length,char *str){
 	OffsetInPage preoffset,curoffset;
 	long currecordpos,curoffsetpos;
 	
-	log_Info("begin file_writeFile.");
 	for(int i=0;i<pagenum;i++){
 		if(pagehead.freeSpace<=length+sizeofrecord){
+	log_Info("begin file_writeFile.");
 			if(pagehead.nextPageNo==-1){
 				break;
 			}
@@ -93,6 +94,7 @@ void file_writeFile(struct Storage *DB, int FileID, int length,char *str){
 			continue;	
 		}
 		else{
+	log_Info("begin file_writeFile1.");
 			memcpy(&preoffset,Buf_ReadBuffer(buftag)+sizeofpagehead,sizeofrecord);
 			isfound = true;
 			if(pagehead.recordNum==0){
@@ -104,25 +106,29 @@ void file_writeFile(struct Storage *DB, int FileID, int length,char *str){
 				
 			}
 			else{
+	log_Info("begin file_writeFile2.");
 				memcpy(&preoffset,Buf_ReadBuffer(buftag)+sizeofpagehead+(pagehead.recordNum-1)*sizeofrecord,sizeofrecord);
 				curoffset.recordID = pagehead.recordNum;
 				curoffset.offset = preoffset.offset+length;
 				curoffset.isDeleted = false;
 				currecordpos = sizeofpagehead + sizeofrecord*pagehead.recordNum;
 				curoffsetpos = PAGE_SIZE - preoffset.offset-length;
+	log_Info("begin file_writeFile2. end");
 				
 			}
 			
 		}
 		pagehead.recordNum++;
-		pagehead.freeSpace=pagehead.freeSpace-length;
+		pagehead.freeSpace=pagehead.freeSpace-length-sizeofrecord;
 		memcpy(Buf_ReadBuffer(buftag),&pagehead,sizeofpagehead);
 		memcpy(Buf_ReadBuffer(buftag)+currecordpos,&curoffset,sizeofrecord);
 		memcpy(Buf_ReadBuffer(buftag)+curoffsetpos,str,length);
 		
+	log_Info("begin file_writeFile3.");
 		break;
 	}
 	if(!isfound){
+	log_Info("begin file_writeFile4.");
 		long pagenumber = page_requestPage(DB,1);
 		if(pagenumber>=0){
 			struct PageMeta pagemeta;
