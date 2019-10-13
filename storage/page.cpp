@@ -5,7 +5,7 @@
  int page_isEmpty(unsigned long bit_map,int position)
  {
 	unsigned long result = 0x00000001;
-	result = result<<(32-position);
+	result = result<<(SIZE_OF_LONG-position);
 	result = result & bit_map;
 	if (result == 0) {
 		return 0;
@@ -18,14 +18,14 @@
 void page_setbitmap(unsigned long *bit_map,int position,int value)
 {
 	if(value!=0&&value!=1){
-		printf("value的值不符合规则!/n");
+		printf("value的值不符合规则!，只能是0或1。/n");
 		return ;
 	}
 	if(value==page_isEmpty(*bit_map,position)){
 		return;
 	}
 	unsigned long  result = 0x00000001;
-	result = result<<(32-position);
+	result = result<<(SIZE_OF_LONG-position);
 	if(value==1){
 		*bit_map = result+*bit_map;
 	}

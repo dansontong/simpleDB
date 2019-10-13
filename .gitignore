@@ -4,6 +4,7 @@ main
 test_log
 storage_d
 storage_r
+*_test
 
 # db file
 simpleDb

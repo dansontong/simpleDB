@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-pthread_mutex_t* mutex_log;
+pthread_mutex_t* mutex_log = NULL;
 const char LogLevelText[6][10]={"FATAL","ERROR","WARN","INFO","DEBUG","ALL"};
 LOGLEVEL logLevelSet = INFO;//设置日志记录级别，高于该级别则输出,0为最高级,可在其他文件重新赋值
 bool log_stdout = false; //写入日志的同时，是否也输出到屏幕
@@ -10,6 +10,10 @@ bool log_stdout = false; //写入日志的同时，是否也输出到屏幕
 //创建共享的mutex, 实现多进程互斥访问log文件
 void initMutex(void)
 {
+    if(mutex_log != NULL)//说明已经初始化过了，不用再执行。该函数可能被多个模块调用，需要防止多次执行
+    {
+        return;
+    }
     int ret;
     //g_mutex一定要是进程间可以共享的，否则无法达到进程间互斥
     mutex_log=(pthread_mutex_t*)mmap(NULL,sizeof(pthread_mutex_t),PROT_READ|PROT_WRITE,MAP_SHARED|MAP_ANONYMOUS,-1,0);
@@ -31,6 +35,7 @@ void initMutex(void)
         exit(1);
     }
     pthread_mutex_init(mutex_log, &attr);
+    //printf("init mutex done.\n");
 }
 
 //设定时间
