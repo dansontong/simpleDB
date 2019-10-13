@@ -12,7 +12,7 @@
 #include <string.h>
 
 // log文件路径
-#define logFilePath "./DBrun.log"
+#define logFilePath "../data/DBrun.log"
 
 typedef enum
 {

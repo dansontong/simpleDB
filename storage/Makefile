@@ -1,6 +1,7 @@
 #不生成.o文件，一步到位得到可执行文件
 cc = g++
 target = storage
+INCLUDE = -I ../log
 ver = debug
 ifeq ($(ver), debug)
 # ALL: storage_d
@@ -12,10 +13,10 @@ target = storage_r
 CXXFLAGS = -pthread -O3
 endif
 
-head = $(shell find ./ -name "*.h")
-src = $(shell find ./ -name "*.cpp")
+head = $(shell find ../log ./ -name "*.h")
+src = $(shell find ../log ./ -name "*.cpp")
 
 $(target): $(src)
-	$(cc) $(CXXFLAGS) $^ -o $(target)
-	./$(target)
-	rm $(target)
+	$(cc) $(CXXFLAGS) $(INCLUDE) $^ -o $(target)
+	# ./$(target)
+	# rm $(target)

@@ -1,2 +1,19 @@
 # compiled object
 *.so
+main
+test_log
+storage_d
+storage_r
+
+# db file
+simpleDb
+
+# log file
+*.log
+
+# ignore itself
+.gitignore
+
+# data file
+supplier.tbl
+table_list
