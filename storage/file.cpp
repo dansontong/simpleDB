@@ -1,6 +1,7 @@
 #include "file.h"
 #include "storage.h"
 #include "buffer.h"
+#include "log.h"
 
 //-1表示文件创建失败
 int file_newFile(struct Storage *DB,int type, long NeededPageNum){
@@ -30,9 +31,9 @@ int file_newFile(struct Storage *DB,int type, long NeededPageNum){
 					pagemeta.nextPageNo = j+1;
 				}
 			}
-			rewind(DB->dataPath);
-			fseek(DB->dataPath,DB->dbMeta.dataAddr+pagemeta.pageNo*PAGE_SIZE,SEEK_SET);
-			fwrite(&pagemeta,sizeof(pagemeta),1,DB->dataPath);
+			rewind(DB->dbFile);
+			fseek(DB->dbFile,DB->dbMeta.dataAddr+pagemeta.pageNo*PAGE_SIZE,SEEK_SET);
+			fwrite(&pagemeta,sizeof(pagemeta),1,DB->dbFile);
 		}
 		for( i = 0;i<MAX_FILE_NUM;i++){
 			if(DB->dbMeta.fileMeta[0].segList[i].id<0){
@@ -42,8 +43,7 @@ int file_newFile(struct Storage *DB,int type, long NeededPageNum){
 		DB->dbMeta.fileMeta[0].segList[i].id=id;
 		DB->dbMeta.fileMeta[0].segList[i].type=type;
 		DB->dbMeta.fileMeta[0].segList[i].firstPageNo=NewPages;
-		DB->dbMeta.fileMeta[0].segList[i].pageNum=NeededPageNum;
-		
+		DB->dbMeta.fileMeta[0].segList[i].pageNum=NeededPageNum;		
 		
 	}
 	else{
@@ -54,7 +54,7 @@ int file_newFile(struct Storage *DB,int type, long NeededPageNum){
 	
 }
 
-void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
+void file_writeFile(struct Storage *DB, int FileID, int length,char *str){
 	int querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){
@@ -72,13 +72,15 @@ void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
 	long pagenum = DB->dbMeta.fileMeta[0].segList[i].pageNum;
 	int sizeofpagehead = sizeof(struct PageMeta);
 	int sizeofrecord = sizeof(struct OffsetInPage);
-	rewind(DB->dataPath);
+	rewind(DB->dbFile);
 	bool isfound = false;
 	struct PageMeta pagehead;
 	struct BufTag buftag = Buf_GenerateTag(CurpageNo);
 	memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);
 	OffsetInPage preoffset,curoffset;
 	long currecordpos,curoffsetpos;
+	
+	log_Info("begin file_writeFile.");
 	for(int i=0;i<pagenum;i++){
 		if(pagehead.freeSpace<=length+sizeofrecord){
 			if(pagehead.nextPageNo==-1){
@@ -218,9 +220,9 @@ void deleteFile(struct Storage *DB,int FileID){
 	long nextPage = -1;
 	struct PageMeta pagehead;
 	for(long j=0;j<pagenum;j++){
-		rewind(DB->dataPath);
-		fseek(DB->dataPath,pageAddr,SEEK_SET);
-		fread(&pagehead,sizeofpagehead,1,DB->dataPath);
+		rewind(DB->dbFile);
+		fseek(DB->dbFile,pageAddr,SEEK_SET);
+		fread(&pagehead,sizeofpagehead,1,DB->dbFile);
 		nextPage = pagehead.nextPageNo;
 		page_recove_onepage(DB,pagehead.pageNo);
 		if(nextPage>0){
@@ -239,12 +241,12 @@ void deleteFile(struct Storage *DB,int FileID){
 	
 }
 void file_read_sd(struct Storage *DB,long pageno,char *bufferpath){
-	rewind(DB->dataPath);
-	fseek(DB->dataPath,DB->dbMeta.dataAddr+pageno*PAGE_SIZE,SEEK_SET);
-	fread(bufferpath,PAGE_SIZE,1,DB->dataPath);
+	rewind(DB->dbFile);
+	fseek(DB->dbFile,DB->dbMeta.dataAddr+pageno*PAGE_SIZE,SEEK_SET);
+	fread(bufferpath,PAGE_SIZE,1,DB->dbFile);
 }
 void file_write_sd(struct Storage *DB,long pageno,char *bufferpath){
-	rewind(DB->dataPath);
-	fseek(DB->dataPath,DB->dbMeta.dataAddr+pageno*PAGE_SIZE,SEEK_SET);
-	fwrite(bufferpath,PAGE_SIZE,1,DB->dataPath);
+	rewind(DB->dbFile);
+	fseek(DB->dbFile,DB->dbMeta.dataAddr+pageno*PAGE_SIZE,SEEK_SET);
+	fwrite(bufferpath,PAGE_SIZE,1,DB->dbFile);
 }
