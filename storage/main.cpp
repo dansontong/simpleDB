@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
 
 	log_init();//初始化日志系统
 	storage_initDB(&DB, dbFile);
-	Buf_Init();
+	Buf_Init(&DB);
 
 	log_Debug("DB initial done.\n");
 
