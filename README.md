@@ -10,8 +10,8 @@ problem:
 
 
 模块分工：  
-1, 缓冲相关:马纳波, 包括buffer.h/cpp  
-2, 段页式文件管理：韩瑞琛，包括file.h/cpp, page.h/cpp, segment.h/cpp  
-3, 存储管理之其他：唐鑫桂，包括storage.h/cpp, config.h  
-4, 日志系统：唐鑫桂, 包括log文件夹  
-5, 查询编译器parser：唐鑫桂（来自github）,parser文件夹  
+1, 缓冲相关:mnb, 包括buffer.h/cpp  
+2, 段页式文件管理：hrc，包括file.h/cpp, page.h/cpp, segment.h/cpp  
+3, 存储管理之其他：txg，包括storage.h/cpp, config.h  
+4, 日志系统：txg, 包括log文件夹  
+5, 查询编译器parser：txg（来自github）,parser文件夹  
