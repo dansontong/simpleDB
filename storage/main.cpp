@@ -6,11 +6,10 @@
 int main(int argc, char* argv[])
 {
 	//初始化数据库
-	log_init();//初始化日志系统
-	log_Info("logging test success!, this is a Info.");
 	Storage DB;
 	char dbFile[30] = "./simpleDb";
 
+	log_init();//初始化日志系统
 	storage_initDB(&DB, dbFile);
 	Buf_Init();
 
