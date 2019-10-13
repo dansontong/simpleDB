@@ -25,7 +25,7 @@ typedef enum
 }LOGLEVEL;
 
 /*
- * 对外函数接口 log_init log_Error log_Warn log_Info log_Debug
+ * 对外函数接口 log_init log_Error log_Warn log_Info log_Debug Log
  */
 void log_init(void);
 
@@ -38,4 +38,5 @@ void log_Info(const char *string);
 void log_Debug(const char *string);
 
 void Log(LOGLEVEL logLevel, const char *fmt, ...);
+
 #endif
