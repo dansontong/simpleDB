@@ -37,4 +37,5 @@ void log_Info(const char *string);
 
 void log_Debug(const char *string);
 
+void Log(LOGLEVEL logLevel, const char *fmt, ...);
 #endif

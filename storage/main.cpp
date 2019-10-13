@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 		strtok(buff, "\n");//使用换行符分割，相当于去掉换行符
 		//char *str = strtok(buff, "|");//使用|分割
 		recordInsert(&DB, sup_dictID, buff);
-		printf("num:%d\n", count++);
+		printf("insert line No.%d\n", count++);
 		//printf("%s\n", buff);
 	}
 		storage_showDbInfo(&DB);

@@ -1,8 +1,11 @@
 #include "log.h"
+#include <stdio.h>
+#include <stdarg.h>
 
 pthread_mutex_t* mutex_log;
 const char LogLevelText[6][10]={"FATAL","ERROR","WARN","INFO","DEBUG","ALL"};
 LOGLEVEL logLevelSet = INFO;//设置日志记录级别，高于该级别则输出,0为最高级,可在其他文件重新赋值
+bool log_stdout = false; //写入日志的同时，是否也输出到屏幕
 
 //创建共享的mutex, 实现多进程互斥访问log文件
 void initMutex(void)
@@ -76,7 +79,11 @@ void LogWrite(LOGLEVEL logLevel, const char *string)
     {
         return;
     }
-    printf("%s\n",string);
+    //写入日志的同时，是否也输出到屏幕
+    if(log_stdout)
+    {
+        printf("%s\n",string);
+    }
     //printf("pthread_mutex_lock begin. \n");
     int ret = pthread_mutex_lock(mutex_log); //lock. //[为支持多线程需要加锁] 
     if( ret!=0 )
@@ -94,9 +101,86 @@ void LogWrite(LOGLEVEL logLevel, const char *string)
     }
 }
 
+// 自定义函数，实现类似printf的功能，但这个只能直接写入文件，不能转为string，最终实现目的靠log()
+void print_stdout(const char *fmt, ...)
+{
+    va_list argp;
+    //fprintf(stderr, "error: ");
+    va_start(argp, fmt);
+    vfprintf(stdout, fmt, argp);
+    va_end(argp);
+    fprintf(stdout, "\n");
+}
+
 /*
- * 对外函数接口 log_init log_Error log_Warn log_Info log_Debug
+ * 对外函数接口 log_init log_Error log_Warn log_Info log_Debug Log
  */
+
+void Log(LOGLEVEL logLevel, const char *fmt, ...)
+{
+
+    FILE * fd = NULL;
+    char headStr[1024];
+    char tmp[256];
+
+    //判断是否需要写LOG
+    if (logLevel > logLevelSet)
+    {
+        return;
+    }
+    //写入日志的同时，是否也输出到屏幕
+    if(log_stdout)
+    {
+        va_list argp;
+        va_start(argp, fmt);
+        vfprintf(stdout, fmt, argp);
+        va_end(argp);
+        fprintf(stdout, "\n");
+    }
+
+    //printf("pthread_mutex_lock begin. \n");
+    int ret = pthread_mutex_lock(mutex_log); //lock. //[为支持多线程需要加锁] 
+    if( ret!=0 )
+    {
+        perror("LogFile pthread_mutex_lock");  
+    }
+    //printf("logwrite begin. \n");
+    //打印日志信息
+    //使用追加方式打开文件
+    fd = fopen(logFilePath,"a+");
+    if(fd == NULL)
+    {
+        printf("log file open failed.\n");
+        return;
+    }
+    memset(headStr, 0, sizeof(headStr));
+    memset(tmp, 0,sizeof(tmp));
+    
+    sprintf(tmp, "%s-[pid=%d][", LogLevelText[logLevel], getpid());
+    strcpy(headStr, tmp);
+    
+    memset(tmp, 0, sizeof(tmp));
+    settime(tmp);
+    strcat(headStr, tmp);
+    fprintf(fd, "%s]:", headStr);
+
+    va_list argp;
+    va_start(argp, fmt);
+    vfprintf(fd, fmt, argp);
+    va_end(argp);
+
+    fprintf(fd, "\n");
+    fclose(fd);
+
+
+    ret = pthread_mutex_unlock(mutex_log); //unlock. //[为支持多线程需要加锁] 
+    if( ret!=0 )
+    {
+        perror("LogFile pthread_mutex_unlock");  
+    }
+
+}
+
 void log_init(void)
 {
     initMutex();//初始化多进程信号量，实现log文件互斥访问。为以后多进程做准备
