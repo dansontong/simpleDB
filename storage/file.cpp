@@ -57,29 +57,30 @@ int file_newFile(struct Storage *DB,int type, long NeededPageNum){
 void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
 	int querypage=-1;
 	int i;
-	for( i=0;i<MAX_FILE_NUM;i++){
-		if(DB->dbMeta.fileMeta[0].segList[i].id==FileID){
-			querypage=DB->dbMeta.fileMeta[0].segList[i].firstPageNo;
-			break;
-		}
+	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
+		if(DB->dbMeta.fileMeta[0].segList[i].id==FileID){						//
+			querypage=DB->dbMeta.fileMeta[0].segList[i].firstPageNo;			//
+			break;																//
+		}																		//
 	}
 	if(querypage==-1){
 		printf("该文件id对应的文件不存在！");
 		exit(0);
 	}
 
-	long CurpageNo = DB->dbMeta.fileMeta[0].segList[i].firstPageNo;
+	long CurpageNo = DB->dbMeta.fileMeta[0].segList[i].firstPageNo;				
 	long pagenum = DB->dbMeta.fileMeta[0].segList[i].pageNum;
+	int fileno = i;
 	int sizeofpagehead = sizeof(struct PageMeta);
-	int sizeofrecord = sizeof(struct OffsetInPage);
-	rewind(DB->dataPath);
+	int sizeofrecord = sizeof(struct OffsetInPage);									//读取该文件的信息
+	rewind(DB->dataPath);					
 	bool isfound = false;
 	struct PageMeta pagehead;
 	struct BufTag buftag = Buf_GenerateTag(CurpageNo);
-	memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);
-	OffsetInPage preoffset,curoffset;
-	long currecordpos,curoffsetpos;
-	for(int i=0;i<pagenum;i++){
+	memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);						//读取第一页的内容并存放在pagehead里
+	OffsetInPage preoffset,curoffset;							//页里的记录索引的结构体，定义在paga.h里
+	long currecordpos,curoffsetpos;								//前一个是指当前记录索引的位置，第二个是指当前记录的位置
+	for(int i=0;i<pagenum;i++){									//该循环是为了遍历所有的页找出能存放该记录的页
 		if(pagehead.freeSpace<=length+sizeofrecord){
 			if(pagehead.nextPageNo==-1){
 				break;
@@ -99,6 +100,7 @@ void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
 				currecordpos = sizeofpagehead;
 				curoffsetpos =  PAGE_SIZE - length;
 				
+				
 			}
 			else{
 				memcpy(&preoffset,Buf_ReadBuffer(buftag)+sizeofpagehead+(pagehead.recordNum-1)*sizeofrecord,sizeofrecord);
@@ -117,16 +119,16 @@ void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
 		memcpy(Buf_ReadBuffer(buftag)+currecordpos,&curoffset,sizeofrecord);
 		memcpy(Buf_ReadBuffer(buftag)+curoffsetpos,str,length);
 		
-		break;
+		break;						//找到后就break
 	}
-	if(!isfound){
+	if(!isfound){					//若遍历完没有页就新申请一个页。
 		long pagenumber = page_requestPage(DB,1);
-		if(pagenumber>=0){
-			struct PageMeta pagemeta;
+		if(pagenumber>=0){									
+			struct PageMeta pagemeta; //pagehead就是未申请前最后一个页
 			pagemeta.nextPageNo=-1;
-			pagemeta.prePageNo=pagehead.pageNo;
+			pagemeta.prePageNo=pagehead.pageNo;				
 			pagemeta.pageNo=pagenumber;
-			pagehead.nextPageNo = pagenumber;
+			pagehead.nextPageNo = pagenumber;		//将这页加在这个文件中				
 			pagemeta.recordNum = 1;
 			pagemeta.freeSpace = PAGE_SIZE - length - sizeofpagehead - sizeofrecord;
 			curoffsetpos = PAGE_SIZE-length;
@@ -141,6 +143,7 @@ void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
 			
 			
 			memcpy(Buf_ReadBuffer(buftag),&pagehead,sizeofpagehead);
+			DB->dbMeta.fileMeta[0].segList[fileno].pageNum++;
 			
 		}
 		
@@ -149,7 +152,7 @@ void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
 	}
 	
 }
-void readFile(struct Storage *DB,int FileID,char *str){
+void file_readFile(struct Storage *DB,int FileID,char *str){
 	int i;
 	for(i=0;i<MAX_FILE_NUM;i++){
 		if(DB->dbMeta.fileMeta[0].segList[i].id==FileID){
@@ -203,7 +206,7 @@ void readFile(struct Storage *DB,int FileID,char *str){
 	}
 }
 
-void deleteFile(struct Storage *DB,int FileID){
+void file_deleteFile(struct Storage *DB,int FileID){
 	int i;
 	for(i=0;i<MAX_FILE_NUM;i++){
 		if(DB->dbMeta.fileMeta[0].segList[i].id==FileID){
