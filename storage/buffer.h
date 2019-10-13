@@ -2,7 +2,6 @@
 #define STORAGE_BUFFER_H
 
 #include "config.h"
-#include "storage.h"
 
 #define BUF_FREE_END -1		   // free list内指针的空值
 #define BUF_FREE_LIST_EMPTY -1 // free list的头指针为空的情况
