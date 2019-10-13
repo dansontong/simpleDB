@@ -1,41 +1,8 @@
-#ifndef LOG_H_INCLUDE
-#define LOG_H_INCLUDE
-
-// #include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <pthread.h>
-#include <time.h>
-#include <string.h>
-
-// log文件路径
-#define logFilePath "./DBrun.log"
-
-typedef enum
-{
-    FATAL=0,
-    ERROR=1,
-    WARN=2,
-    INFO=3,
-    DEBUG=4,
-    ALL=5
-}LOGLEVEL;
-
-const static char LogLevelText[6][10]={"FATAL","ERROR","WARN","INFO","DEBUG","ALL"};
+#include "log.h"
 
 pthread_mutex_t* mutex_log;
-static LOGLEVEL logLevelSet = INFO;//设置日志记录级别，高于该级别则输出,0为最高级
-
-//设定时间
-static char * settime(char * time_s)
-{
-    time_t timer=time(NULL);
-    strftime(time_s, 20, "%Y-%m-%d %H:%M:%S",localtime(&timer));
-    return time_s;
-}
+const char LogLevelText[6][10]={"FATAL","ERROR","WARN","INFO","DEBUG","ALL"};
+LOGLEVEL logLevelSet = INFO;//设置日志记录级别，高于该级别则输出,0为最高级,可在其他文件重新赋值
 
 //创建共享的mutex, 实现多进程互斥访问log文件
 void initMutex(void)
@@ -63,9 +30,15 @@ void initMutex(void)
     pthread_mutex_init(mutex_log, &attr);
 }
 
-/*
- *打印
- * */
+//设定时间
+static char * settime(char * time_s)
+{
+    time_t timer=time(NULL);
+    strftime(time_s, 20, "%Y-%m-%d %H:%M:%S",localtime(&timer));
+    return time_s;
+}
+
+//打印
 static int PrintfLog(LOGLEVEL logLevel, const char *string)
 {
     FILE * fd = NULL;
@@ -127,6 +100,7 @@ void LogWrite(LOGLEVEL logLevel, const char *string)
 void log_init(void)
 {
     initMutex();//初始化多进程信号量，实现log文件互斥访问。为以后多进程做准备
+    printf("log_init done.\n");
 }
 
 void log_Error(const char *string)
@@ -148,5 +122,3 @@ void log_Debug(const char *string)
 {
     LogWrite(DEBUG, string);
 }
-
-#endif

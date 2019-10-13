@@ -1,6 +1,7 @@
 #include "file.h"
 #include "storage.h"
 #include "buffer.h"
+#include "log.h"
 
 //-1表示文件创建失败
 int file_newFile(struct Storage *DB,int type, long NeededPageNum){
@@ -15,6 +16,7 @@ int file_newFile(struct Storage *DB,int type, long NeededPageNum){
 		int i,j;
 		for(i=0,j =NewPages;i<NeededPageNum,j<(DB->dbMeta.blockNum);i++,j++){
 			struct PageMeta pagemeta;
+			pagemeta.recordNum = 0;
 			pagemeta.pageNo = j;
 			if(i==0){
 				pagemeta.prePageNo=-1;//-1表示没有前页
@@ -30,9 +32,10 @@ int file_newFile(struct Storage *DB,int type, long NeededPageNum){
 					pagemeta.nextPageNo = j+1;
 				}
 			}
-			rewind(DB->dataPath);
-			fseek(DB->dataPath,DB->dbMeta.dataAddr+pagemeta.pageNo*PAGE_SIZE,SEEK_SET);
-			fwrite(&pagemeta,sizeof(pagemeta),1,DB->dataPath);
+			pagemeta.freeSpace = PAGE_SIZE - sizeof(pagemeta);
+			rewind(DB->dbFile);
+			fseek(DB->dbFile,DB->dbMeta.dataAddr+pagemeta.pageNo*PAGE_SIZE,SEEK_SET);
+			fwrite(&pagemeta,sizeof(pagemeta),1,DB->dbFile);
 		}
 		for( i = 0;i<MAX_FILE_NUM;i++){
 			if(DB->dbMeta.fileMeta[0].segList[i].id<0){
@@ -42,8 +45,7 @@ int file_newFile(struct Storage *DB,int type, long NeededPageNum){
 		DB->dbMeta.fileMeta[0].segList[i].id=id;
 		DB->dbMeta.fileMeta[0].segList[i].type=type;
 		DB->dbMeta.fileMeta[0].segList[i].firstPageNo=NewPages;
-		DB->dbMeta.fileMeta[0].segList[i].pageNum=NeededPageNum;
-		
+		DB->dbMeta.fileMeta[0].segList[i].pageNum=NeededPageNum;		
 		
 	}
 	else{
@@ -54,7 +56,7 @@ int file_newFile(struct Storage *DB,int type, long NeededPageNum){
 	
 }
 
-void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
+void file_writeFile(struct Storage *DB, int FileID, int length,char *str){
 	int querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
@@ -109,16 +111,14 @@ void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
 				curoffset.isDeleted = false;
 				currecordpos = sizeofpagehead + sizeofrecord*pagehead.recordNum;
 				curoffsetpos = PAGE_SIZE - preoffset.offset-length;
-				
 			}
 			
 		}
 		pagehead.recordNum++;
-		pagehead.freeSpace=pagehead.freeSpace-length;
+		pagehead.freeSpace=pagehead.freeSpace-length-sizeofrecord;
 		memcpy(Buf_ReadBuffer(buftag),&pagehead,sizeofpagehead);
 		memcpy(Buf_ReadBuffer(buftag)+currecordpos,&curoffset,sizeofrecord);
 		memcpy(Buf_ReadBuffer(buftag)+curoffsetpos,str,length);
-		
 		break;						//找到后就break
 	}
 	if(!isfound){					//若遍历完没有页就新申请一个页。
@@ -140,15 +140,10 @@ void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
 			memcpy(Buf_ReadBuffer(buftag),&pagemeta,sizeofpagehead);
 			memcpy(Buf_ReadBuffer(buftag)+currecordpos,&curoffset,sizeofrecord);
 			memcpy(Buf_ReadBuffer(buftag)+curoffsetpos,str,length);
-			
-			
 			memcpy(Buf_ReadBuffer(buftag),&pagehead,sizeofpagehead);
+
 			DB->dbMeta.fileMeta[0].segList[fileno].pageNum++;
-			
 		}
-		
-		
-		
 	}
 	
 }
@@ -242,12 +237,12 @@ void file_deleteFile(struct Storage *DB,int FileID){
 	
 }
 void file_read_sd(struct Storage *DB,long pageno,char *bufferpath){
-	rewind(DB->dataPath);
-	fseek(DB->dataPath,DB->dbMeta.dataAddr+pageno*PAGE_SIZE,SEEK_SET);
-	fread(bufferpath,PAGE_SIZE,1,DB->dataPath);
+	rewind(DB->dbFile);
+	fseek(DB->dbFile,DB->dbMeta.dataAddr+pageno*PAGE_SIZE,SEEK_SET);
+	fread(bufferpath,PAGE_SIZE,1,DB->dbFile);
 }
 void file_write_sd(struct Storage *DB,long pageno,char *bufferpath){
-	rewind(DB->dataPath);
-	fseek(DB->dataPath,DB->dbMeta.dataAddr+pageno*PAGE_SIZE,SEEK_SET);
-	fwrite(bufferpath,PAGE_SIZE,1,DB->dataPath);
+	rewind(DB->dbFile);
+	fseek(DB->dbFile,DB->dbMeta.dataAddr+pageno*PAGE_SIZE,SEEK_SET);
+	fwrite(bufferpath,PAGE_SIZE,1,DB->dbFile);
 }

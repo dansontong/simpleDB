@@ -42,7 +42,7 @@ struct BufPool
 
 // ==================== extern function ====================
 // 缓冲池初始化
-void Buf_Init(void);
+void Buf_Init(struct Storage* db);
 
 // 缓冲池释放
 void Buf_Free(void);
@@ -69,6 +69,7 @@ void Buf_HitBlockById(long bufid);			// 更新bufmeta的调度信息
 void Buf_HitBlockByTag(BufTag btag); 
 char *Buf_ReadBuffer_inner(BufTag btag);
 void Buf_WriteBuffer_inner(BufTag tag, char *data);
+void Buf_ClearBufTag(BufTag* btag);
 void Buf_PrintInfo();			// 打印buffer的信息
 
 // ==================== mem function ====================
