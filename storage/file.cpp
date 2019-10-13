@@ -84,7 +84,6 @@ void file_writeFile(struct Storage *DB, int FileID, int length,char *str){
 	
 	for(int i=0;i<pagenum;i++){
 		if(pagehead.freeSpace<=length+sizeofrecord){
-	log_Info("begin file_writeFile.");
 			if(pagehead.nextPageNo==-1){
 				break;
 			}
@@ -94,7 +93,6 @@ void file_writeFile(struct Storage *DB, int FileID, int length,char *str){
 			continue;	
 		}
 		else{
-	log_Info("begin file_writeFile1.");
 			memcpy(&preoffset,Buf_ReadBuffer(buftag)+sizeofpagehead,sizeofrecord);
 			isfound = true;
 			if(pagehead.recordNum==0){
@@ -106,15 +104,12 @@ void file_writeFile(struct Storage *DB, int FileID, int length,char *str){
 				
 			}
 			else{
-	log_Info("begin file_writeFile2.");
 				memcpy(&preoffset,Buf_ReadBuffer(buftag)+sizeofpagehead+(pagehead.recordNum-1)*sizeofrecord,sizeofrecord);
 				curoffset.recordID = pagehead.recordNum;
 				curoffset.offset = preoffset.offset+length;
 				curoffset.isDeleted = false;
 				currecordpos = sizeofpagehead + sizeofrecord*pagehead.recordNum;
 				curoffsetpos = PAGE_SIZE - preoffset.offset-length;
-	log_Info("begin file_writeFile2. end");
-				
 			}
 			
 		}
@@ -123,12 +118,9 @@ void file_writeFile(struct Storage *DB, int FileID, int length,char *str){
 		memcpy(Buf_ReadBuffer(buftag),&pagehead,sizeofpagehead);
 		memcpy(Buf_ReadBuffer(buftag)+currecordpos,&curoffset,sizeofrecord);
 		memcpy(Buf_ReadBuffer(buftag)+curoffsetpos,str,length);
-		
-	log_Info("begin file_writeFile3.");
 		break;
 	}
 	if(!isfound){
-	log_Info("begin file_writeFile4.");
 		long pagenumber = page_requestPage(DB,1);
 		if(pagenumber>=0){
 			struct PageMeta pagemeta;
@@ -147,14 +139,8 @@ void file_writeFile(struct Storage *DB, int FileID, int length,char *str){
 			memcpy(Buf_ReadBuffer(buftag),&pagemeta,sizeofpagehead);
 			memcpy(Buf_ReadBuffer(buftag)+currecordpos,&curoffset,sizeofrecord);
 			memcpy(Buf_ReadBuffer(buftag)+curoffsetpos,str,length);
-			
-			
 			memcpy(Buf_ReadBuffer(buftag),&pagehead,sizeofpagehead);
-			
 		}
-		
-		
-		
 	}
 	
 }
