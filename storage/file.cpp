@@ -149,7 +149,7 @@ void file_writeFile(struct Storage *DB,int length,char *str,int FileID){
 	}
 	
 }
-void file_readFile(struct Storage *DB,int FileID,char *str){
+void readFile(struct Storage *DB,int FileID,char *str){
 	int i;
 	for(i=0;i<MAX_FILE_NUM;i++){
 		if(DB->dbMeta.fileMeta[0].segList[i].id==FileID){
@@ -203,7 +203,7 @@ void file_readFile(struct Storage *DB,int FileID,char *str){
 	}
 }
 
-void file_deleteFile(struct Storage *DB,int FileID){
+void deleteFile(struct Storage *DB,int FileID){
 	int i;
 	for(i=0;i<MAX_FILE_NUM;i++){
 		if(DB->dbMeta.fileMeta[0].segList[i].id==FileID){

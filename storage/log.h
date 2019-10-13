@@ -82,14 +82,14 @@ static int PrintfLog(LOGLEVEL logLevel, const char *string)
     memset(headStr, 0, sizeof(headStr));
     memset(tmp, 0,sizeof(tmp));
     
-    sprintf(tmp, "***[pid=%d]:[", getpid());
+    sprintf(tmp, "%s-[pid=%d][", LogLevelText[logLevel], getpid());
     strcpy(headStr, tmp);
     
     memset(tmp, 0, sizeof(tmp));
     settime(tmp);
     strcat(headStr, tmp);
 
-    fprintf(fd, "]%s-%s:%s\n", headStr, LogLevelText[logLevel], string);
+    fprintf(fd, "%s]:%s\n", headStr, string);
     fclose(fd);
 }
 
@@ -103,13 +103,14 @@ void LogWrite(LOGLEVEL logLevel, const char *string)
     {
         return;
     }
-    printf("pthread_mutex_lock begin. \n");
+    printf("%s\n",string);
+    //printf("pthread_mutex_lock begin. \n");
     int ret = pthread_mutex_lock(mutex_log); //lock. //[为支持多线程需要加锁] 
     if( ret!=0 )
     {
         perror("LogFile pthread_mutex_lock");  
     }
-    printf("logwrite begin. \n");
+    //printf("logwrite begin. \n");
     //打印日志信息
     PrintfLog(logLevel, string);
 
