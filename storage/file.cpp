@@ -165,9 +165,9 @@ void file_readFile(struct Storage *DB,int FileID,char *str){
 	long CurpageNo = DB->dbMeta.fileMeta[0].segList[i].firstPageNo;
 	OffsetInPage preoffset,curoffset;
 	struct PageMeta pagehead;
-	for(i=0;i<pagenum;i++){
-		struct BufTag buftag = Buf_GenerateTag(CurpageNo);
-		memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);
+	for(i=0;i<pagenum;i++){					
+		struct BufTag buftag = Buf_GenerateTag(CurpageNo);		//根据页号从缓冲区调取页的内容
+		memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);//打印页的基本信息
 		printf("第%d号文件中的第%d个页面\n",FileID,i+1);
 		printf("页号：%ld\n",pagehead.pageNo);
 		printf("前继页号：%ld\n",pagehead.prePageNo);
@@ -177,7 +177,7 @@ void file_readFile(struct Storage *DB,int FileID,char *str){
 		if(pagehead.recordNum>0){
 			for(int j=0;j<pagehead.recordNum;j++){
 				int readlength;
-				if(j==0){
+				if(j==0){																	//打印页的每条记录
 					memcpy(&curoffset,Buf_ReadBuffer(buftag)+sizeofpagehead,sizeofrecord);
 					readlength = curoffset.offset;
 					memcpy(str,Buf_ReadBuffer(buftag)+PAGE_SIZE-curoffset.offset,readlength);
@@ -209,25 +209,25 @@ void file_readFile(struct Storage *DB,int FileID,char *str){
 void file_deleteFile(struct Storage *DB,int FileID){
 	int i;
 	for(i=0;i<MAX_FILE_NUM;i++){
-		if(DB->dbMeta.fileMeta[0].segList[i].id==FileID){
+		if(DB->dbMeta.fileMeta[0].segList[i].id==FileID){			//找到文件对应的页
 			break;
 		}
 	}
-	long pagenum = DB->dbMeta.fileMeta[0].segList[i].pageNum;
+	long pagenum = DB->dbMeta.fileMeta[0].segList[i].pageNum;			//读取第一页的信息
 	long CurpageNo = DB->dbMeta.fileMeta[0].segList[i].firstPageNo;
 	long pageAddr = DB->dbMeta.dataAddr +CurpageNo * PAGE_SIZE;
 	int sizeofpagehead = sizeof(struct PageMeta);
 	int sizeofrecord = sizeof(struct OffsetInPage);
 	long nextPage = -1;
 	struct PageMeta pagehead;
-	for(long j=0;j<pagenum;j++){
+	for(long j=0;j<pagenum;j++){							//遍历每一页
 		rewind(DB->dataPath);
 		fseek(DB->dataPath,pageAddr,SEEK_SET);
-		fread(&pagehead,sizeofpagehead,1,DB->dataPath);
+		fread(&pagehead,sizeofpagehead,1,DB->dataPath);			//读取这一页的内容
 		nextPage = pagehead.nextPageNo;
-		page_recove_onepage(DB,pagehead.pageNo);
+		page_recove_onepage(DB,pagehead.pageNo);				//删除这一页
 		if(nextPage>0){
-			pageAddr = DB->dbMeta.dataAddr +nextPage * PAGE_SIZE;
+			pageAddr = DB->dbMeta.dataAddr +nextPage * PAGE_SIZE;	//获取新的一页的地址
 		}
 		else{
 			break;
