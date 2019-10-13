@@ -7,7 +7,7 @@ int main(int argc, char* argv[])
 {
 	//初始化数据库
 	Storage DB;
-	char dbFile[30] = "./simpleDb";
+	char dbFile[30] = "../data/simpleDb";
 
 	log_init();//初始化日志系统
 	storage_initDB(&DB, dbFile);
@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
 	int sup_dictID = createTable(&DB, tableFile);//后续需要改，要能根据parser解析结果自动创建表,目前只创建supplier表
 
 	//读入数据，插入记录
-	char tupleFile[30] = "./supplier.tbl";
+	char tupleFile[30] = "../data/supplier.tbl";
 	char buff[1000];
 	FILE *fp = fopen(tupleFile, "rb");
 	
