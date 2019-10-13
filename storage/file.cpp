@@ -46,7 +46,7 @@ int file_newFile(struct Storage *DB,int type, long NeededPageNum){
 		DB->dbMeta.fileMeta[0].segList[i].type=type;
 		DB->dbMeta.fileMeta[0].segList[i].firstPageNo=NewPages;
 		DB->dbMeta.fileMeta[0].segList[i].pageNum=NeededPageNum;
-		DB->dbMeta.blockFree=DB->dbMeta.blockFree-1;
+		DB->dbMeta.blockFree=DB->dbMeta.blockFree-NeededPageNum;
 		file_print_freepace(DB);
 		
 	}
