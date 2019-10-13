@@ -37,6 +37,8 @@ int main(int argc, char* argv[])
 		printf("num:%d\n", count++);
 		//printf("%s\n", buff);
 	}
+		storage_showDbInfo(&DB);
+
 	// int fileID = file_createFile(&dbMeta, TABLE_FILE, 1);
 	// printf("创建文件%d成功！\n", fileID);
 	// //int fileID = 0;
