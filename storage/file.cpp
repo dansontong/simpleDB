@@ -75,7 +75,7 @@ void file_writeFile(struct Storage *DB, int FileID, int length,char *str){
 	int fileno = i;
 	int sizeofpagehead = sizeof(struct PageMeta);
 	int sizeofrecord = sizeof(struct OffsetInPage);									//读取该文件的信息
-	rewind(DB->dataPath);					
+	rewind(DB->dbFile);					
 	bool isfound = false;
 	struct PageMeta pagehead;
 	struct BufTag buftag = Buf_GenerateTag(CurpageNo);
@@ -216,9 +216,9 @@ void file_deleteFile(struct Storage *DB,int FileID){
 	long nextPage = -1;
 	struct PageMeta pagehead;
 	for(long j=0;j<pagenum;j++){							//遍历每一页
-		rewind(DB->dataPath);
-		fseek(DB->dataPath,pageAddr,SEEK_SET);
-		fread(&pagehead,sizeofpagehead,1,DB->dataPath);			//读取这一页的内容
+		rewind(DB->dbFile);
+		fseek(DB->dbFile,pageAddr,SEEK_SET);
+		fread(&pagehead,sizeofpagehead,1,DB->dbFile);			//读取这一页的内容
 		nextPage = pagehead.nextPageNo;
 		page_recove_onepage(DB,pagehead.pageNo);				//删除这一页
 		if(nextPage>0){
