@@ -10,6 +10,8 @@
 //文件描述信息
 struct FileMeta{
 	int id;       // 文件号
+	long pageNum;   // 文件页数
+	long firstPageNo;   // 文件段数
 	char name[20];// 文件名,最长20个字符
 	int state;    // 文件状态
 	int segNum;   // 文件段数

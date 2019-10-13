@@ -23,18 +23,12 @@ struct DbMeta{
 	struct FileMeta fileMeta[MAX_FILE_NUM];
 };
 
-// 数据存储信息
-struct Storage{
-	FILE *dataPath;
-	DbMeta dbMeta;
-	BufPool bufPool;
-	unsigned long *freeSpaceBitMap;
-};
-
 struct Attribute{
 	char name[MAX_NAME_LENGTH]; //属性名
 	int length; 
 	DATA_TYPE type;//数据类型
+	int offset; //偏移位置
+	bool notNull;
 };
 
 struct Table{
@@ -42,27 +36,43 @@ struct Table{
 	char tableName[MAX_NAME_LENGTH];   //表名
 	Attribute attr[MAX_ATTRIBUTE_NUM]; //属性列表
 	int attrNum;  //属性个数
-	int recordNum;//记录个数
+	int attrLength;//属性总长度
 };
+
+// 数据存储信息
+struct Storage{
+	FILE *dbFile;
+	DbMeta dbMeta;
+	BufPool bufPool;
+	unsigned long *freeSpaceBitMap;
+	Table dataDict[MAX_FILE_NUM];
+};
+
 
 // ==================== manager function ====================
 // 存储管理
 
 void storage_createDbFile(char *fileName); 
-void storage_initDB(struct Storage *storage, char *fileName);
-void storage_showDbInfo(struct Storage *storage);
-void storage_showSegList(struct Storage *storage, int fileID); 
+void storage_initDB(struct Storage *DB, char *fileName);
+void storage_closeDB(struct Storage *DB);
+void storage_showDbInfo(struct Storage *DB);
+void storage_showSegList(struct Storage *DB, int fileID); 
 
 
 //定时把内存中缓冲区的所有数据写到磁盘
-int storage_memToDisk(struct Storage *storage);
+int storage_memToDisk(struct Storage *DB);
 
 
 // 记录相关
-bool recordInsert(char *str);
+void recordInsert(struct Storage *DB, int dictID, char *str);
 
 
 // 表相关
-bool creatTable(char *str);
+int createTable(struct Storage *DB, char *str);
+void insertAttr(Table *table,const char *name, DATA_TYPE type, int length,bool notNull);
+int getDictIDbyName(char *tableName);
+
+//字典相关
+int readDataDictionary(struct Storage *DB);
 
 #endif
