@@ -43,7 +43,7 @@ struct Table{
 struct Storage{
 	FILE *dbFile;
 	DbMeta dbMeta;
-	BufPool bufPool;
+	//BufPool bufPool;
 	unsigned long *freeSpaceBitMap;
 	Table dataDict[MAX_FILE_NUM];
 };
