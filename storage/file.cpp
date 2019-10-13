@@ -45,7 +45,9 @@ int file_newFile(struct Storage *DB,int type, long NeededPageNum){
 		DB->dbMeta.fileMeta[0].segList[i].id=id;
 		DB->dbMeta.fileMeta[0].segList[i].type=type;
 		DB->dbMeta.fileMeta[0].segList[i].firstPageNo=NewPages;
-		DB->dbMeta.fileMeta[0].segList[i].pageNum=NeededPageNum;		
+		DB->dbMeta.fileMeta[0].segList[i].pageNum=NeededPageNum;
+		DB->dbMeta.blockFree=DB->dbMeta.blockFree-1;
+		file_print_freepace(DB);
 		
 	}
 	else{
@@ -75,7 +77,7 @@ void file_writeFile(struct Storage *DB, int FileID, int length,char *str){
 	int fileno = i;
 	int sizeofpagehead = sizeof(struct PageMeta);
 	int sizeofrecord = sizeof(struct OffsetInPage);									//读取该文件的信息
-	rewind(DB->dataPath);					
+	rewind(DB->dbFile);					
 	bool isfound = false;
 	struct PageMeta pagehead;
 	struct BufTag buftag = Buf_GenerateTag(CurpageNo);
@@ -123,7 +125,9 @@ void file_writeFile(struct Storage *DB, int FileID, int length,char *str){
 	}
 	if(!isfound){					//若遍历完没有页就新申请一个页。
 		long pagenumber = page_requestPage(DB,1);
-		if(pagenumber>=0){									
+		if(pagenumber>=0){
+			DB->dbMeta.blockFree=DB->dbMeta.blockFree-1;
+			file_print_freepace(DB);
 			struct PageMeta pagemeta; //pagehead就是未申请前最后一个页
 			pagemeta.nextPageNo=-1;
 			pagemeta.prePageNo=pagehead.pageNo;				
@@ -216,9 +220,9 @@ void file_deleteFile(struct Storage *DB,int FileID){
 	long nextPage = -1;
 	struct PageMeta pagehead;
 	for(long j=0;j<pagenum;j++){							//遍历每一页
-		rewind(DB->dataPath);
-		fseek(DB->dataPath,pageAddr,SEEK_SET);
-		fread(&pagehead,sizeofpagehead,1,DB->dataPath);			//读取这一页的内容
+		rewind(DB->dbFile);
+		fseek(DB->dbFile,pageAddr,SEEK_SET);
+		fread(&pagehead,sizeofpagehead,1,DB->dbFile);			//读取这一页的内容
 		nextPage = pagehead.nextPageNo;
 		page_recove_onepage(DB,pagehead.pageNo);				//删除这一页
 		if(nextPage>0){
@@ -245,4 +249,8 @@ void file_write_sd(struct Storage *DB,long pageno,char *bufferpath){
 	rewind(DB->dbFile);
 	fseek(DB->dbFile,DB->dbMeta.dataAddr+pageno*PAGE_SIZE,SEEK_SET);
 	fwrite(bufferpath,PAGE_SIZE,1,DB->dbFile);
+}
+void file_print_freepace(struct Storage *DB){
+	printf("已经用了%ld块，还空闲%ld块\n",DB->dbMeta.blockNum-DB->dbMeta.blockFree,DB->dbMeta.blockFree);
+	
 }
