@@ -12,6 +12,7 @@ int main(int argc, char* argv[])
 	char dbFile[30] = "./simpleDb";
 
 	storage_initDB(&DB, dbFile);
+	Buf_Init();
 
 	log_Debug("DB initial done.\n");
 
