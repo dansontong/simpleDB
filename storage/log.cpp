@@ -100,6 +100,7 @@ void LogWrite(LOGLEVEL logLevel, const char *string)
 void log_init(void)
 {
     initMutex();//初始化多进程信号量，实现log文件互斥访问。为以后多进程做准备
+    printf("log_init done.\n");
 }
 
 void log_Error(const char *string)

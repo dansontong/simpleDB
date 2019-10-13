@@ -51,6 +51,7 @@ void storage_initDB(struct Storage *DB, char *fileName)
 void storage_closeDB(struct Storage *DB)
 {
 	fclose(DB->dbFile);
+	free(DB->freeSpaceBitMap);
 }
 
 int readDataDictionary(struct Storage *DB)
@@ -100,8 +101,6 @@ void storage_createDbFile(char *fileName)
 	DB.dbMeta.fileMeta[0].state = 1;
 	memset(DB.dbMeta.fileMeta[0].segList, -1, sizeof(struct Segment) * SEGMENT_NUM);
 
-	printf("dbMeta set done.\n");
-
 	// 为空闲空间映射表分配空间，所有的初始化为-1，表示空闲
 	DB.freeSpaceBitMap = (unsigned long *)malloc(DB.dbMeta.bitMapSize);
 	memset(DB.freeSpaceBitMap, -1, DB.dbMeta.bitMapSize);
@@ -113,7 +112,10 @@ void storage_createDbFile(char *fileName)
 	fseek(dbFile, DB.dbMeta.bitMapAddr, SEEK_SET);
 	fwrite(DB.freeSpaceBitMap, DB.dbMeta.bitMapSize, 1, dbFile);
 
+	free(DB.freeSpaceBitMap);
 	fclose(dbFile);
+	
+	printf("create dataBase done.\n");
 }
 
 void storage_showDbInfo(struct Storage *DB){
@@ -182,7 +184,7 @@ int createTable(struct Storage *DB, char *str)
 	insertAttr(&DB->dataDict[dictID],"S_PHONE",CHAR_TYPE,15,true);
 	insertAttr(&DB->dataDict[dictID],"S_ACCTBAL",FLOAT_TYPE,8,true);
 	insertAttr(&DB->dataDict[dictID],"S_COMMENT",VARCHAR_TYPE,101,true);
-	
+
 	return dictID;
 }
 
