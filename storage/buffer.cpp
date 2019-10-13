@@ -1,8 +1,11 @@
 #include <assert.h>
 #include <string>
+#include <ctime>
 
 #include "buffer.h"
 #include "log.h"
+#include "file.h"
+
 using std::string;
 
 // ==================== buffer global variable ====================
@@ -10,11 +13,13 @@ char *bufBlocks;    /* buffer data */
 BufMeta *bufMetas;  /* 每一个缓存块对应的参数信息 */
 long freeBlockHead; /* 空闲块组成的链表的起始节点 */
 
+struct Storage *db = NULL; /* 与外存交互时需要…… */
 // ==================== public func ====================
-void Buf_Init(void)
+void Buf_Init(struct Storage *db_p)
 {
     // temp
     log_init();
+    db = db_p;
 
     char *newbufblocks = NULL;
     BufMeta *newbufmeta = NULL;
@@ -89,7 +94,7 @@ void Buf_WriteBuffer_inner(BufTag tag, char *data)
     if (bufid == -1)
     { // buffer不存在
         // TODO 我先想一想，如果写缓存块时块不存在怎么办
-
+        log_Error("buffer not exist.");
         return;
     }
 
@@ -132,8 +137,6 @@ long Buf_AllocBlock_inner(BufTag btag)
     // 查看是否有空闲的缓存块
     // 如果没有则调用淘汰算法
 
-    // TODO 加锁控制
-
     if (freeBlockHead == BUF_FREE_LIST_EMPTY)
     {
         Buf_Schedule();
@@ -155,7 +158,6 @@ long Buf_AllocBlock_inner(BufTag btag)
 
     // buf tag 的拷贝
     newbmeta->bTag.pageNo = btag.pageNo;
-    // TODO 释放锁
 
     return newBufId;
 }
@@ -173,8 +175,10 @@ long Buf_LoadPage(BufTag btag)
     char *blockStart = Buf_GetBlock(newBufId);
     assert(blockStart != NULL);
 
-    // just for test
-    TestLoad(blockStart);
+    // // just for test
+    // TestLoad(blockStart);
+    // 从外存读取一个块
+    file_read_sd(db, btag.pageNo, blockStart);
     newbmeta->bufMode = BM_isValid;
     return newBufId;
 }
@@ -197,8 +201,8 @@ long Buf_StrategyLRU()
     for (i = 0; i < BUFFER_NUM; i++)
     {
         BufMeta bmeta = bufMetas[i];
-        // 只有处于valid状态的缓存块才会被删除
-        if (bmeta.bufMode != BM_isValid)
+        // TODO 没有想好这部分的处理，什么状态的缓存块参与淘汰
+        if (bmeta.bufMode == BM_ioProgress)
         {
             continue;
         }
@@ -231,10 +235,21 @@ bool Buf_Remove(long bufId)
         return false;
     }
 
+    if (bmeta->bufMode == BM_isDirty)
+    {
+        // 缓存块为脏数据，丢弃前先写回
+        char *bufstart = Buf_GetBlock(bufId);
+        file_write_sd(db, bmeta->bTag.pageNo, bufstart);
+
+        char logs[255];
+        sprintf(logs, "%ld buffer is dirty, write to disk first.", bufId);
+        log_Info(logs);
+    }
+
     // 当前块符合释放条件，将该块放回freelist里
     bmeta->bufMode = BM_free;
     bmeta->visitTime = 0;
-
+    Buf_ClearBufTag(&(bmeta->bTag));
     if (freeBlockHead == BUF_FREE_LIST_EMPTY)
     {
         // 如果当前空闲list为空
@@ -299,6 +314,11 @@ void Buf_HitBlockByTag(BufTag btag)
     Buf_HitBlockById(bufid);
 }
 
+void Buf_ClearBufTag(BufTag *btag)
+{
+    btag->pageNo = -1;
+}
+
 void Buf_PrintInfo()
 {
     char logs[1024];
@@ -312,7 +332,6 @@ void Buf_PrintInfo()
         }
     }
     sprintf(logs, "blocks: %p, metas: %p, used: %d, freehead: %ld", bufBlocks, bufMetas, used, freeBlockHead);
-
     log_Info(logs);
 }
 
@@ -324,7 +343,8 @@ void Buf_PrintInfo()
 // ==================== utils ====================
 long UTCNowTimestamp()
 {
-    return 0;
+    time_t t;
+    return long(std::time(&t));
 }
 
 // BufTag 的比较函数,BufTag的比较结果就只有相等以及不相等
