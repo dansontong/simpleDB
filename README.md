@@ -6,7 +6,12 @@ simple database using cpp.
 problem:  
 1, 磁盘使用空间受bitMap大小限制，以后如何扩展数据库磁盘空间？  
 2, 如何互斥访问buffer数据页？设置lock变量，然后轮询？应用回调思想设置等待队列？每个数据页都要一个队列，是不是不现实？
-
+3, 索引模块需提供的接口：（参数根据需要调整）
+　create_index(table,collumn)//对列建索引
+　drop_index(table,collumn) //对列删除索引
+　insert_index(table,collumn,rowid)//对指定索引插入一项
+　delete_index(table,collumn,rowid)//对指定索引删除一项
+  
   
   
 模块分工：  
