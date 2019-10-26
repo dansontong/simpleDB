@@ -32,6 +32,7 @@ using namespace std;
 
 // page 配置参数
 #define PAGE_SIZE BLOCK_SIZE//页大小==文件块大小
+#define SIZE_OF_LONG sizeof(long)  //long类型的长度，使得该程序可以适用于不同位数cpu的机器
 
 // buffer 配置参数
 #define BUFFER_NUM 2048     //缓冲区数量,每个4k，总大小8M

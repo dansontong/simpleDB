@@ -1,5 +1,4 @@
 #include "storage.h"
-#include "Test.h" 
 #include "log.h"
 
 
@@ -34,9 +33,12 @@ int main(int argc, char* argv[])
 		strtok(buff, "\n");//使用换行符分割，相当于去掉换行符
 		//char *str = strtok(buff, "|");//使用|分割
 		recordInsert(&DB, sup_dictID, buff);
-		printf("num:%d\n", count++);
+		Log(INFO, "insert line No.%d", count);
+		printf("insert line No.%d\n", count++);
 		//printf("%s\n", buff);
 	}
+		storage_showDbInfo(&DB);
+
 	// int fileID = file_createFile(&dbMeta, TABLE_FILE, 1);
 	// printf("创建文件%d成功！\n", fileID);
 	// //int fileID = 0;

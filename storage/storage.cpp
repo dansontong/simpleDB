@@ -119,7 +119,7 @@ void storage_createDbFile(char *fileName)
 }
 
 void storage_showDbInfo(struct Storage *DB){
-
+	Buf_PrintInfo();
 }
 
 int storage_memToDisk(struct Storage *DB){

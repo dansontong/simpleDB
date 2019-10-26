@@ -113,11 +113,9 @@ char *Buf_ReadBuffer_inner(BufTag btag)
     long buf_id;
     // step2 - 查询tag和buf id的映射转换
     buf_id = Buf_QuickLookup(btag);
-    cout << "[debug] quick lookup res: " << buf_id << endl;
     if (buf_id == -1)
     {
         // 该缓存页不存在，发出load动作
-        cout << "[debug] prepare to load page" << endl;
         buf_id = Buf_LoadPage(btag);
     }
 
@@ -136,7 +134,6 @@ long Buf_AllocBlock_inner(BufTag btag)
 
     // 查看是否有空闲的缓存块
     // 如果没有则调用淘汰算法
-
     if (freeBlockHead == BUF_FREE_LIST_EMPTY)
     {
         Buf_Schedule();
@@ -153,6 +150,7 @@ long Buf_AllocBlock_inner(BufTag btag)
     BufMeta *newbmeta = &(bufMetas[newBufId]);
     // 维护空闲链表
     freeBlockHead = newbmeta->fNext == BUF_FREE_END ? BUF_FREE_LIST_EMPTY : newbmeta->fNext;
+    newbmeta->visitTime = UTCNowTimestamp();
     newbmeta->bufMode = BM_isValid;
     newbmeta->fNext = BUF_FREE_END;
 
@@ -262,9 +260,6 @@ bool Buf_Remove(long bufId)
         freeBlockHead = bufId;
     }
 
-    char logs[255];
-    sprintf(logs, "%ld buffer already removed.", bufId);
-    log_Info(logs);
 
     return true;
 }
@@ -279,10 +274,6 @@ long Buf_QuickLookup(BufTag btag)
     for (i = 0; i < BUFFER_NUM; i++)
     {
         BufMeta bmeta = bufMetas[i];
-        // if (bmeta.bufMode != BM_isValid)
-        // {
-        //     continue;
-        // }
         if (CMPBufTag(btag, bmeta.bTag) == true)
         {
             return i;
@@ -302,8 +293,8 @@ char *Buf_GetBlock(long bufId)
 
 void Buf_HitBlockById(long bufid)
 {
+    assert(bufid>=0 && bufid < BUFFER_NUM);
     BufMeta *bmeta;
-
     bmeta = &(bufMetas[bufid]);
     bmeta->visitTime = UTCNowTimestamp();
 }
