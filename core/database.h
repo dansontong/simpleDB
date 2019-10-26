@@ -1,5 +1,5 @@
-#ifndef STORAGE_H
-#define STORAGE_H
+#ifndef CORE_DATABASE_H
+#define CORE_DATABASE_H
 
 #include "config.h"
 #include "file.h"

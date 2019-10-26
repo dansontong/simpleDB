@@ -1,7 +1,7 @@
 cc = g++
 
 CXXFLAGS = -pthread -g -Ddebug
-INCLUDE = -I ../storage -I ../log
+INCLUDE = -I ../core -I ../storage -I ../log -I ../index/BPlusTree -I ../index
 CFLAGS_parser = -std=c++1z -lstdc++ -Wall -Werror -I../parser -L../parser -lsqlparser
 SRC = -L../storage/*.cpp
 
