@@ -225,9 +225,9 @@ void file_deleteFile(struct Storage *DB,int FileID){
 	for(long j=0;j<pagenum;j++){							//遍历每一页
 		rewind(DB->dbFile);
 		fseek(DB->dbFile,pageAddr,SEEK_SET);
-		fread(&pagehead,sizeofpagehead,1,DB->dbFile);			//读取这一页的内容
+		size_t sizeRead = fread(&pagehead,sizeofpagehead,1,DB->dbFile);			//读取这一页的内容
 		nextPage = pagehead.nextPageNo;
-		page_recove_onepage(DB,pagehead.pageNo);				//删除这一页
+		page_recover_onepage(DB,pagehead.pageNo);				//删除这一页
 		if(nextPage>0){
 			pageAddr = DB->dbMeta.dataAddr +nextPage * PAGE_SIZE;	//获取新的一页的地址
 		}
@@ -246,7 +246,7 @@ void file_deleteFile(struct Storage *DB,int FileID){
 void file_read_sd(struct Storage *DB,long pageno,char *bufferpath){
 	rewind(DB->dbFile);
 	fseek(DB->dbFile,DB->dbMeta.dataAddr+pageno*PAGE_SIZE,SEEK_SET);
-	fread(bufferpath,PAGE_SIZE,1,DB->dbFile);
+	size_t sizeRead = fread(bufferpath,PAGE_SIZE,1,DB->dbFile);
 }
 void file_write_sd(struct Storage *DB,long pageno,char *bufferpath){
 	rewind(DB->dbFile);
@@ -272,12 +272,12 @@ bool file_getrecord(long pageNo,int recordID,char *record){
 	if(recordID>0){//判断是否是第一个记录
 		memcpy(&curoffset,Buf_ReadBuffer(buftag)+sizeofpagehead+sizeofrecord*recordID,sizeofrecord);
 		memcpy(&preoffset,Buf_ReadBuffer(buftag)+sizeofpagehead+sizeofrecord*recordID-1,sizeofrecord);
-		memcpy(record,Buf_ReadBuffer(buftag)+PAGE_SIZE-curoffset.offset，curoffset.offset-preoffset.offset);//记录的位置为页的起始位置加上pagesize-记录距离页尾的距离，记录长度为该记录距离页尾的位置减去上一条记录距离页尾的位置
+		memcpy(record,Buf_ReadBuffer(buftag)+PAGE_SIZE-curoffset.offset,curoffset.offset-preoffset.offset);//记录的位置为页的起始位置加上pagesize-记录距离页尾的距离，记录长度为该记录距离页尾的位置减去上一条记录距离页尾的位置
 		return true;
 	}
 	else{
 		memcpy(&curoffset,Buf_ReadBuffer(buftag)+sizeofpagehead+sizeofrecord*recordID,sizeofrecord);
-		memcpy(record,Buf_ReadBuffer(buftag)+PAGE_SIZE-curoffset.offset，curoffset.offset);//第一条记录的长度为该记录距离页尾的距离
+		memcpy(record,Buf_ReadBuffer(buftag)+PAGE_SIZE-curoffset.offset,curoffset.offset);//第一条记录的长度为该记录距离页尾的距离
 		return true;
 	}
 	return false;
@@ -394,7 +394,7 @@ int page_requestPage(struct Storage *DB, long NeededPageNum)
 	}
 }
 
-void page_recove_onepage(struct Storage *DB,int PageNo)
+void page_recover_onepage(struct Storage *DB,int PageNo)
 {
 
 	int p_num = PageNo/(8*sizeof(long));
