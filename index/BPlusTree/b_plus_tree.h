@@ -18,27 +18,27 @@ typedef struct
 	int key;//记录的键值
 	int posPage;//页号
 	int posOffset;//偏移量
-}RecordOffset;//B+树节点上的记录
+}TreeRecord;//B+树节点上的记录
 
 typedef struct
 {
 	int type;//节点的种类 分为叶节点 左孩子 右孩子
 	int count;//record的个数
-	RecordOffsetOffset pair[MAX];
+	TreeRecord pair[MAX];
 	int parent;//父节点所在的位置
 }Node;//B+树的节点
 
 void getRoot(FILE *index, Node &node);
 int search(FILE *index, int key);
 void searchNode(FILE *index, Node &node, int key);
-int searchRecordOffset(Node &node, int key);
-int insert(FILE *index, RecordOffset record);
-int insertRecordOffset(FILE *index, Node &node, RecordOffset record);
-void splitNode(FILE *index, Node &nodea, RecordOffset record, int pos);
+int searchRecord(Node &node, int key);
+int insert(FILE *index, TreeRecord record);
+int insertRecord(FILE *index, Node &node, TreeRecord record);
+void splitNode(FILE *index, Node &nodea, TreeRecord record, int pos);
 void enlargeKey(FILE *index, Node &node);
 int del(FILE *index, int key);
-int delRecordOffset(FILE *index, Node &node, int key);
-void transRecordOffset(FILE *index, Node &left, Node &right, int dir, int pos);
+int delRecord(FILE *index, Node &node, int key);
+void transRecord(FILE *index, Node &left, Node &right, int dir, int pos);
 void mergeNode(FILE *index, Node &left, Node &right);
 void ensmallKey(FILE *index, Node &nod);
 void changeParent(FILE *index, Node &node, int child, int parent);

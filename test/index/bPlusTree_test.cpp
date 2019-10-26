@@ -12,9 +12,11 @@ using namespace std;
 
 int main()
 {
+	printf("====================== BplusTree_test begin ======\n");
+
 	FILE *fp;
 	int key_num = 20;
-	Record record_insert;
+	TreeRecord record_insert;
  int x = 1;
     int y = 0;
 		fp=fopen(INDEX_DAT,"rb+");
@@ -35,11 +37,11 @@ int main()
         printf("    *******************************************************************\n");
         printf("    *           Welcome to BPlusTree Program!                         *\n");
         printf("    *           1.Create B+ Tree                                      *\n");
-        printf("    *           2.Search a number form B+ Tree                                  *\n");
-        printf("    *           3.Insert a number form B+ Tree                         *\n");
-        printf("    *           4.Delete a number form B+ Tree                                  *\n");
-		printf("    *           5.Print B+ Tree										   *\n");			
-        printf("    *           0.Exit                                          *\n");
+        printf("    *           2.Search a number form B+ Tree                        *\n");
+        printf("    *           3.Insert a number form B+ Tree                        *\n");
+        printf("    *           4.Delete a number form B+ Tree                        *\n");
+		printf("    *           5.Print B+ Tree										  *\n");
+        printf("    *           0.Exit                                                *\n");
         printf("    *******************************************************************\n");
         printf("\n    Select a number:");
 
@@ -116,4 +118,6 @@ int main()
             break;
         }
     }
+
+	printf("======================= BplusTree_test end ========\n");
 }
