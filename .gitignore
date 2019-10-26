@@ -1,5 +1,6 @@
 # compiled object
 # *.so
+*.o
 main
 storage_d
 storage_r
