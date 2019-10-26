@@ -13,9 +13,9 @@ char *bufBlocks;    /* buffer data */
 BufMeta *bufMetas;  /* 每一个缓存块对应的参数信息 */
 long freeBlockHead; /* 空闲块组成的链表的起始节点 */
 
-struct Storage *db = NULL; /* 与外存交互时需要…… */
+struct DataBase *db = NULL; /* 与外存交互时需要…… */
 // ==================== public func ====================
-void Buf_Init(struct Storage *db_p)
+void Buf_Init(struct DataBase *db_p)
 {
     // temp
     log_init();

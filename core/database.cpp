@@ -1,18 +1,18 @@
 #include <stdlib.h>
-#include "storage.h"
+#include "database.h"
 // include the sql parser
 // #include "SQLParser.h"
 // contains printing utilities
 // #include "util/sqlhelper.h"
 
 
-void storage_initDB(struct Storage *DB, char *fileName)
+void database_initDB(struct DataBase *DB, char *fileName)
 {
 	FILE *dbFile = fopen(fileName, "rb");
 	if(dbFile == NULL)
 	{
 		printf("DataBase isn't exist, creating new dataBase.\n");
-		storage_createDbFile(fileName);
+		database_createDbFile(fileName);
 		dbFile = fopen(fileName, "rb");
 	}
 
@@ -48,13 +48,13 @@ void storage_initDB(struct Storage *DB, char *fileName)
 }
 
 // 关闭数据库
-void storage_closeDB(struct Storage *DB)
+void database_closeDB(struct DataBase *DB)
 {
 	fclose(DB->dbFile);
 	free(DB->freeSpaceBitMap);
 }
 
-int readDataDictionary(struct Storage *DB)
+int readDataDictionary(struct DataBase *DB)
 {
 	int fid = DB->dbMeta.dataDictFid;
 	if (fid < 0) {
@@ -82,9 +82,9 @@ int readDataDictionary(struct Storage *DB)
 	return count;
 }
 
-void storage_createDbFile(char *fileName)
+void database_createDbFile(char *fileName)
 {
-	struct Storage DB;
+	struct DataBase DB;
 	DB.dbMeta.blockSize = BLOCK_SIZE;
 	DB.dbMeta.blockNum = FILE_DATA_SIZE / BLOCK_SIZE; // 256*1024
 	DB.dbMeta.blockFree = DB.dbMeta.blockNum;
@@ -118,16 +118,16 @@ void storage_createDbFile(char *fileName)
 	printf("create dataBase done.\n");
 }
 
-void storage_showDbInfo(struct Storage *DB){
+void database_showDbInfo(struct DataBase *DB){
 	Buf_PrintInfo();
 }
 
-int storage_memToDisk(struct Storage *DB){
+int database_memToDisk(struct DataBase *DB){
 
 	return 0;
 }
 
-bool tupleInsert(struct Storage *DB, int length, int FileID, char *str){
+bool tupleInsert(struct DataBase *DB, int length, int FileID, char *str){
 
 }
 
@@ -156,7 +156,7 @@ void insertAttr(Table *table,const char *name, DATA_TYPE type, int length,bool n
 }
 
 //创建表，并返回数据字典下标
-int createTable(struct Storage *DB, char *str)
+int createTable(struct DataBase *DB, char *str)
 {
 	//解析字符串 CREATE TABLE NATION ( N_NATIONKEY INTEGER NOT NULL,N_NAMECHAR(25) NOT NULL,N_REGIONKEY INTEGER NOT NULL,N_COMMENTVARCHAR(152));
 	// parse a given query
@@ -164,7 +164,7 @@ int createTable(struct Storage *DB, char *str)
 	// hsql::SQLParser::parse(query, &result);//后期再使用
 	char tableName[MAX_NAME_LENGTH] = "Supplier";
 
-	int fid = file_newFile(DB, TABLE_FILE, 1);
+	int fileID = file_newFile(DB, TABLE_FILE, 1);
 	//插入数据字典
 	int dictID = -1;
 	for(int i=0; i<MAX_FILE_NUM; i++){
@@ -173,7 +173,7 @@ int createTable(struct Storage *DB, char *str)
 			break;
 		}
 	}
-	DB->dataDict[dictID].fileID = fid;
+	DB->dataDict[dictID].fileID = fileID;
 	strcpy(DB->dataDict[dictID].tableName, tableName);
 
 	//插入属性
@@ -188,9 +188,9 @@ int createTable(struct Storage *DB, char *str)
 	return dictID;
 }
 
-void recordInsert(struct Storage *DB, int dictID, char *str)
+void recordInsert(struct DataBase *DB, int dictID, char *str)
 {
-	int fid = DB->dataDict[dictID].fileID;
+	int fileID = DB->dataDict[dictID].fileID;
 	int length = strlen(str);
-	file_writeFile(DB, fid, length, str);
+	file_writeFile(DB, fileID, length, str);
 }

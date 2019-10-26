@@ -42,7 +42,7 @@ struct BufPool
 
 // ==================== extern function ====================
 // 缓冲池初始化
-void Buf_Init(struct Storage* db);
+void Buf_Init(struct DataBase* db);
 
 // 缓冲池释放
 void Buf_Free(void);
