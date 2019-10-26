@@ -4,8 +4,8 @@
 #include "config.h"
 #include "file.h"
 #include "buffer.h"
-#include "page.h"
-#include "segment.h"
+// #include "page.h"
+// #include "segment.h"
 
 // ==================== data structure ====================
 // 数据库文件的描述信息

@@ -12,7 +12,7 @@
 #include <string.h>
 
 // log文件路径
-#define logFilePath "../data/DBrun.log"
+static char logFilePath[50] = "../data/DBrun.log";
 
 typedef enum
 {
@@ -28,6 +28,8 @@ typedef enum
  * 对外函数接口 log_init log_Error log_Warn log_Info log_Debug Log
  */
 void log_init(void);
+
+void log_init(const char *newLogFilePath);
 
 void log_Error(const char *string);
 

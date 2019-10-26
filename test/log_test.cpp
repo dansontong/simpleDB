@@ -1,8 +1,9 @@
 #include "log.h"
 
 int main(int argc, char* argv[]) {
-	log_init();
-	printf("hhhhhh\n");
+	printf("====================== log_test begin ======\n");
+	
+	log_init("./test.log");
 
 	log_Error("logging.h test success!, this is a Info.");
 	log_Warn("logging.h test success!, this is a Info.");
@@ -15,6 +16,8 @@ int main(int argc, char* argv[]) {
 	Log(INFO, "logtemp:No.%s,char:%4f","我是插进来的字符串", 0.1);
 	
 	log_init();
+
+	printf("======================= log_test end ========\n");
 }
 
 // 使用说明：
