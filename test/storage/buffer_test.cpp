@@ -1,11 +1,16 @@
 #include <iostream>
 #include "buffer.h"
+#include "database.h"
 
 using namespace std;
 
 int main()
 {
-    Buf_Init();
+    //初始化数据库
+    DataBase DB;
+    char dbFile[30] = "./data/simpleDb";
+    database_initDB(&DB, dbFile);
+    Buf_Init(&DB);
     cout << "Buffer init success." << endl;
 
     cout << "======= test generate buftag =======" << endl;
