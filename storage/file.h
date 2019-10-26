@@ -27,4 +27,6 @@ void file_deleteFile(struct Storage *DB,int FileID);
 void file_read_sd(struct Storage *DB,long pageno,char *bufferpath);
 void file_write_sd(struct Storage *DB,long pageno,char *bufferpath);
 void file_print_freepace(struct Storage *DB);
+bool file_getrecord(long pageNo,int recordID,char *record);//record 存储返回的记录
+bool file_getrecordAttribute(struct Storage *DB,long pageNo,int recordID,char* Attributename,char*Attribute,char* tablename);//Attribute存储返回的属性值
 #endif
