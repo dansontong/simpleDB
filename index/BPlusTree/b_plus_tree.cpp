@@ -37,14 +37,14 @@ int search(FILE *index, int key)//ÕÒ³ö¸ø¶¨µÄ¼üÖµÔÚ B+Ê÷ÖÐµÄÎ»ÖÃ
 	int pos;
 	getRoot(index, node);
 	searchNode(index, node, key);
-	pos = searchRecord(node, key);
+	pos = searchTreeRecord(node, key);
 	if (pos == node.count || node.pair[pos].key != key)
 		return -1;
 	else
 		return node.pair[pos].pos;
 }
 
-int searchRecord(Node &node, int key)
+int searchTreeRecord(Node &node, int key)
 {
 	//ÔÚ±¾½ÚµãÖÐÕÒµ½µÚÒ»¸ö±Èkey´óµÄÎ»ÖÃ
 	int i;
@@ -60,7 +60,7 @@ void searchNode(FILE *index, Node &node, int key)
 	}
 	else
 	{
-		pos = searchRecord(node, key);
+		pos = searchTreeRecord(node, key);
 		pos = pos == node.count ? pos - 1 : pos;
 		offset = node.pair[pos].pos;
 		fseek(index, offset, SEEK_SET);
@@ -69,11 +69,11 @@ void searchNode(FILE *index, Node &node, int key)
 	}
 } 
 
-int insertRecord(FILE *index, Node &node, Record record)
+int insertTreeRecord(FILE *index, Node &node, TreeRecord record)
 {
 	
 	int pos, cur;
-	pos = searchRecord(node, record.key);
+	pos = searchTreeRecord(node, record.key);
 	cout << "insert pos:" << pos << endl;
 	cout << "insert key:" << record.key << endl;;
 	cout << endl;
@@ -110,12 +110,12 @@ int insertRecord(FILE *index, Node &node, Record record)
 		return -1;
 }
 
-void splitNode(FILE *index, Node &nodea, Record record, int pos)
+void splitNode(FILE *index, Node &nodea, TreeRecord record, int pos)
 {
 	
 	//nodea ·ÖÁÑÖ®Ç°µÄ½Úµã¡¢nodebÎªÐÂÔö½Úµã
 	Node nodeb, top;
-	Record recorda, recordb;
+	TreeRecord recorda, recordb;
 	int cur;
 	//³õÊ¼»¯ÐÂ½Úµã
 	nodeb.type = nodea.type;//Á½½ÚµãµÄÀàÐÍ±£³ÖÒ»ÖÂ£¬ÒªÃ´¶¼ÊÇÒ¶×Ó½Úµã£¬ÒªÃ´¶¼ÊÇÄÚ²¿½Úµã¡£
@@ -176,8 +176,8 @@ void splitNode(FILE *index, Node &nodea, Record record, int pos)
 		fwrite(&nodeb, 1, sizeof(nodeb), index);
 		fflush(index);
 		fseek(index, sizeof(top), SEEK_CUR);
-		insertRecord(index, top, recorda);
-		insertRecord(index, top, recordb);
+		insertTreeRecord(index, top, recorda);
+		insertTreeRecord(index, top, recordb);
 		rewind(index);
 		fwrite(&cur, 1, sizeof(cur), index);//½«µ±Ç°¸ù½ÚµãµÄÎ»ÖÃÐ´µ½Õû¸öÎÄ¼þµÄÆäÊµÎ»ÖÃ£¬Ò²¾ÍÊÇÄÇ¸öoffsetÖÐ¡£
 		fflush(index);
@@ -193,11 +193,11 @@ void splitNode(FILE *index, Node &nodea, Record record, int pos)
 		//fflush(index);
 		fseek(index, nodea.parent, SEEK_SET);
 		fread(&top, 1, sizeof(top), index);
-		cur = searchRecord(top, recordb.key);
+		cur = searchTreeRecord(top, recordb.key);
 		if (cur == top.count)
 			cur--;
 		top.pair[cur] = recorda;
-		insertRecord(index, top, recordb);
+		insertTreeRecord(index, top, recordb);
 	}
 
 	if (nodeb.type == NODE)
@@ -215,7 +215,7 @@ void splitNode(FILE *index, Node &nodea, Record record, int pos)
 	}
 }
 
-int insert(FILE *index, Record record)//¶ÔÓÚ¸ø¶¨µÄÒ»¸ö¡°¼üÖµ¡ªÖ¸Õë¶Ô¡±£¬°´ÕÕ B+Ê÷µÄ¶¨Òå£¬½«Æä²åÈëµ½¹æ¶¨µÄÒ¶½Úµã¡£
+int insert(FILE *index, TreeRecord record)//¶ÔÓÚ¸ø¶¨µÄÒ»¸ö¡°¼üÖµ¡ªÖ¸Õë¶Ô¡±£¬°´ÕÕ B+Ê÷µÄ¶¨Òå£¬½«Æä²åÈëµ½¹æ¶¨µÄÒ¶½Úµã¡£
 {
 	Node node;	
 	getRoot(index, node);
@@ -228,7 +228,7 @@ int insert(FILE *index, Record record)//¶ÔÓÚ¸ø¶¨µÄÒ»¸ö¡°¼üÖµ¡ªÖ¸Õë¶Ô¡±£¬°´ÕÕ B+Ê
 	cout << "node.pair[3].key " << node.pair[3].key << endl;
 	cout << "node.pair[4].key " << node.pair[4].key << endl;
 	searchNode(index, node, record.key);
-	return insertRecord(index, node, record);
+	return insertTreeRecord(index, node, record);
 }
 
 void enlargeKey(FILE *index, Node &node)
@@ -237,7 +237,7 @@ void enlargeKey(FILE *index, Node &node)
 	key = node.pair[node.count - 1].key;
 	fseek(index, node.parent, SEEK_SET);
 	fread(&node, 1, sizeof(node), index);
-/*	int pos = searchRecord(node, key)-1;
+/*	int pos = searchTreeRecord(node, key)-1;
 	if (node.pair[pos].key < key)
 	{
 		node.pair[pos].key = key;
@@ -286,15 +286,15 @@ int del(FILE *index, int key)
 		cout << node.pair[i].key << "   ";
 	}
 	cout << endl;
-	return delRecord(index, node, key);
+	return delTreeRecord(index, node, key);
 }
 
-int delRecord(FILE *index, Node &node, int key)
+int delTreeRecord(FILE *index, Node &node, int key)
 {
 	Node left, right, top,root;//±íÊ¾´ýÉ¾³ýÔªËØËùÔÚ½ÚµãµÄ×óÁÚ½Úµã£¬ÓÒÁÚ½Úµã£¬ÒÔ¼°¸¸½Úµã
-	Record recon ,recol, recor, recot;//±íÊ¾¸¸½ÚµãÖÐ´ýÉ¾³ý½Úµã£¬×óÁÚ½Úµã£¬ÓÒÁÚ½ÚµãµÄ·Ö¸ôÔªËØ£¬ÒÔ¼°¸¸½ÚµãµÄ¸¸½Úµã¡£
+	TreeRecord recon ,recol, recor, recot;//±íÊ¾¸¸½ÚµãÖÐ´ýÉ¾³ý½Úµã£¬×óÁÚ½Úµã£¬ÓÒÁÚ½ÚµãµÄ·Ö¸ôÔªËØ£¬ÒÔ¼°¸¸½ÚµãµÄ¸¸½Úµã¡£
 	int pos, tpos;
-	pos = searchRecord(node, key);
+	pos = searchTreeRecord(node, key);
 	cout << "delete pos:" << pos << endl;
 	if (pos == node.count)
 		return -1;//Ò»Ö±ÕÒµ½×îºóÒ»¸ö½ÚµãµÄÏÂÒ»¸öÎ»ÖÃ£¬´ú±íÃ»ÓÐÕÒµ½
@@ -368,7 +368,7 @@ int delRecord(FILE *index, Node &node, int key)
 		cout << endl;
 		recot.key = top.pair[top.count - 1].key;//recot½ÚµãµÄkeyÖµÊÇ¸ÃÔªËØµÄ¸¸½ÚµãµÄ×îºóÒ»¸ökey
 	//	cout << "recot.key" << recot.key << endl;
-		tpos = searchRecord(top, key);//ÔÚ´ýÉ¾³ýÔªËØµÄ¸¸½ÚµãÖÐÕÒµ½µÚÒ»¸ö±ÈËü´óµÄÎ»ÖÃ
+		tpos = searchTreeRecord(top, key);//ÔÚ´ýÉ¾³ýÔªËØµÄ¸¸½ÚµãÖÐÕÒµ½µÚÒ»¸ö±ÈËü´óµÄÎ»ÖÃ
 		cout <<"tpos:"<< tpos << endl;
 		if (tpos == top.count - 1)
 		{//ÈôÉ¾³ýµÄÎ»ÖÃÊÇ½ÚµãÖÐµÄ×îºóÒ»¸öÔªËØ
@@ -384,7 +384,7 @@ int delRecord(FILE *index, Node &node, int key)
 			}
 			if (left.count > MIN)
 			{
-				transRecord(index, left, node, RIGHT, pos);
+				transTreeRecord(index, left, node, RIGHT, pos);
 				if (node.type == NODE)
 					changeParent(index, right, node.pair[0].pos, recon.pos);
 				recon.key = node.pair[node.count - 1].key;
@@ -446,7 +446,7 @@ int delRecord(FILE *index, Node &node, int key)
 				fflush(index);
 				cout << "½«¸¸½ÚµãÖÐµÄ¾ÉµÄ·Ö¸ôÔªËØ:" << recol.key << "É¾³ý" << endl;
 				cout << endl;
-				delRecord(index, top, recol.key);
+				delTreeRecord(index, top, recol.key);
 				//×¢ÒâÕâÀïÉ¾³ýµÄ·Ö¸ôÔªËØÊÇ×óÁÚ½ÚµãµÄ·Ö¸ôÔªËØ¶ø²»ÊÇ±¾½ÚµãµÄ·Ö¸ôÔªËØ¡£ÒòÎª±¾½ÚµãµÄ·Ö¸ôÔªËØÊÇ
 			}
 			if (top.parent != 0 && top.count != 0)
@@ -472,10 +472,10 @@ int delRecord(FILE *index, Node &node, int key)
 			if (right.count > MIN)
 			{
 				//ÓÒÁÚ½Úµã´óÓÚ3µÄÇé¿öÏÂ
-				transRecord(index, node, right, LEFT, pos);//½«´ýÉ¾³ýÔªËØÉ¾µô
+				transTreeRecord(index, node, right, LEFT, pos);//½«´ýÉ¾³ýÔªËØÉ¾µô
 				if (node.type == NODE)
 					changeParent(index, left, node.pair[node.count - 1].pos, recon.pos);
-				//ÔÚtransRecordÍê³ÉÖ®ºó£º
+				//ÔÚtransTreeRecordÍê³ÉÖ®ºó£º
 				//¸ÃÔªËØËùÔÚ½ÚµãµÄ×îºóÒ»¸öÔªËØ±»¸üÐÂÎªÓÒÁÚ½ÚµãÖÐµÄµÚÒ»¸öÔªËØ
 				//²¢ÇÒ¸üÐÂ¸¸½ÚµãÖÐµÄ·Ö¸ôÔªËØ
 				recon.key = node.pair[node.count - 1].key;
@@ -511,7 +511,7 @@ int delRecord(FILE *index, Node &node, int key)
 				if (left.count > MIN)
 				{
 					//×óÁÚ½Úµã´óÓÚ3µÄÇéÐÎÏÂ
-					transRecord(index, left, node, RIGHT, pos);
+					transTreeRecord(index, left, node, RIGHT, pos);
 					if (node.type == NODE)
 						changeParent(index, right, node.pair[0].pos, recon.pos);
 					recon.key = node.pair[node.count - 1].key;
@@ -580,7 +580,7 @@ int delRecord(FILE *index, Node &node, int key)
 					
 					cout <<"½«¸¸½ÚµãÖÐµÄ¾ÉµÄ·Ö¸ôÔªËØ:"<<recon.key<<"É¾³ý" << endl;
 					cout << endl;
-					delRecord(index, top, recon.key);
+					delTreeRecord(index, top, recon.key);
 					
 				}
 			}
@@ -606,14 +606,14 @@ int delRecord(FILE *index, Node &node, int key)
 				fseek(index, recot.pos, SEEK_SET);
 				fwrite(&top, 1, sizeof(top), index);
 				fflush(index);
-				delRecord(index, top, recon.key);
+				delTreeRecord(index, top, recon.key);
 			}
 		}
 		return 0;
 	}
 }
 
-void transRecord(FILE *index, Node &left, Node &right, int dir, int pos)
+void transTreeRecord(FILE *index, Node &left, Node &right, int dir, int pos)
 {
 	if (dir == RIGHT)
 	{
@@ -669,7 +669,7 @@ void ensmallKey(FILE *index, Node &node)
 	key = node.pair[node.count - 1].key;
 	fseek(index, node.parent, SEEK_SET);
 	fread(&node, 1, sizeof(node), index);
-	pos = searchRecord(node, key);
+	pos = searchTreeRecord(node, key);
 	if (node.pair[pos].key != key)
 	{
 		node.pair[pos].key = key;

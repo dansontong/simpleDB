@@ -1,9 +1,10 @@
 # ====== compiled object ======
-# *.so
+*.so
+*.out
 *.o
 main
-storage_d
-storage_r
+database_d
+database_r
 *_test
 .DS_Store
 
@@ -19,4 +20,4 @@ simpleDb
 # ======== data file ========
 supplier.tbl
 table_list
-#*.dat
+*.dat
