@@ -2,8 +2,8 @@
 # *.so
 *.o
 main
-storage_d
-storage_r
+database_d
+database_r
 *_test
 .DS_Store
 
