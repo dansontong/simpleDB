@@ -12,7 +12,7 @@
 #include <string.h>
 
 // log文件路径
-static char logFilePath[50] = "../data/DBrun.log";
+static char logFilePath[50] = "./data/DBrun.log";
 
 typedef enum
 {

@@ -16,13 +16,13 @@ void storage_initDB(struct Storage *DB, char *fileName)
 		dbFile = fopen(fileName, "rb");
 	}
 
-	fread(&(DB->dbMeta), sizeof(struct DbMeta), 1, dbFile);
+	size_t sizeRead = fread(&(DB->dbMeta), sizeof(struct DbMeta), 1, dbFile);
 	// 为空闲空间的位示图bitMap分配空间
 	DB->freeSpaceBitMap = (unsigned long *)malloc(DB->dbMeta.bitMapSize);
 	//rewind(dbFile);
 	// 在文件中定位到bitMap开始的位置，令文件指针指向这里
 	fseek(dbFile, DB->dbMeta.bitMapAddr, SEEK_SET);
-	fread(DB->freeSpaceBitMap, DB->dbMeta.bitMapSize, 1, dbFile);// 从文件中读取bitMap的内容
+	sizeRead = fread(DB->freeSpaceBitMap, DB->dbMeta.bitMapSize, 1, dbFile);// 从文件中读取bitMap的内容
 	fclose(dbFile);
 	DB->dbFile = fopen(fileName, "rb+");
 
