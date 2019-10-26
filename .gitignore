@@ -5,6 +5,7 @@ main
 storage_d
 storage_r
 *_test
+.DS_Store
 
 # ======== db file ==========
 simpleDb
