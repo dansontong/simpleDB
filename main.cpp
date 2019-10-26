@@ -1,22 +1,22 @@
-#include "storage.h"
+#include "database.h"
 #include "log.h"
 
 
 int main(int argc, char* argv[])
 {
 	//初始化数据库
-	Storage DB;
+	DataBase DB;
 	char dbFile[30] = "./data/simpleDb";
 
 	log_init();//初始化日志系统
-	storage_initDB(&DB, dbFile);
+	database_initDB(&DB, dbFile);
 	Buf_Init(&DB);
 
 	log_Debug("DB initial done.\n");
 
 	//展示数据库
-	storage_showDbInfo(&DB);
-	storage_memToDisk(&DB);
+	database_showDbInfo(&DB);
+	database_memToDisk(&DB);
 	
 	//创建表
 	char tableFile[30] = "./data/table_list";
@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 		printf("insert line No.%d\n", count++);
 		//printf("%s\n", buff);
 	}
-		storage_showDbInfo(&DB);
+		database_showDbInfo(&DB);
 
 	// int fileID = file_createFile(&dbMeta, TABLE_FILE, 1);
 	// printf("创建文件%d成功！\n", fileID);
@@ -57,5 +57,5 @@ int main(int argc, char* argv[])
 	// 	file_writeFile(&dbMeta, fileID, strlen(str), str);
 	// }
 
-	storage_closeDB(&DB);
+	database_closeDB(&DB);
 }

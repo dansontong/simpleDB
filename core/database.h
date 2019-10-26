@@ -31,6 +31,12 @@ struct Attribute{
 	bool notNull;
 };
 
+struct Index{
+	int fileID;   //索引文件的文件号
+	char tableName[MAX_NAME_LENGTH];//表名
+	char attrName[MAX_NAME_LENGTH]; //属性名
+};
+
 struct Table{
 	int fileID;   //表文件的文件号
 	char tableName[MAX_NAME_LENGTH];   //表名
@@ -40,7 +46,7 @@ struct Table{
 };
 
 // 数据存储信息
-struct Storage{
+struct DataBase{
 	FILE *dbFile;
 	DbMeta dbMeta;
 	//BufPool bufPool;
@@ -52,27 +58,27 @@ struct Storage{
 // ==================== manager function ====================
 // 存储管理
 
-void storage_createDbFile(char *fileName); 
-void storage_initDB(struct Storage *DB, char *fileName);
-void storage_closeDB(struct Storage *DB);
-void storage_showDbInfo(struct Storage *DB);
-void storage_showSegList(struct Storage *DB, int fileID); 
+void database_createDbFile(char *fileName); 
+void database_initDB(struct DataBase *DB, char *fileName);
+void database_closeDB(struct DataBase *DB);
+void database_showDbInfo(struct DataBase *DB);
+void database_showSegList(struct DataBase *DB, int fileID); 
 
 
 //定时把内存中缓冲区的所有数据写到磁盘
-int storage_memToDisk(struct Storage *DB);
+int database_memToDisk(struct DataBase *DB);
 
 
 // 记录相关
-void recordInsert(struct Storage *DB, int dictID, char *str);
+void recordInsert(struct DataBase *DB, int dictID, char *str);
 
 
 // 表相关
-int createTable(struct Storage *DB, char *str);
-void insertAttr(Table *table,const char *name, DATA_TYPE type, int length,bool notNull);
+int createTable(struct DataBase *DB, char *str);
+void insertAttr(Table *table, const char *name, DATA_TYPE type, int length,bool notNull);
 int getDictIDbyName(char *tableName);
 
 //字典相关
-int readDataDictionary(struct Storage *DB);
+int readDataDictionary(struct DataBase *DB);
 
 #endif

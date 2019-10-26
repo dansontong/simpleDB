@@ -1,4 +1,4 @@
-# compiled object
+# ====== compiled object ======
 # *.so
 *.o
 main
@@ -6,15 +6,16 @@ storage_d
 storage_r
 *_test
 
-# db file
+# ======== db file ==========
 simpleDb
 
-# log file
+# ======== log file =========
 *.log
 
-# ignore itself
+# ====== ignore itself ======
 .gitignore
 
-# data file
+# ======== data file ========
 supplier.tbl
 table_list
+#*.dat

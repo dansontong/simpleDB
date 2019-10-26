@@ -1,9 +1,9 @@
 
 
 目录结构：
-/storage 
-    storage.h 存储总管理
-    storage.cpp
+/DataBase 
+    DataBase.h 存储总管理
+    DataBase.cpp
     buffer.h  缓冲区管理
     buffer.cpp
     file.h    文件管理
@@ -16,7 +16,7 @@
     main.cpp  主函数
 
 数据结构：
-Storage:
+DataBase:
 |___freeSpaceBitMap
 |___bufPool
 |     |___data
@@ -54,7 +54,7 @@ Storage:
                       |___freeSpace
 
 函数结构
-StorageMgr
+DataBaseMgr
 |___initial
 |___
 |___
