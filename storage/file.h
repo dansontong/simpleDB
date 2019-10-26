@@ -68,5 +68,10 @@ void page_recover_allpages(struct Storage *DB);
 
 // 段管理-实现在segment部分
 
+// record 
+bool getRecord(int fileID, int recordID, char *record);//fileID->table, recordID->record
+bool getRecordAttr(int fileID, int recordID, char AttrName char *recordAttr);//fileID->table, recordID->record
+
+
 
 #endif
