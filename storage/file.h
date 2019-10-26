@@ -55,6 +55,10 @@ void file_read_sd(struct Storage *DB,long pageno,char *bufferpath); //提供给b
 void file_write_sd(struct Storage *DB,long pageno,char *bufferpath);//提供给buffer模块，写入磁盘
 void file_print_freepace(struct Storage *DB);
 
+bool file_getrecord(long pageNo,int recordID,char *record);//record 存储返回的记录
+bool file_getrecordAttribute(struct Storage *DB,long pageNo,int recordID,char* Attributename,char*Attribute,char* tablename);//Attribute存储返回的属性值
+
+
 
 // 页管理-实现在page部分
 int page_isEmpty(unsigned long bit_map,int position);
@@ -69,8 +73,8 @@ void page_recover_allpages(struct Storage *DB);
 // 段管理-实现在segment部分
 
 // record 
-bool getRecord(int fileID, int recordID, char *record);//fileID->table, recordID->record
-bool getRecordAttr(int fileID, int recordID, char AttrName char *recordAttr);//fileID->table, recordID->record
+//bool getRecord(int fileID, int recordID, char *record);//fileID->table, recordID->record
+//bool getRecordAttr(int fileID, int recordID, char AttrName char *recordAttr);//fileID->table, recordID->record
 
 
 

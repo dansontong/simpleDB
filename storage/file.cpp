@@ -258,6 +258,64 @@ void file_print_freepace(struct Storage *DB){
 	
 }
 
+bool file_getrecord(long pageNo,int recordID,char *record){
+	
+	int sizeofpagehead = sizeof(struct PageMeta);
+	int sizeofrecord = sizeof(struct OffsetInPage);
+	OffsetInPage curoffset,preoffset;
+	struct BufTag buftag = Buf_GenerateTag(pageNo);
+	struct PageMeta pagehead;
+	memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);
+	if(recordID<0||recordID>pagehead.recordNum){
+		return false;
+	}
+	if(recordID>0){//判断是否是第一个记录
+		memcpy(&curoffset,Buf_ReadBuffer(buftag)+sizeofpagehead+sizeofrecord*recordID,sizeofrecord);
+		memcpy(&preoffset,Buf_ReadBuffer(buftag)+sizeofpagehead+sizeofrecord*recordID-1,sizeofrecord);
+		memcpy(record,Buf_ReadBuffer(buftag)+PAGE_SIZE-curoffset.offset，curoffset.offset-preoffset.offset);//记录的位置为页的起始位置加上pagesize-记录距离页尾的距离，记录长度为该记录距离页尾的位置减去上一条记录距离页尾的位置
+		return true;
+	}
+	else{
+		memcpy(&curoffset,Buf_ReadBuffer(buftag)+sizeofpagehead+sizeofrecord*recordID,sizeofrecord);
+		memcpy(record,Buf_ReadBuffer(buftag)+PAGE_SIZE-curoffset.offset，curoffset.offset);//第一条记录的长度为该记录距离页尾的距离
+		return true;
+	}
+	return false;
+}
+bool file_getrecordAttribute(struct Storage *DB,long pageNo,int recordID,char* Attributename,char*Attribute,char* tablename){
+	char *record;
+	if(file_getrecord(pageNo,recordID,record)){//返回该条记录
+		int i=0;
+		for(i=0;i<MAX_FILE_NUM;i++){
+			if(DB->dataDict[i].fileID<0){
+				return false;
+			}
+			else{
+				if(strcmp(DB->dataDict[i].tableName,tablename)==0){//查找表
+					int j=0;
+					for(j=0;j<DB->dataDict[i].attrNum;j++){//查找属性，根据属性名找到属性在记录中的具体位置
+						if(strcmp(DB->dataDict[i].attr[j].name,Attributename)==0){
+							if(j<DB->dataDict[i].attrNum-1){
+								memcpy(Attribute,record+DB->dataDict[i].attr[j].offset,DB->dataDict[i].attr[j+1].offset-DB->dataDict[i].attr[j].offset);//一般情况：位置为record的起始地址加上属性的偏移量，长度为该下一条属性的偏移量减去该属性的偏移量
+								return true;
+							}
+							else{
+								memcpy(Attribute,record+DB->dataDict[i].attr[j].offset,DB->dataDict[i].attrLength-DB->dataDict[i].attr[j].offset);//当该属性为最后一个属性时，长度为总属性长度减去该属性的偏移量
+								return true;
+							}
+							
+						}
+					}
+				}
+			}
+		}
+	}
+	else{
+		return false;
+	}
+}
+
+
 /**************************************************
  *                  page                          *
  **************************************************/
@@ -358,3 +416,4 @@ void page_recover_allpages(struct Storage *DB)
 /**************************************************
  *                  segment                       *
  **************************************************/
+
