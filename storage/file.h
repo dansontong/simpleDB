@@ -49,7 +49,7 @@ struct FileMeta{
 // void file_Init(struct DataBase *DB);
 
 // 文件管理-实现在file部分
-void file_writeFile(int fileID, int length, char *str);
+Record* file_writeFile(int fileID, int length, char *str);
 int file_newFile(int type, long NeededPageNum);
 void file_readFile(int FileID,char *str);
 void file_deleteFile(int FileID);

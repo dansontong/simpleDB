@@ -29,7 +29,7 @@ struct Attribute{
 	DATA_TYPE type;//数据类型
 	int offset; //偏移位置
 	bool notNull;
-	Index indexList;
+	Index indexFile;
 };
 
 struct Index{
@@ -44,6 +44,11 @@ struct Table{
 	Attribute attr[MAX_ATTRIBUTE_NUM]; //属性列表
 	int attrNum;  //属性个数
 	int attrLength;//属性总长度
+};
+
+struct Record{
+	long pageNo;   //页号
+	int recordID;  //页内第几个记录
 };
 
 // 数据存储信息

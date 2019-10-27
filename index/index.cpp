@@ -40,8 +40,9 @@ void create_index(struct DataBase *DB,char *tableName,char *Attributename){
 		if(pagehead.recordNum>0){
 			for(j=0;j<pagehead.recordNum;j++){
 				indexRecord.posPage=pagehead.pageNo;
-				file_getrecordAttribute(DB,pagehead.pageNo,j,tableName,Attributename,indexRecord.key,indexRecord.posOffset);
-
+				file_getrecordAttribute(pagehead.pageNo,j,tableName,Attributename,indexRecord.key,indexRecord.posOffset);
+				indexRecord.recordID = j;
+				
 //				int node=insert(indexID, indexRecord);							//建立B+树索引
 
 			}
