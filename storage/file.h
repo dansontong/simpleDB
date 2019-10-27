@@ -3,7 +3,6 @@
 
 #include "config.h"
 #include "buffer.h"
-#include "database.h"
 
 /*       段页式文件管理模块-头文件
  * 该模块内部可分为setment,page,file三个子模块。
@@ -46,6 +45,12 @@ struct FileMeta{
 	struct Segment segList[SEGMENT_NUM];// 段表
 };
 
+struct Record{
+	long pageNo;   //页号
+	int recordID;  //页内第几个记录
+	char* posOffset;//地址
+};
+
 // ==================== manager function ====================
 // void file_Init(struct DataBase *DB);
 
@@ -75,7 +80,7 @@ void page_recover_allpages();
 
 // record 
 bool file_getrecord(long pageNo,int recordID,char *record);//record 存储返回的记录
-bool file_getrecordAttribute(long pageNo,int recordID,char* Attributename,char*Attribute,char* tablename);//Attribute存储返回的属性值
+bool file_getrecordAttribute(long pageNo,int recordID,char* Attributename,char*Attribute,char* tablename,char* posOffset);//Attribute存储返回的属性值
 //bool getRecord(int fileID, int recordID, char *record);//fileID->table, recordID->record
 //bool getRecordAttr(int fileID, int recordID, char AttrName char *recordAttr);//fileID->table, recordID->record
 

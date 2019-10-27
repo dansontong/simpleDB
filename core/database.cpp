@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "database.h"
+#include "index.h"
 // include the sql parser
 // #include "SQLParser.h"
 // contains printing utilities
@@ -196,21 +197,30 @@ void insertRecord(int dictID, char *str)
 	int length = strlen(str);
 	Record record = file_writeFile(fileID, length, str);
 	
-	for(int i=0; i<DB->dataDict[dictID].attrNum; i++)
+	char *recordStr;
+	char *attribute;
+	file_getrecord(record.pageNo,record.recordID,recordStr);
+	int i;
+	char *offset;
+	for(i=0; i<DB->dataDict[dictID].attrNum; i++)
 	{
 		if( DB->dataDict[dictID].attr[i].indexFile.fileID != 0 )
-		{					
-			for(int j=0;j<DB->dataDict[dictID].attrNum;j++){//查找属性，根据属性名找到属性在记录中的具体位置
-				if(strcmp(DB->dataDict[dictID].attr[j].name, DB->dataDict[dictID].attr[i].name)==0){
-					record.offset = record+DB->dataDict[dictID].attr[j].offset; //TODO：是否需要加上record?
-				}
+		{		
+			offset = recordStr+DB->dataDict[dictID].attr[i].offset; //TODO：是否需要加上record?
+			if(i<DB->dataDict[dictID].attrNum-1)
+			{
+				memcpy(attribute,recordStr+DB->dataDict[dictID].attr[i].offset,DB->dataDict[dictID].attr[i+1].offset-DB->dataDict[dictID].attr[i].offset);//一般情况：位置为record的起始地址加上属性的偏移量，长度为该下一条属性的偏移量减去该属性的偏移量
 			}
-			insert_index(DB->dataDict[dictID].tableName, DB->dataDict[dictID].attr[i].name, &record);
+			else
+			{
+				memcpy(attribute,recordStr+DB->dataDict[dictID].attr[i].offset,DB->dataDict[dictID].attrLength-DB->dataDict[dictID].attr[i].offset);//当该属性为最后一个属性时，长度为总属性长度减去该属性的偏移量
+			}
+			insert_index(DB->dataDict[dictID].tableName, DB->dataDict[dictID].attr[i].name, attribute, &record, offset);			
 		}
 	}	
 }
 
 void deleteRecord(int dictID, char *str)
 {
-	
+
 }
