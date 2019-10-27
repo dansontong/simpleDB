@@ -18,10 +18,10 @@ void create_index(struct DataBase *DB,char *tableName,char *Attributename){
 				DB->dataDict[i].attr[j].indexFile.fileID=indexID;	
 				DB->dataDict[i].attr[j].indexFile.tableName=tableName;
 				DB->dataDict[i].attr[j].indexFile.attrName=Attributename;
-			}	
+			}
 			else{
 				indexID=DB->dataDict[i].attr[j].indexFile.fileID;				//获取索引文件
-			}	
+			}
 		}
 	}
 	for(i=0;i<MAX_FILE_NUM;i++){												//查找表文件的起始页号
@@ -42,7 +42,7 @@ void create_index(struct DataBase *DB,char *tableName,char *Attributename){
 				indexRecord.posPage=pagehead.pageNo;
 				file_getrecordAttribute(pagehead.pageNo,j,tableName,Attributename,indexRecord.key,indexRecord.posOffset);
 				indexRecord.recordID = j;
-				
+
 //				int node=insert(indexID, indexRecord);							//建立B+树索引
 
 			}
@@ -72,3 +72,8 @@ void drop_index(struct DataBase *DB,char *tableName,char *Attributename){
 	}
 }
 
+void update_index(char *tableName, char *Attributename, Record* oldRecord, Record* newRecord)
+{
+	delete_index(tableName, Attributename, oldRecord);
+	insert_index(tableName, *Attributename, newRecord);
+}
