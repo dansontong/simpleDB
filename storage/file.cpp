@@ -68,7 +68,7 @@ int file_newFile(int type, long NeededPageNum){
 	
 }
 
-Record file_writeFile(int FileID, int length,char *str){
+struct Record file_writeFile(int FileID, int length,char *str){
 	Record record; // 返回刚存入的记录描述信息
 
 	int querypage=-1;
