@@ -195,4 +195,8 @@ void recordInsert(int dictID, char *str)
 	int fileID = DB->dataDict[dictID].fileID;
 	int length = strlen(str);
 	file_writeFile(fileID, length, str);
+	for(int i=0; i<DB->dataDict[dictID].attrNum; i++){
+		DB->dataDict[dictID].
+	}
+	insert_index(DB->dataDict[dictID].tableName, attrName, pageNo, offset);
 }
