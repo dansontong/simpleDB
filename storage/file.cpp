@@ -282,7 +282,7 @@ bool file_getrecord(long pageNo,int recordID,char *record){
 	}
 	return false;
 }
-bool file_getrecordAttribute(struct DataBase *DB,long pageNo,int recordID,char* tablename,char* Attributename,int* Attribute,int* posOffset){
+bool file_getrecordAttribute(struct DataBase *DB,long pageNo,int recordID,char* tablename,char* Attributename,char* Attribute,int* posOffset){
 	char *record;
 	if(file_getrecord(pageNo,recordID,record)){//返回该条记录
 		int i=0;
