@@ -46,6 +46,11 @@ struct Table{
 	int attrLength;//属性总长度
 };
 
+struct Record{
+	long pageNo;   //页号
+	int recordID;  //页内第几个记录
+};
+
 // 数据存储信息
 struct DataBase{
 	FILE *dbFile;

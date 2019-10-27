@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 		printf("insert line No.%d\n", count++);
 		//printf("%s\n", buff);
 	}
-		database_showDbInfo();
+	database_showDbInfo();
 
 	// int fileID = file_createFile(&dbMeta, TABLE_FILE, 1);
 	// printf("创建文件%d成功！\n", fileID);

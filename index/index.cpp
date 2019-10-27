@@ -53,6 +53,7 @@ void create_index(char *tableName,char *Attributename){
 			for(j=0;j<pagehead.recordNum;j++){
 				indexRecord.posPage=pagehead.pageNo;
 				file_getrecordAttribute(DB,pagehead.pageNo,j,tableName,Attributename,indexRecord.key,indexRecord.posOffset);
+        indexRecord.recordID = j;
 				int value=insert(index, indexRecord);							//建立B+树索引
 				if(value==-1){
 					printf("error:Insertion failed!\n");

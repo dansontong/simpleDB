@@ -49,12 +49,12 @@ struct FileMeta{
 // void file_Init(struct DataBase *DB);
 
 // 文件管理-实现在file部分
-void file_writeFile(int fileID, int length, char *str);
+Record* file_writeFile(int fileID, int length, char *str);
 int file_newFile(int type, long NeededPageNum);
 void file_readFile(int FileID,char *str);
 void file_deleteFile(int FileID);
-void file_read_sd(long pageno,char *bufferpath); //提供给buffer模块，读取磁盘
-void file_write_sd(long pageno,char *bufferpath);//提供给buffer模块，写入磁盘
+void file_read_sd(long pageNo, char *bufferpath); //提供给buffer模块，读取磁盘
+void file_write_sd(long pageNo, char *bufferpath);//提供给buffer模块，写入磁盘
 void file_print_freepace();
 void file_fseek(int fileID, long offset, int fromwhere);//文件流 偏移量(用正负表示方向) 偏移位置(刘欢-B+树-需求)
 
