@@ -30,10 +30,10 @@ void create_index(char *tableName,char *Attributename){
 				DB->dataDict[i].attr[j].indexFile.fileID=indexID;	
 				DB->dataDict[i].attr[j].indexFile.tableName=tableName;
 				DB->dataDict[i].attr[j].indexFile.attrName=Attributename;
-			}	
+			}
 			else{
 				indexID=DB->dataDict[i].attr[j].indexFile.fileID;				//获取索引文件
-			}	
+			}
 		}
 	}
 	for(i=0;i<MAX_FILE_NUM;i++){												//查找表文件的起始页号
@@ -52,6 +52,7 @@ void create_index(char *tableName,char *Attributename){
 		if(pagehead.recordNum>0){
 			for(j=0;j<pagehead.recordNum;j++){
 				indexRecord.posPage=pagehead.pageNo;
+
 				file_getrecordAttribute(DB,pagehead.pageNo,j,tableName,Attributename,indexRecord.key,indexRecord.posOffset);
         indexRecord.recordID = j;
 				int value=insert(index, indexRecord);							//建立B+树索引
@@ -94,4 +95,10 @@ int find_indexfile(char *tableName,char *Attributename){								//查找索引�
 			}
 		}
 	}
+}
+
+void update_index(char *tableName, char *Attributename, Record* oldRecord, Record* newRecord)
+{
+	delete_index(tableName, Attributename, oldRecord);
+	insert_index(tableName, *Attributename, newRecord);
 }
