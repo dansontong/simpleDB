@@ -5,56 +5,57 @@
 // contains printing utilities
 // #include "util/sqlhelper.h"
 
+//==================== global variable ====================
+struct DataBase *DB = NULL; /* 模块内共享 */
 
-void database_initDB(struct DataBase *DB, char *fileName)
+//====================    function     ====================
+void database_initDB(struct DataBase *db, char *fileName)
 {
-	FILE *dbFile = fopen(fileName, "rb");
-	if(dbFile == NULL)
+	DB = db;
+	DB->dbFile = fopen(fileName, "rb");
+	if(DB->dbFile == NULL)
 	{
 		printf("DataBase isn't exist, creating new dataBase.\n");
 		database_createDbFile(fileName);
-		dbFile = fopen(fileName, "rb");
 	}
-
-	size_t sizeRead = fread(&(DB->dbMeta), sizeof(struct DbMeta), 1, dbFile);
+	
+	size_t sizeRead = fread(&(DB->dbMeta), sizeof(struct DbMeta), 1, DB->dbFile);
 	// 为空闲空间的位示图bitMap分配空间
 	DB->freeSpaceBitMap = (unsigned long *)malloc(DB->dbMeta.bitMapSize);
-	//rewind(dbFile);
+	//rewind(DB->dbFile);
 	// 在文件中定位到bitMap开始的位置，令文件指针指向这里
-	fseek(dbFile, DB->dbMeta.bitMapAddr, SEEK_SET);
-	sizeRead = fread(DB->freeSpaceBitMap, DB->dbMeta.bitMapSize, 1, dbFile);// 从文件中读取bitMap的内容
-	fclose(dbFile);
-	DB->dbFile = fopen(fileName, "rb+");
+	fseek(DB->dbFile, DB->dbMeta.bitMapAddr, SEEK_SET);
+	sizeRead = fread(DB->freeSpaceBitMap, DB->dbMeta.bitMapSize, 1, DB->dbFile);// 从文件中读取bitMap的内容
+	//fclose(dbFile);
+	// DB->dbFile = fopen(fileName, "rb+");
 
 	//加载 数据字典
 	int fid = DB->dbMeta.dataDictFid;
 	if(fid < 0)
 	{
 		//printf("dataDictionary file doesn't exist.\n");
-		fid = file_newFile(DB, DATA_DICT_FILE, 1);
+		fid = file_newFile(DATA_DICT_FILE, 1);
 		DB->dbMeta.dataDictFid = fid;
 	}
-	int count = readDataDictionary(DB);
+	int count = readDataDictionary();
 	//一律重置数据字典，后续需要更改
 	for (int i = count; i < MAX_FILE_NUM; i++) {
 		memset(&DB->dataDict[i], 0, sizeof(Table));
 		DB->dataDict[i].fileID = -1;
 	}
 	printf("initDB done.\n");
-
 	//建立表
-
 	//插入数据
 }
 
 // 关闭数据库
-void database_closeDB(struct DataBase *DB)
+void database_closeDB()
 {
 	fclose(DB->dbFile);
 	free(DB->freeSpaceBitMap);
 }
 
-int readDataDictionary(struct DataBase *DB)
+int readDataDictionary()
 {
 	int fid = DB->dbMeta.dataDictFid;
 	if (fid < 0) {
@@ -84,50 +85,51 @@ int readDataDictionary(struct DataBase *DB)
 
 void database_createDbFile(char *fileName)
 {
-	struct DataBase DB;
-	DB.dbMeta.blockSize = BLOCK_SIZE;
-	DB.dbMeta.blockNum = FILE_DATA_SIZE / BLOCK_SIZE; // 256*1024
-	DB.dbMeta.blockFree = DB.dbMeta.blockNum;
-	DB.dbMeta.bitMapSize = BIT_MAP_SIZE;
-	DB.dbMeta.bitMapAddr = BIT_MAP_ADDR;
-	DB.dbMeta.dataSize = FILE_DATA_SIZE;
-	DB.dbMeta.dataAddr = FILE_DATA_ADDR;
-	DB.dbMeta.currFileNum = 0;
-	DB.dbMeta.dataDictFid = -1;
-	//DB.dbMeta.fileMeta[MAX_FILE_NUM] = new FileMeta[MAX_FILE_NUM];
-	DB.dbMeta.fileMeta[0].id = 0;
-	strcpy(DB.dbMeta.fileMeta[0].name, "0");
-	DB.dbMeta.fileMeta[0].segNum = SEGMENT_NUM;
-	DB.dbMeta.fileMeta[0].state = 1;
-	memset(DB.dbMeta.fileMeta[0].segList, -1, sizeof(struct Segment) * SEGMENT_NUM);
+	DataBase db;
+	db.dbMeta.blockSize = BLOCK_SIZE;
+	db.dbMeta.blockNum = FILE_DATA_SIZE / BLOCK_SIZE; // 256*1024
+	db.dbMeta.blockFree = db.dbMeta.blockNum;
+	db.dbMeta.bitMapSize = BIT_MAP_SIZE;
+	db.dbMeta.bitMapAddr = BIT_MAP_ADDR;
+	db.dbMeta.dataSize = FILE_DATA_SIZE;
+	db.dbMeta.dataAddr = FILE_DATA_ADDR;
+	db.dbMeta.currFileNum = 0;
+	db.dbMeta.dataDictFid = -1;
+	//db.dbMeta.fileMeta[MAX_FILE_NUM] = new FileMeta[MAX_FILE_NUM];
+	db.dbMeta.fileMeta[0].id = 0;
+	strcpy(db.dbMeta.fileMeta[0].name, "0");
+	db.dbMeta.fileMeta[0].segNum = SEGMENT_NUM;
+	db.dbMeta.fileMeta[0].state = 1;
+	memset(db.dbMeta.fileMeta[0].segList, -1, sizeof(struct Segment) * SEGMENT_NUM);
 
 	// 为空闲空间映射表分配空间，所有的初始化为-1，表示空闲
-	DB.freeSpaceBitMap = (unsigned long *)malloc(DB.dbMeta.bitMapSize);
-	memset(DB.freeSpaceBitMap, -1, DB.dbMeta.bitMapSize);
+	db.freeSpaceBitMap = (unsigned long *)malloc(db.dbMeta.bitMapSize);
+	memset(db.freeSpaceBitMap, -1, db.dbMeta.bitMapSize);
 
-	FILE *dbFile = fopen(fileName, "wb");
+	db.dbFile = fopen(fileName, "wb");
 	// 把初始化的相关参数写到数据库文件头部
-	fwrite(&(DB.dbMeta), sizeof(struct DbMeta), 1, dbFile);
+	fwrite(&(db.dbMeta), sizeof(struct DbMeta), 1, db.dbFile);
 	// 把bitMap写到数据库文件中
-	fseek(dbFile, DB.dbMeta.bitMapAddr, SEEK_SET);
-	fwrite(DB.freeSpaceBitMap, DB.dbMeta.bitMapSize, 1, dbFile);
+	fseek(db.dbFile, db.dbMeta.bitMapAddr, SEEK_SET);
+	fwrite(db.freeSpaceBitMap, db.dbMeta.bitMapSize, 1, db.dbFile);
 
-	free(DB.freeSpaceBitMap);
-	fclose(dbFile);
+	// close db
+	free(db.freeSpaceBitMap);
+	fclose(db.dbFile);
 	
 	printf("create dataBase done.\n");
 }
 
-void database_showDbInfo(struct DataBase *DB){
+void database_showDbInfo(){
 	Buf_PrintInfo();
 }
 
-int database_memToDisk(struct DataBase *DB){
+int database_memToDisk(){
 
 	return 0;
 }
 
-bool tupleInsert(struct DataBase *DB, int length, int FileID, char *str){
+bool tupleInsert(int length, int FileID, char *str){
 
 }
 
@@ -156,7 +158,7 @@ void insertAttr(Table *table,const char *name, DATA_TYPE type, int length,bool n
 }
 
 //创建表，并返回数据字典下标
-int createTable(struct DataBase *DB, char *str)
+int createTable(char *str)
 {
 	//解析字符串 CREATE TABLE NATION ( N_NATIONKEY INTEGER NOT NULL,N_NAMECHAR(25) NOT NULL,N_REGIONKEY INTEGER NOT NULL,N_COMMENTVARCHAR(152));
 	// parse a given query
@@ -164,7 +166,7 @@ int createTable(struct DataBase *DB, char *str)
 	// hsql::SQLParser::parse(query, &result);//后期再使用
 	char tableName[MAX_NAME_LENGTH] = "Supplier";
 
-	int fileID = file_newFile(DB, TABLE_FILE, 1);
+	int fileID = file_newFile(TABLE_FILE, 1);
 	//插入数据字典
 	int dictID = -1;
 	for(int i=0; i<MAX_FILE_NUM; i++){
@@ -188,9 +190,9 @@ int createTable(struct DataBase *DB, char *str)
 	return dictID;
 }
 
-void recordInsert(struct DataBase *DB, int dictID, char *str)
+void recordInsert(int dictID, char *str)
 {
 	int fileID = DB->dataDict[dictID].fileID;
 	int length = strlen(str);
-	file_writeFile(DB, fileID, length, str);
+	file_writeFile(fileID, length, str);
 }

@@ -9,6 +9,7 @@
 #include "util/sqlhelper.h"
 
 int main(int argc, char* argv[]) {
+  printf("======================= parser_test begin ===========\n");
   if (argc <= 1) {
     fprintf(stderr, "Usage: ./example \"SELECT * FROM test;\"\n");
     return -1;
@@ -38,4 +39,5 @@ int main(int argc, char* argv[]) {
             result.errorColumn());
     return -1;
   }
+  printf("======================= parser_test end ============\n");
 }

@@ -10,17 +10,17 @@ int main(int argc, char* argv[])
 
 	log_init();//初始化日志系统
 	database_initDB(&DB, dbFile);
-	Buf_Init(&DB);
+	Buf_Init();
 
 	log_Debug("DB initial done.\n");
 
 	//展示数据库
-	database_showDbInfo(&DB);
-	database_memToDisk(&DB);
+	database_showDbInfo();
+	database_memToDisk();
 	
 	//创建表
 	char tableFile[30] = "./data/table_list";
-	int sup_dictID = createTable(&DB, tableFile);//后续需要改，要能根据parser解析结果自动创建表,目前只创建supplier表
+	int sup_dictID = createTable(tableFile);//后续需要改，要能根据parser解析结果自动创建表,目前只创建supplier表
 
 	//读入数据，插入记录
 	char tupleFile[30] = "./data/supplier.tbl";

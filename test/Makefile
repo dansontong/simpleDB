@@ -8,16 +8,16 @@ src_buf = $(shell find ../log ../core ../storage -name "*.cpp")
 src_bPtree = $(shell find ../log ../core ../storage ../index/BPlusTree -name "*.cpp")
 
 buffer: storage/buffer_test.cpp
-	$(cc) $(CXXFLAGS) $(INCLUDE) storage/buffer_test.cpp $(src_buf) -o buffer_test.o
-	$(cc) $(CXXFLAGS) $(INCLUDE) log/log_test.cpp ../log/log.cpp -o log_test.o
-	$(cc) $(CXXFLAGS) $(INCLUDE) storage/pageBitMap_test.cpp  -o pageBitMap_test.o
-	$(CXX) $(CFLAGS_parser) parser/parser_test.cpp -o parser_test.o -lsqlparser
+	# $(cc) $(CXXFLAGS) $(INCLUDE) storage/buffer_test.cpp $(src_buf) -o buffer_test.o
+	# $(cc) $(CXXFLAGS) $(INCLUDE) log/log_test.cpp ../log/log.cpp -o log_test.o
+	# $(cc) $(CXXFLAGS) $(INCLUDE) storage/pageBitMap_test.cpp  -o pageBitMap_test.o
+	# $(CXX) $(CFLAGS_parser) parser/parser_test.cpp -o parser_test.o -lsqlparser
 	# $(cc) $(CXXFLAGS) $(INCLUDE) index/index_test.cpp  -o index_test.o
 	$(cc) $(CXXFLAGS) $(INCLUDE) index/bPlusTree_test.cpp $(src_bPtree) -o bPlusTree_test.o
-	./buffer_test.o
-	./log_test.o
-	./pageBitMap_test.o
-	./parser_test.o
+	# ./buffer_test.o
+	# ./log_test.o
+	# ./pageBitMap_test.o
+	# ./parser_test.o
 	# ./index_test.o
 	 ./bPlusTree_test.o
 	rm -rf *_test.o *.log
@@ -27,4 +27,4 @@ clear:
 	rm -rf *test.o  *.log
 
 # run follow command, before run ./parser_test
-# export LD_LIBRARY_PATH=..
+# export LD_LIBRARY_PATH=../parser
