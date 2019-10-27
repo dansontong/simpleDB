@@ -13,13 +13,12 @@ char *bufBlocks;    /* buffer data */
 BufMeta *bufMetas;  /* 每一个缓存块对应的参数信息 */
 long freeBlockHead; /* 空闲块组成的链表的起始节点 */
 
-struct DataBase *db = NULL; /* 与外存交互时需要…… */
+// struct DataBase *db = NULL; /* 与外存交互时需要…… */
 // ==================== public func ====================
-void Buf_Init(struct DataBase *db_p)
+void Buf_Init()
 {
     // temp
     log_init();
-    db = db_p;
 
     char *newbufblocks = NULL;
     BufMeta *newbufmeta = NULL;
@@ -176,7 +175,7 @@ long Buf_LoadPage(BufTag btag)
     // // just for test
     // TestLoad(blockStart);
     // 从外存读取一个块
-    file_read_sd(db, btag.pageNo, blockStart);
+    file_read_sd(btag.pageNo, blockStart);
     newbmeta->bufMode = BM_isValid;
     return newBufId;
 }
@@ -237,7 +236,7 @@ bool Buf_Remove(long bufId)
     {
         // 缓存块为脏数据，丢弃前先写回
         char *bufstart = Buf_GetBlock(bufId);
-        file_write_sd(db, bmeta->bTag.pageNo, bufstart);
+        file_write_sd(bmeta->bTag.pageNo, bufstart);
 
         char logs[255];
         sprintf(logs, "%ld buffer is dirty, write to disk first.", bufId);

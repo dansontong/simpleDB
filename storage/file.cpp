@@ -3,18 +3,25 @@
 #include "buffer.h"
 #include "log.h"
 
+//==================== file global variable ====================
+extern struct DataBase *DB; /* 全局共享 */
+
+// void file_Init(struct DataBase *db)
+// {
+// 	DB = db;
+// }
 /**************************************************
  *                  file                          *
  **************************************************/
 //-1表示文件创建失败
-int file_newFile(struct DataBase *DB,int type, long NeededPageNum){
+int file_newFile(int type, long NeededPageNum){
 	if(DB->dbMeta.currFileNum>=MAX_FILE_NUM||DB->dbMeta.blockFree<NeededPageNum){
 		printf("空闲空间不足，文件创建失败！/n");
 		exit(0);	
 	}
 	int id = DB->dbMeta.currFileNum;
 	DB->dbMeta.currFileNum++;
-	long NewPages = page_requestPage( DB,NeededPageNum);
+	long NewPages = page_requestPage(NeededPageNum);
 	if(NewPages>=0){
 		int i,j;
 		for(i=0,j =NewPages;i<NeededPageNum,j<(DB->dbMeta.blockNum);i++,j++){
@@ -50,7 +57,7 @@ int file_newFile(struct DataBase *DB,int type, long NeededPageNum){
 		DB->dbMeta.fileMeta[0].segList[i].firstPageNo=NewPages;
 		DB->dbMeta.fileMeta[0].segList[i].pageNum=NeededPageNum;
 		DB->dbMeta.blockFree=DB->dbMeta.blockFree-NeededPageNum;
-		file_print_freepace(DB);
+		file_print_freepace();
 		
 	}
 	else{
@@ -61,7 +68,7 @@ int file_newFile(struct DataBase *DB,int type, long NeededPageNum){
 	
 }
 
-void file_writeFile(struct DataBase *DB, int FileID, int length,char *str){
+void file_writeFile(int FileID, int length,char *str){
 	int querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
@@ -127,10 +134,10 @@ void file_writeFile(struct DataBase *DB, int FileID, int length,char *str){
 		break;						//找到后就break
 	}
 	if(!isfound){					//若遍历完没有页就新申请一个页。
-		long pagenumber = page_requestPage(DB,1);
+		long pagenumber = page_requestPage(1);
 		if(pagenumber>=0){
 			DB->dbMeta.blockFree=DB->dbMeta.blockFree-1;
-			file_print_freepace(DB);
+			file_print_freepace();
 			struct PageMeta pagemeta; //pagehead就是未申请前最后一个页
 			pagemeta.nextPageNo=-1;
 			pagemeta.prePageNo=pagehead.pageNo;				
@@ -154,7 +161,7 @@ void file_writeFile(struct DataBase *DB, int FileID, int length,char *str){
 	}
 	
 }
-void file_readFile(struct DataBase *DB,int FileID,char *str){
+void file_readFile(int FileID,char *str){
 	int i;
 	for(i=0;i<MAX_FILE_NUM;i++){
 		if(DB->dbMeta.fileMeta[0].segList[i].id==FileID){
@@ -208,7 +215,7 @@ void file_readFile(struct DataBase *DB,int FileID,char *str){
 	}
 }
 
-void file_deleteFile(struct DataBase *DB,int FileID){
+void file_deleteFile(int FileID){
 	int i;
 	for(i=0;i<MAX_FILE_NUM;i++){
 		if(DB->dbMeta.fileMeta[0].segList[i].id==FileID){			//找到文件对应的页
@@ -227,7 +234,7 @@ void file_deleteFile(struct DataBase *DB,int FileID){
 		fseek(DB->dbFile,pageAddr,SEEK_SET);
 		size_t sizeRead = fread(&pagehead,sizeofpagehead,1,DB->dbFile);			//读取这一页的内容
 		nextPage = pagehead.nextPageNo;
-		page_recover_onepage(DB,pagehead.pageNo);				//删除这一页
+		page_recover_onepage(pagehead.pageNo);				//删除这一页
 		if(nextPage>0){
 			pageAddr = DB->dbMeta.dataAddr +nextPage * PAGE_SIZE;	//获取新的一页的地址
 		}
@@ -243,17 +250,17 @@ void file_deleteFile(struct DataBase *DB,int FileID){
 	DB->dbMeta.fileMeta[0].segList[i].pageNum = -1;
 	
 }
-void file_read_sd(struct DataBase *DB,long pageno,char *bufferpath){
+void file_read_sd(long pageno,char *bufferpath){
 	rewind(DB->dbFile);
 	fseek(DB->dbFile,DB->dbMeta.dataAddr+pageno*PAGE_SIZE,SEEK_SET);
 	size_t sizeRead = fread(bufferpath,PAGE_SIZE,1,DB->dbFile);
 }
-void file_write_sd(struct DataBase *DB,long pageno,char *bufferpath){
+void file_write_sd(long pageno,char *bufferpath){
 	rewind(DB->dbFile);
 	fseek(DB->dbFile,DB->dbMeta.dataAddr+pageno*PAGE_SIZE,SEEK_SET);
 	fwrite(bufferpath,PAGE_SIZE,1,DB->dbFile);
 }
-void file_print_freepace(struct DataBase *DB){
+void file_print_freepace(){
 	printf("已经用了%ld块，还空闲%ld块\n",DB->dbMeta.blockNum-DB->dbMeta.blockFree,DB->dbMeta.blockFree);
 	
 }
@@ -282,7 +289,8 @@ bool file_getrecord(long pageNo,int recordID,char *record){
 	}
 	return false;
 }
-bool file_getrecordAttribute(struct DataBase *DB,long pageNo,int recordID,char* tablename,char* Attributename,int* Attribute,int* posOffset){
+
+bool file_getrecordAttribute(long pageNo,int recordID,char* tablename,char* Attributename,int* Attribute,int* posOffset){
 	char *record;
 	if(file_getrecord(pageNo,recordID,record)){//返回该条记录
 		int i=0;
@@ -317,6 +325,10 @@ bool file_getrecordAttribute(struct DataBase *DB,long pageNo,int recordID,char* 
 	}
 }
 
+void file_fseek(int fileID, long offset, int fromwhere)
+{
+
+}
 
 /**************************************************
  *                  page                          *
@@ -355,7 +367,7 @@ void page_setbitmap(unsigned long *bit_map,int position,int value)
 	
 }
 
-int page_requestPage(struct DataBase *DB, long NeededPageNum)
+int page_requestPage(long NeededPageNum)
 {
 	int flag = 0;
 
@@ -396,7 +408,7 @@ int page_requestPage(struct DataBase *DB, long NeededPageNum)
 	}
 }
 
-void page_recover_onepage(struct DataBase *DB,int PageNo)
+void page_recover_onepage(int PageNo)
 {
 
 	int p_num = PageNo/(8*sizeof(long));
@@ -405,7 +417,7 @@ void page_recover_onepage(struct DataBase *DB,int PageNo)
 	page_setbitmap(DB->freeSpaceBitMap+p_num,position,0);
 }
 
-void page_recover_allpages(struct DataBase *DB)
+void page_recover_allpages()
 {
 	for(int i= 0;i<DB->dbMeta.blockNum;i++){
 		int p_num = i/(8*sizeof(long));

@@ -46,24 +46,27 @@ struct FileMeta{
 };
 
 // ==================== manager function ====================
+// void file_Init(struct DataBase *DB);
+
 // 文件管理-实现在file部分
-void file_writeFile(struct DataBase *storage, int fileID, int length, char *str);
-int file_newFile(struct DataBase *DB,int type, long NeededPageNum);
-void file_readFile(struct DataBase *DB,int FileID,char *str);
-void file_deleteFile(struct DataBase *DB,int FileID);
-void file_read_sd(struct DataBase *DB,long pageno,char *bufferpath); //提供给buffer模块，读取磁盘
-void file_write_sd(struct DataBase *DB,long pageno,char *bufferpath);//提供给buffer模块，写入磁盘
-void file_print_freepace(struct DataBase *DB);
+void file_writeFile(int fileID, int length, char *str);
+int file_newFile(int type, long NeededPageNum);
+void file_readFile(int FileID,char *str);
+void file_deleteFile(int FileID);
+void file_read_sd(long pageno,char *bufferpath); //提供给buffer模块，读取磁盘
+void file_write_sd(long pageno,char *bufferpath);//提供给buffer模块，写入磁盘
+void file_print_freepace();
+void file_fseek(int fileID, long offset, int fromwhere);//文件流 偏移量(用正负表示方向) 偏移位置(刘欢-B+树-需求)
 
 
 // 页管理-实现在page部分
 int page_isEmpty(unsigned long bit_map,int position);
 void page_setbitmap(unsigned long *bit_map,int position,int value);
 
-int page_requestPage(struct DataBase *DB, long NeededPageNum);
+int page_requestPage(long NeededPageNum);
 
-void page_recover_onepage(struct DataBase *DB,int PageNo);
-void page_recover_allpages(struct DataBase *DB);
+void page_recover_onepage(int PageNo);
+void page_recover_allpages();
 
 
 // 段管理-实现在segment部分
@@ -71,7 +74,7 @@ void page_recover_allpages(struct DataBase *DB);
 
 // record 
 bool file_getrecord(long pageNo,int recordID,char *record);//record 存储返回的记录
-bool file_getrecordAttribute(struct DataBase *DB,long pageNo,int recordID,char* Attributename,char*Attribute,char* tablename);//Attribute存储返回的属性值
+bool file_getrecordAttribute(long pageNo,int recordID,char* Attributename,char*Attribute,char* tablename);//Attribute存储返回的属性值
 //bool getRecord(int fileID, int recordID, char *record);//fileID->table, recordID->record
 //bool getRecordAttr(int fileID, int recordID, char AttrName char *recordAttr);//fileID->table, recordID->record
 
