@@ -16,6 +16,7 @@
 typedef struct
 {
 	int key;//记录的键值
+	int pos;
 	int posPage;//页号
 	int posOffset;//偏移量
 }TreeRecord;//B+树节点上的记录
@@ -31,14 +32,14 @@ typedef struct
 void getRoot(FILE *index, Node &node);
 int search(FILE *index, int key);
 void searchNode(FILE *index, Node &node, int key);
-int searchRecord(Node &node, int key);
+int searchTreeRecord(Node &node, int key);
 int insert(FILE *index, TreeRecord record);
-int insertRecord(FILE *index, Node &node, TreeRecord record);
+int insertTreeRecord(FILE *index, Node &node, TreeRecord record);
 void splitNode(FILE *index, Node &nodea, TreeRecord record, int pos);
 void enlargeKey(FILE *index, Node &node);
 int del(FILE *index, int key);
-int delRecord(FILE *index, Node &node, int key);
-void transRecord(FILE *index, Node &left, Node &right, int dir, int pos);
+int delTreeRecord(FILE *index, Node &node, int key);
+void transTreeRecord(FILE *index, Node &left, Node &right, int dir, int pos);
 void mergeNode(FILE *index, Node &left, Node &right);
 void ensmallKey(FILE *index, Node &nod);
 void changeParent(FILE *index, Node &node, int child, int parent);

@@ -35,7 +35,7 @@ int main()
     {
         printf("\n\n");
         printf("    *******************************************************************\n");
-        printf("    *           Welcome to BPlusTree Program!                         *\n");
+        printf("    *           Welcome to BPlusTree Program!ÍË³ö³ÌÐò                         *\n");
         printf("    *           1.Create B+ Tree                                      *\n");
         printf("    *           2.Search a number form B+ Tree                        *\n");
         printf("    *           3.Insert a number form B+ Tree                        *\n");
