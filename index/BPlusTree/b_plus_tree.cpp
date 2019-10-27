@@ -1,9 +1,16 @@
 
 #include"b_plus_tree.h"
+#include"file.h"
 #include<stdio.h>
 #include<iostream>
 using namespace std;
 
+/*
+//需要调用的函数
+void fwrite(int fileID, int length, char *str);
+int file_newFile(int type, long NeededPageNum);
+void fread(int FileID,char *str);
+*/
 
 void getRoot(FILE *index, Node &node)
 {
