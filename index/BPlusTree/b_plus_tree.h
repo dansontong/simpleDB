@@ -20,6 +20,7 @@ typedef struct
 	int pos;//节点里面记录的相对位置
 	int posPage;//页号
 	char* posOffset;//偏移量
+	int recordID;   //记录ID
 }TreeRecord;//B+树节点上的记录
 
 typedef struct Node
