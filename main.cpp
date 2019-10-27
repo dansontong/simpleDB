@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 		//printf("%s\n", buff);
 	}
 	//delete record
-	delete
+	deleteRecord(int sup_dictID, char *str);
 
 
 
