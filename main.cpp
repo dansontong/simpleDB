@@ -32,12 +32,12 @@ int main(int argc, char* argv[])
 	{
 		strtok(buff, "\n");//使用换行符分割，相当于去掉换行符
 		//char *str = strtok(buff, "|");//使用|分割
-		recordInsert(&DB, sup_dictID, buff);
+		recordInsert(sup_dictID, buff);
 		Log(INFO, "insert line No.%d", count);
 		printf("insert line No.%d\n", count++);
 		//printf("%s\n", buff);
 	}
-		database_showDbInfo(&DB);
+		database_showDbInfo();
 
 	// int fileID = file_createFile(&dbMeta, TABLE_FILE, 1);
 	// printf("创建文件%d成功！\n", fileID);
@@ -57,5 +57,5 @@ int main(int argc, char* argv[])
 	// 	file_writeFile(&dbMeta, fileID, strlen(str), str);
 	// }
 
-	database_closeDB(&DB);
+	database_closeDB();
 }
