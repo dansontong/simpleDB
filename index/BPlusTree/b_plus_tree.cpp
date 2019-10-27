@@ -1,6 +1,6 @@
 
 #include"b_plus_tree.h"
-#include"file.h"
+//#include"file.h"
 #include<stdio.h>
 #include<iostream>
 using namespace std;
@@ -59,6 +59,7 @@ int searchTreeRecord(Node &node, int key)
 	return i;
 }
 
+//寻找叶节点
 void searchNode(FILE *index, Node &node, int key)
 {
 	int pos, offset;
@@ -76,6 +77,7 @@ void searchNode(FILE *index, Node &node, int key)
 	}
 } 
 
+//找到叶节点之后就可以在叶节点插入记录
 int insertTreeRecord(FILE *index, Node &node, TreeRecord record)
 {
 	
@@ -222,7 +224,8 @@ void splitNode(FILE *index, Node &nodea, TreeRecord record, int pos)
 	}
 }
 
-int insert(FILE *index, TreeRecord record)//对于给定的一个“键值—指针对”，按照 B+树的定义，将其插入到规定的叶节点。
+//对于给定的一个“键值—指针对”，按照 B+树的定义，将其插入到规定的叶节点。
+int insert(FILE *index, TreeRecord record)
 {
 	Node node;	
 	getRoot(index, node);
@@ -271,6 +274,7 @@ void enlargeKey(FILE *index, Node &node)
 	}
 }
 
+//删除节点
 int del(FILE *index, int key)
 {
 	cout << "start delete" << key << endl;

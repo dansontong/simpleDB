@@ -31,11 +31,14 @@ int main()
 			exit(0);
 		}
 	}
+	int ret = 0;
+            srand((unsigned int)time(NULL));
+			ret = rand()%100;
     while (0 != x)
     {
         printf("\n\n");
         printf("    *******************************************************************\n");
-        printf("    *           Welcome to BPlusTree Program!退出程序                         *\n");
+        printf("    *           Welcome to BPlusTree Program!                         *\n");
         printf("    *           1.Create B+ Tree                                      *\n");
         printf("    *           2.Search a number form B+ Tree                        *\n");
         printf("    *           3.Insert a number form B+ Tree                        *\n");
@@ -55,7 +58,8 @@ int main()
         case 1:
 	
 			rewind(fp);//相当于fseek（文件指针，0,0），简单来说，就是使文件内的指向字节的指针回到开头，重新指向第一个字节
-			for (k= 0; k<=8; k++)
+			
+			for (k= 0; k<=ret; k++)
 			{
 				record_insert.key = k;		
 				record_insert.pos = k* 2;
