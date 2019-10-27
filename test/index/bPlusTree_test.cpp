@@ -66,6 +66,7 @@ int main()
 				insert(fp, record_insert);
 			}
 			rewind(fp);
+			break;
 		
 //			for(w=0;w<node.count;w++)   //
 //			{
@@ -90,7 +91,21 @@ int main()
 			record_insert.pos = b* 2;
            	insert(fp,record_insert);
 			printf("insert succeed");
+			/*
+
+			Node node;
+			getRoot(fp, node);
+			int rootOffSet;
+			Node rootNode;
+			rewind(fp);
+			fread(&rootOffSet, 1, sizeof(rootOffSet), fp);
+			fseek(fp, rootOffSet, SEEK_SET);
+			fread(&node, 1, sizeof(node), fp);
+			showTree(fp,node);
+			*/
+			goto print;
 		 
+
             break;
 
         case 4:
@@ -100,7 +115,21 @@ int main()
 			scanf("%d",&a);
            	del(fp,a);
 			printf("delet succeed");
-            break;
+			/*
+
+			Node node;
+			getRoot(fp, node);
+			int rootOffSet;
+			Node rootNode;
+			rewind(fp);
+			fread(&rootOffSet, 1, sizeof(rootOffSet), fp);
+			fseek(fp, rootOffSet, SEEK_SET);
+			fread(&node, 1, sizeof(node), fp);
+			showTree(fp,node);
+			*/
+
+            //break;
+		print:
 		case 5:
 			Node node;
 			getRoot(fp, node);
