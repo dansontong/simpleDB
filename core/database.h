@@ -66,25 +66,25 @@ struct DataBase{
 
 void database_createDbFile(char *fileName); 
 void database_initDB(struct DataBase *DB, char *fileName);
-void database_closeDB();
-void database_showDbInfo();
-void database_showSegList(int fileID); 
+void database_closeDB(struct DataBase *DB);
+void database_showDbInfo(struct DataBase *DB);
+void database_showSegList(struct DataBase *DB, int fileID); 
 
 
 //定时把内存中缓冲区的所有数据写到磁盘
-int database_memToDisk();
+int database_memToDisk(struct DataBase *DB);
 
 
 // 记录相关
-void recordInsert(int dictID, char *str);
+void recordInsert(struct DataBase *DB, int dictID, char *str);
 
 
 // 表相关
-int createTable(char *str);
+int createTable(struct DataBase *DB, char *str);
 void insertAttr(Table *table, const char *name, DATA_TYPE type, int length,bool notNull);
 int getDictIDbyName(char *tableName);
 
 //字典相关
-int readDataDictionary();
+int readDataDictionary(struct DataBase *DB);
 
 #endif
