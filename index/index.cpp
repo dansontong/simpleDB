@@ -111,15 +111,6 @@ int find_indexfile(char *tableName,char *Attributename){					//查找索引文�
 	}
 }
 
-void insert_index(char *tableName,char *Attributename,Record* record){
-	struct TreeRecord indexRecord;
-	
-void update_index(char *tableName, char *Attributename, Record* oldRecord, Record* newRecord)
-{
-	delete_index(tableName, Attributename, oldRecord);
-	insert_index(tableName, *Attributename, newRecord);
-}
-
 void insert_index(char *tableName, char *Attributename, Record* record){		//索引插入结点
 	int value=find_indexfile(tableName,Attributename);
 	if(value==-1){
@@ -154,4 +145,10 @@ void delete_index(char *tableName, char *Attributename, Record* record){		//索�
 			printf("error:delete failed!\n");
 		}
 	}
+}
+
+void update_index(char *tableName, char *Attributename, Record* oldRecord, Record* newRecord)
+{
+	delete_index(tableName, Attributename, oldRecord);
+	insert_index(tableName, *Attributename, newRecord);
 }
