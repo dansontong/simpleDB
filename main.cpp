@@ -10,17 +10,17 @@ int main(int argc, char* argv[])
 
 	log_init();//初始化日志系统
 	database_initDB(&DB, dbFile);
-	Buf_Init(&DB);
+	Buf_Init();
 
 	log_Debug("DB initial done.\n");
 
 	//展示数据库
-	database_showDbInfo(&DB);
-	database_memToDisk(&DB);
+	database_showDbInfo();
+	database_memToDisk();
 	
 	//创建表
 	char tableFile[30] = "./data/table_list";
-	int sup_dictID = createTable(&DB, tableFile);//后续需要改，要能根据parser解析结果自动创建表,目前只创建supplier表
+	int sup_dictID = createTable(tableFile);//后续需要改，要能根据parser解析结果自动创建表,目前只创建supplier表
 
 	//读入数据，插入记录
 	char tupleFile[30] = "./data/supplier.tbl";
@@ -32,12 +32,12 @@ int main(int argc, char* argv[])
 	{
 		strtok(buff, "\n");//使用换行符分割，相当于去掉换行符
 		//char *str = strtok(buff, "|");//使用|分割
-		recordInsert(&DB, sup_dictID, buff);
+		recordInsert(sup_dictID, buff);
 		Log(INFO, "insert line No.%d", count);
 		printf("insert line No.%d\n", count++);
 		//printf("%s\n", buff);
 	}
-		database_showDbInfo(&DB);
+		database_showDbInfo();
 
 	// int fileID = file_createFile(&dbMeta, TABLE_FILE, 1);
 	// printf("创建文件%d成功！\n", fileID);
@@ -57,5 +57,5 @@ int main(int argc, char* argv[])
 	// 	file_writeFile(&dbMeta, fileID, strlen(str), str);
 	// }
 
-	database_closeDB(&DB);
+	database_closeDB();
 }
