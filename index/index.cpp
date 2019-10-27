@@ -54,7 +54,7 @@ void create_index(char *tableName,char *Attributename){
 				indexRecord.posPage=pagehead.pageNo;
 
 				file_getrecordAttribute(DB,pagehead.pageNo,j,tableName,Attributename,indexRecord.key,indexRecord.posOffset);
-        indexRecord.recordID = j;
+        		indexRecord.recordID = j;
 				int value=insert(index, indexRecord);							//建立B+树索引
 				if(value==-1){
 					printf("error:Insertion failed!\n");
@@ -97,6 +97,9 @@ int find_indexfile(char *tableName,char *Attributename){								//查找索引�
 	}
 }
 
+void insert_index(char *tableName,char *Attributename,Record* record){
+	struct TreeRecord indexRecord;
+	
 void update_index(char *tableName, char *Attributename, Record* oldRecord, Record* newRecord)
 {
 	delete_index(tableName, Attributename, oldRecord);
