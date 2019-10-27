@@ -3,8 +3,19 @@
 #include "buffer.h"
 #include "log.h"
 #include "index.h"
+#include<stdio.h>
 
-void create_index(struct DataBase *DB,char *tableName,char *Attributename){
+//==================== file global variable ====================
+extern struct DataBase *DB; /* 全局共享 */
+
+// void file_Init(struct DataBase *db)
+// {
+// 	DB = db;
+// }
+
+
+void create_index(char *tableName,char *Attributename){
+	FILE *index;
 	int indexID,FileID,i,j;
 	for(i=0;i<MAX_FILE_NUM;i++){												//查找表文件的文件号
 		if(strcmp(DB->dataDict[i].tableName,tableName)==0){
@@ -14,7 +25,8 @@ void create_index(struct DataBase *DB,char *tableName,char *Attributename){
 	for(j=0;attr<DB->dataDict[i].attrNum;j++){									//查找属性列
 		if(strcmp(DB->dataDict[i].attr[j].name,Attributename)==0){
 			if(DB->dataDict[i].attr[j].indexFile.fileID==0){
-				indexID=file_newFile(DB,INDEX_FILE,1)；							//新建索引文件
+				indexID=DB->dataDict[i].fileID*100+j；							//新建索引文件
+				index=fopen("../data/indexID","wb+");
 				DB->dataDict[i].attr[j].indexFile.fileID=indexID;	
 				DB->dataDict[i].attr[j].indexFile.tableName=tableName;
 				DB->dataDict[i].attr[j].indexFile.attrName=Attributename;
@@ -32,7 +44,7 @@ void create_index(struct DataBase *DB,char *tableName,char *Attributename){
 	long pagenum = DB->dbMeta.fileMeta[0].segList[i].pageNum;
 	int sizeofpagehead = sizeof(struct PageMeta);								//读取文件信息
 	int sizeofrecord = sizeof(struct OffsetInPage);								//
-	struct RecordOffset indexRecord;
+	struct TreeRecord indexRecord;
 	struct PageMeta pagehead;
 	for(i=0;i<pagenum;i++){					
 		struct BufTag buftag = Buf_GenerateTag(CurpageNo);						//根据页号从缓冲区调取页的内容
@@ -40,11 +52,13 @@ void create_index(struct DataBase *DB,char *tableName,char *Attributename){
 		if(pagehead.recordNum>0){
 			for(j=0;j<pagehead.recordNum;j++){
 				indexRecord.posPage=pagehead.pageNo;
-				file_getrecordAttribute(pagehead.pageNo,j,tableName,Attributename,indexRecord.key,indexRecord.posOffset);
-				indexRecord.recordID = j;
-				
-//				int node=insert(indexID, indexRecord);							//建立B+树索引
-
+				file_getrecordAttribute(DB,pagehead.pageNo,j,tableName,Attributename,indexRecord.key,indexRecord.posOffset);
+        indexRecord.recordID = j;
+				int value=insert(index, indexRecord);							//建立B+树索引
+				if(value==-1){
+					printf("error:Insertion failed!\n");
+					break；
+				}
 			}
 		}
 		long nextPno = pagehead.nextPageNo;
@@ -55,20 +69,29 @@ void create_index(struct DataBase *DB,char *tableName,char *Attributename){
 	}
 }
 
-void drop_index(struct DataBase *DB,char *tableName,char *Attributename){
-	for(int i=0;i<MAX_FILE_NUM;i++){													//查找表文件的文件号
+void drop_index(char *tableName,char *Attributename){
+	int value=find_indexfile(tableName,Attributename);
+	if(value==-1){
+		printf("error:the indexfile is not exist!\n");
+	}
+	else{
+
+	}
+}
+
+int find_indexfile(char *tableName,char *Attributename){								//查找索引文件号
+	for(int i=0;i<MAX_FILE_NUM;i++){
 		if(strcmp(DB->dataDict[i].tableName,tableName)==0){
-			for(int j=0;attr<DB->dataDict[i].attrNum;j++){								//查找属性列
+			for(int j=0;attr<DB->dataDict[i].attrNum;j++){
 				if(strcmp(DB->dataDict[i].attr[j].name,Attributename)==0){
 					if(DB->dataDict[i].attr[j].indexFile.fileID==0){
-						printf("error:the index is not exist!\n");						//属性列上不存在索引文件
+						return -1;
 					}
 					else{
-						file_deleteFile(DB,DB->dataDict[i].attr[j].indexFile.fileID);	//删除属性列上的索引文件
+						return DB->dataDict[i].attr[j].indexFile.fileID;
 					}
 				}
 			}
 		}
 	}
 }
-
