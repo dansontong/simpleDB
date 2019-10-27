@@ -289,7 +289,8 @@ bool file_getrecord(long pageNo,int recordID,char *record){
 	}
 	return false;
 }
-bool file_getrecordAttribute(long pageNo,int recordID,char* Attributename,char*Attribute,char* tablename){
+
+bool file_getrecordAttribute(long pageNo,int recordID,char* tablename,char* Attributename,int* Attribute,int* posOffset){
 	char *record;
 	if(file_getrecord(pageNo,recordID,record)){//返回该条记录
 		int i=0;
@@ -304,10 +305,12 @@ bool file_getrecordAttribute(long pageNo,int recordID,char* Attributename,char*A
 						if(strcmp(DB->dataDict[i].attr[j].name,Attributename)==0){
 							if(j<DB->dataDict[i].attrNum-1){
 								memcpy(Attribute,record+DB->dataDict[i].attr[j].offset,DB->dataDict[i].attr[j+1].offset-DB->dataDict[i].attr[j].offset);//一般情况：位置为record的起始地址加上属性的偏移量，长度为该下一条属性的偏移量减去该属性的偏移量
+								posOffset=record+DB->dataDict[i].attr[j].offset;
 								return true;
 							}
 							else{
 								memcpy(Attribute,record+DB->dataDict[i].attr[j].offset,DB->dataDict[i].attrLength-DB->dataDict[i].attr[j].offset);//当该属性为最后一个属性时，长度为总属性长度减去该属性的偏移量
+								posOffset=record+DB->dataDict[i].attr[j].offset;
 								return true;
 							}
 							

@@ -29,6 +29,7 @@ struct Attribute{
 	DATA_TYPE type;//数据类型
 	int offset; //偏移位置
 	bool notNull;
+	bool indexIsExist;
 };
 
 struct Index{

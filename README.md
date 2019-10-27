@@ -13,6 +13,7 @@ problem:
 　drop_index(table,collumn) //对列删除索引  
 　insert_index(table,collumn,rowid)//对指定索引插入一项  
 　delete_index(table,collumn,rowid)//对指定索引删除一项  
+fseek(FILE *stream, long offset, int fromwhere);//文件流 偏移量(用正负表示方向) 偏移位置
   
   
   
