@@ -107,6 +107,9 @@ int find_indexfile(char *tableName,char *Attributename){					//查找索引文�
 	}
 }
 
+void insert_index(char *tableName,char *Attributename,Record* record){
+	struct TreeRecord indexRecord;
+	
 void update_index(char *tableName, char *Attributename, Record* oldRecord, Record* newRecord)
 {
 	delete_index(tableName, Attributename, oldRecord);
