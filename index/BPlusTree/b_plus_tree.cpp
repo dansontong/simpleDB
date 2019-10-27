@@ -1,6 +1,6 @@
 
 #include"b_plus_tree.h"
-#include"file.h"
+//#include"file.h"
 #include<stdio.h>
 #include<iostream>
 using namespace std;
@@ -274,6 +274,7 @@ void enlargeKey(FILE *index, Node &node)
 	}
 }
 
+//É¾³ý½Úµã
 int del(FILE *index, int key)
 {
 	cout << "start delete" << key << endl;
