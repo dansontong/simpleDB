@@ -3,7 +3,7 @@
 #include "buffer.h"
 #include "log.h"
 
-//==================== file global variable ====================
+//==================== global variable ====================
 extern struct DataBase *DB; /* 全局共享 */
 
 // void file_Init(struct DataBase *db)
