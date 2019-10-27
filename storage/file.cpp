@@ -68,7 +68,9 @@ int file_newFile(int type, long NeededPageNum){
 	
 }
 
-void file_writeFile(int FileID, int length,char *str){
+Record file_writeFile(int FileID, int length,char *str){
+	Record record; // 返回刚存入的记录描述信息
+
 	int querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
@@ -92,7 +94,7 @@ void file_writeFile(int FileID, int length,char *str){
 	struct PageMeta pagehead;
 	struct BufTag buftag = Buf_GenerateTag(CurpageNo);
 	memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);						//读取第一页的内容并存放在pagehead里
-	OffsetInPage preoffset,curoffset;							//页里的记录索引的结构体，定义在paga.h里
+	OffsetInPage preoffset,curoffset;							//页里的记录索引的结构体，定义在file.h里
 	long currecordpos,curoffsetpos;								//前一个是指当前记录索引的位置，第二个是指当前记录的位置
 	for(int i=0;i<pagenum;i++){									//该循环是为了遍历所有的页找出能存放该记录的页
 		if(pagehead.freeSpace<=length+sizeofrecord){
@@ -121,7 +123,7 @@ void file_writeFile(int FileID, int length,char *str){
 				curoffset.recordID = pagehead.recordNum;
 				curoffset.offset = preoffset.offset+length;
 				curoffset.isDeleted = false;
-				currecordpos = sizeofpagehead + sizeofrecord*pagehead.recordNum;
+				currecordpos = sizeofpagehead + sizeofrecord*pagehead.recordNum; //currecordpos 等价于，页顶已被占据的空间大小。页前面放record描述信息，具体record数据存在页底。
 				curoffsetpos = PAGE_SIZE - preoffset.offset-length;
 			}
 			
@@ -134,15 +136,15 @@ void file_writeFile(int FileID, int length,char *str){
 		break;						//找到后就break
 	}
 	if(!isfound){					//若遍历完没有页就新申请一个页。
-		long pagenumber = page_requestPage(1);
-		if(pagenumber>=0){
+		long CurpageNo = page_requestPage(1);
+		if(CurpageNo>=0){
 			DB->dbMeta.blockFree=DB->dbMeta.blockFree-1;
 			file_print_freepace();
 			struct PageMeta pagemeta; //pagehead就是未申请前最后一个页
 			pagemeta.nextPageNo=-1;
 			pagemeta.prePageNo=pagehead.pageNo;				
-			pagemeta.pageNo=pagenumber;
-			pagehead.nextPageNo = pagenumber;		//将这页加在这个文件中				
+			pagemeta.pageNo=CurpageNo;
+			pagehead.nextPageNo = CurpageNo;		//将这页加在这个文件中				
 			pagemeta.recordNum = 1;
 			pagemeta.freeSpace = PAGE_SIZE - length - sizeofpagehead - sizeofrecord;
 			curoffsetpos = PAGE_SIZE-length;
@@ -159,7 +161,9 @@ void file_writeFile(int FileID, int length,char *str){
 			DB->dbMeta.fileMeta[0].segList[fileno].pageNum++;
 		}
 	}
-	
+	record.pageNo = CurpageNo;
+	record.recordID = curoffset.recordID;
+	return record;
 }
 void file_readFile(int FileID,char *str){
 	int i;

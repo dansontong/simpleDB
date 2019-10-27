@@ -194,9 +194,18 @@ void recordInsert(int dictID, char *str)
 {
 	int fileID = DB->dataDict[dictID].fileID;
 	int length = strlen(str);
-	file_writeFile(fileID, length, str);
-	for(int i=0; i<DB->dataDict[dictID].attrNum; i++){
-		DB->dataDict[dictID].
-	}
-	insert_index(DB->dataDict[dictID].tableName, attrName, pageNo, offset);
+	Record record = file_writeFile(fileID, length, str);
+	
+	for(int i=0; i<DB->dataDict[dictID].attrNum; i++)
+	{
+		if( DB->dataDict[dictID].attr[i].indexFile.fileID != 0 )
+		{					
+			for(int j=0;j<DB->dataDict[dictID].attrNum;j++){//查找属性，根据属性名找到属性在记录中的具体位置
+				if(strcmp(DB->dataDict[dictID].attr[j].name, DB->dataDict[dictID].attr[i].name)==0){
+					record.offset = record+DB->dataDict[dictID].attr[j].offset; //TODO：是否需要加上record?
+				}
+			}
+			insert_index(DB->dataDict[dictID].tableName, DB->dataDict[dictID].attr[i].name, &record);
+		}
+	}	
 }
