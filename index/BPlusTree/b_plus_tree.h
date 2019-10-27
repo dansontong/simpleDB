@@ -1,9 +1,9 @@
 #include<stdio.h>
 
 //最大节点数
-#define MAX 5
+#define MAX 10
 //最小节点数
-#define MIN 3
+#define MIN 5
 //内部节点为 0
 #define NODE 0
 //叶节点为 1

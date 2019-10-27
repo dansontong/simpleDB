@@ -363,15 +363,15 @@ int delTreeRecord(FILE *index, Node &node, int key)
 		//因此父节点中的用于找到该节点的那个分隔元素也需要更新。
 		//recon的key就是待删除元素所在节点的最后一个元素
 		//recon的pos就是待删除元素所在节点的起始地址
-		cout << "删除记录后，记录数<Min,考虑向左右孩子借或者合并" << endl;
+		cout << "after delete,the records<Min, think to brow or merge" << endl;//删除记录后，记录数<Min,考虑向左右孩子借或者合并
 		recon.key = node.pair[node.count - 1].key;//本元素所在节点的最后一个key
 		recon.pos = ftell(index) - sizeof(node);
 		//recot节点指向该元素的父节点
 		recot.pos = node.parent;
 		fseek(index, recot.pos, SEEK_SET);
 		fread(&top, 1, sizeof(top), index);
-		cout << "找到node的父亲节点" << endl;
-		cout << "top记录" << endl;
+		cout << "find node.parent" << endl;//找到node的父亲节点
+		cout << "top record" << endl;
 		for (int i = 0; i < top.count; i++)
 		{
 			cout << top.pair[i].key << "   ";
@@ -383,11 +383,11 @@ int delTreeRecord(FILE *index, Node &node, int key)
 		cout <<"tpos:"<< tpos << endl;
 		if (tpos == top.count - 1)
 		{//若删除的位置是节点中的最后一个元素
-			cout << "无右孩子" << endl;
+			cout << "no right child" << endl;
 			recol = top.pair[tpos - 1];
 			fseek(index, recol.pos, SEEK_SET);
 			fread(&left, 1, sizeof(left), index);
-			cout << "找到左孩子的叶子节点" << endl;
+			cout << "find left child's leaf" << endl;//找到左孩子的叶子节点
 			cout << "left.count:" << left.count << endl;
 			for (int i = 0; i < left.count; i++)
 			{
@@ -414,11 +414,11 @@ int delTreeRecord(FILE *index, Node &node, int key)
 			}
 			else
 			{
-				cout << "左孩子的记录数目小于Min" << endl;
+				cout << "left records<Min" << endl;//左孩子的记录数目小于Min
 				for (node.count--; pos < node.count; pos++)
 					node.pair[pos] = node.pair[pos + 1];
 
-				cout << "将node中删除记录后面的记录前移" << endl;
+				cout << "mv the delete record next record" << endl;//将node中删除记录后面的记录前移
 				cout << "node.count:" << node.count << endl;
 				for (int i = 0; i < node.count; i++)
 				{
@@ -430,7 +430,7 @@ int delTreeRecord(FILE *index, Node &node, int key)
 						changeParent(index, right, node.pair[pos].pos, recol.pos);
 				}
 				mergeNode(index, left, node);
-				cout << "将左孩子和node合并" << endl;
+				cout << "merge the left child and node" << endl;//将左孩子和node合并
 				fseek(index, recol.pos, SEEK_SET);
 				fwrite(&left, 1, sizeof(left), index);
 				fflush(index);
@@ -455,7 +455,7 @@ int delTreeRecord(FILE *index, Node &node, int key)
 				fseek(index, recot.pos, SEEK_SET);
 				fwrite(&top, 1, sizeof(top), index);
 				fflush(index);
-				cout << "将父节点中的旧的分隔元素:" << recol.key << "删除" << endl;
+				cout << "delete the root's old record:" << recol.key << "delete" << endl;//将父节点中的旧的分隔元素
 				cout << endl;
 				delTreeRecord(index, top, recol.key);
 				//注意这里删除的分隔元素是左邻节点的分隔元素而不是本节点的分隔元素。因为本节点的分隔元素是
@@ -466,14 +466,14 @@ int delTreeRecord(FILE *index, Node &node, int key)
 		else
 		{
 			//删除的元素是节点中的中间元素
-			cout << "tpos!=top.count,有右孩子"<< endl;
+			cout << "tpos!=top.count,have left child"<< endl;
 		//	cout << "top.pair[tpos]" << top.pair[tpos].key << endl;
 			recor = top.pair[tpos + 1];
 			//recor.pos代表待删除元素的所在节点的右邻节点的地址。
 			fseek(index, recor.pos, SEEK_SET);
 		//	cout << "recor" << recor.key << endl;
 			fread(&right, 1, sizeof(right), index);
-			cout << "右孩子：" << endl;
+			cout << "right child:" << endl;
 			cout << "right.count:" << right.count << endl;
 			for (int i = 0; i < right.count; i++)
 			{
@@ -512,7 +512,7 @@ int delTreeRecord(FILE *index, Node &node, int key)
 				recol = top.pair[tpos - 1];
 				fseek(index, recol.pos, SEEK_SET);
 				fread(&left, 1, sizeof(left), index);
-				cout << "左孩子：" << endl;
+				cout << "left child:" << endl;
 				cout << "left.count:" << left.count << endl;
 				for (int i = 0; i <left.count; i++)
 				{
@@ -542,7 +542,7 @@ int delTreeRecord(FILE *index, Node &node, int key)
 				else
 				{
 					//左右节点中全部是小于或等于3个节点
-					cout << "左孩子数目<Min" << endl;
+					cout << "the counts of left childs<Min" << endl;//左孩子数目<Min
 					for (node.count--; pos < node.count; pos++)
 						node.pair[pos] = node.pair[pos + 1];
 					if (right.type == NODE)
@@ -551,7 +551,7 @@ int delTreeRecord(FILE *index, Node &node, int key)
 							changeParent(index, left, right.pair[pos].pos, recon.pos);
 					}
 					mergeNode(index, node, right);//和右节点进行合并
-					cout << "node和右孩子进行合并" << endl;
+					cout << "merge the right child and node" << endl;//node和右孩子进行合并
 					fseek(index, recor.pos, SEEK_SET);
 					fwrite(&right, 1, sizeof(right), index);
 					cout << "right：" << endl;
@@ -566,7 +566,7 @@ int delTreeRecord(FILE *index, Node &node, int key)
 					fwrite(&node, 1, sizeof(node), index);
 					cout << "node：" << endl;
 					cout << "node.count:" << node.count << endl;
-					cout << "node记录" << endl;
+					cout << "node.record" << endl;
 					for (int i = 0; i < node.count; i++)
 					{
 						cout << node.pair[i].key << "   ";
@@ -589,7 +589,8 @@ int delTreeRecord(FILE *index, Node &node, int key)
 					fflush(index);
 					//删除父节点中的当前元素的旧分隔元素，
 					
-					cout <<"将父节点中的旧的分隔元素:"<<recon.key<<"删除" << endl;
+					//cout << "delete the root's old record:" << recol.key << "delete" << endl;//将父节点中的旧的分隔元素
+					cout <<"delete the root's old record:"<<recon.key<<"delete" << endl;
 					cout << endl;
 					delTreeRecord(index, top, recon.key);
 					
