@@ -25,3 +25,7 @@ void delete_index(char *tableName, char *Attributename, Record* record);
 
 void update_index(char *tableName, char *Attributename, Record* oldRecord, Record* newRecord);
 
+<<<<<<< HEAD
+void search(char *tableName, char *attributeName, char* Attribute, Record* recordList);
+=======
+>>>>>>> 14894723178b7699eb54356d040a1b77274d5ffe

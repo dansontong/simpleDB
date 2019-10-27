@@ -76,7 +76,8 @@ int database_memToDisk(struct DataBase *DB);
 
 
 // 记录相关
-void recordInsert(struct DataBase *DB, int dictID, char *str);
+void insertRecord(int dictID, char *str);
+void deleteRecord(int dictID, char *str);
 
 
 // 表相关
