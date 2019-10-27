@@ -190,7 +190,7 @@ int createTable(char *str)
 	return dictID;
 }
 
-void recordInsert(int dictID, char *str)
+void insertRecord(int dictID, char *str)
 {
 	int fileID = DB->dataDict[dictID].fileID;
 	int length = strlen(str);
@@ -208,4 +208,9 @@ void recordInsert(int dictID, char *str)
 			insert_index(DB->dataDict[dictID].tableName, DB->dataDict[dictID].attr[i].name, &record);
 		}
 	}	
+}
+
+void deleteRecord(int dictID, char *str)
+{
+	
 }

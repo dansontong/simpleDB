@@ -31,11 +31,14 @@ int main()
 			exit(0);
 		}
 	}
+	int ret = 0;
+            srand((unsigned int)time(NULL));
+			ret = rand()%100;
     while (0 != x)
     {
         printf("\n\n");
         printf("    *******************************************************************\n");
-        printf("    *           Welcome to BPlusTree Program!退出程序                         *\n");
+        printf("    *           Welcome to BPlusTree Program!                         *\n");
         printf("    *           1.Create B+ Tree                                      *\n");
         printf("    *           2.Search a number form B+ Tree                        *\n");
         printf("    *           3.Insert a number form B+ Tree                        *\n");
@@ -55,13 +58,15 @@ int main()
         case 1:
 	
 			rewind(fp);//相当于fseek（文件指针，0,0），简单来说，就是使文件内的指向字节的指针回到开头，重新指向第一个字节
-			for (k= 0; k<=8; k++)
+			
+			for (k= 0; k<=ret; k++)
 			{
 				record_insert.key = k;		
 				record_insert.pos = k* 2;
 				insert(fp, record_insert);
 			}
 			rewind(fp);
+			break;
 		
 //			for(w=0;w<node.count;w++)   //
 //			{
@@ -86,7 +91,21 @@ int main()
 			record_insert.pos = b* 2;
            	insert(fp,record_insert);
 			printf("insert succeed");
+			/*
+
+			Node node;
+			getRoot(fp, node);
+			int rootOffSet;
+			Node rootNode;
+			rewind(fp);
+			fread(&rootOffSet, 1, sizeof(rootOffSet), fp);
+			fseek(fp, rootOffSet, SEEK_SET);
+			fread(&node, 1, sizeof(node), fp);
+			showTree(fp,node);
+			*/
+			goto print;
 		 
+
             break;
 
         case 4:
@@ -96,7 +115,21 @@ int main()
 			scanf("%d",&a);
            	del(fp,a);
 			printf("delet succeed");
-            break;
+			/*
+
+			Node node;
+			getRoot(fp, node);
+			int rootOffSet;
+			Node rootNode;
+			rewind(fp);
+			fread(&rootOffSet, 1, sizeof(rootOffSet), fp);
+			fseek(fp, rootOffSet, SEEK_SET);
+			fread(&node, 1, sizeof(node), fp);
+			showTree(fp,node);
+			*/
+
+            //break;
+		print:
 		case 5:
 			Node node;
 			getRoot(fp, node);

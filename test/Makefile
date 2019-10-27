@@ -5,7 +5,7 @@ INCLUDE = -I ../core -I ../storage -I ../log -I ../index/BPlusTree -I ../index
 CFLAGS_parser = -std=c++1z -lstdc++ -Wall -Werror -I../parser -L../parser -lsqlparser
 SRC =  -L../storage/*.cpp -L../core/*.cpp
 src_buf = $(shell find ../log ../core ../storage -name "*.cpp")
-src_bPtree = $(shell find ../log ../core ../storage ../index/BPlusTree -name "*.cpp")
+src_bPtree = $(shell find ../log ../index/BPlusTree -name "*.cpp")
 
 buffer: storage/buffer_test.cpp
 	# $(cc) $(CXXFLAGS) $(INCLUDE) storage/buffer_test.cpp $(src_buf) -o buffer_test.o
