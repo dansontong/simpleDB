@@ -76,7 +76,8 @@ int database_memToDisk();
 
 
 // 记录相关
-void recordInsert(int dictID, char *str);
+void insertRecord(int dictID, char *str);
+void deleteRecord(int dictID, char *str);
 
 
 // 表相关

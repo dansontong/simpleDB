@@ -23,3 +23,5 @@ void insert_index(char *tableName, char *Attributename, char* Attribute, Record*
 void delete_index(char *tableName, char *Attributename, Record* record);
 
 void update_index(char *tableName, char *Attributename, Record* oldRecord, Record* newRecord);
+
+void search(char *tableName, char *attributeName, char* Attribute, Record* recordList);
