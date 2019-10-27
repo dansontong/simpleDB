@@ -52,12 +52,11 @@ void create_index(char *tableName,char *Attributename){
 		if(pagehead.recordNum>0){
 			for(j=0;j<pagehead.recordNum;j++){
 				indexRecord.posPage=pagehead.pageNo;
-
 				file_getrecordAttribute(DB,pagehead.pageNo,j,tableName,Attributename,indexRecord.key,indexRecord.posOffset);
         		indexRecord.recordID = j;
 				int value=insert(index, indexRecord);							//建立B+树索引
 				if(value==-1){
-					printf("error:Insertion failed!\n");
+					printf("error:insert failed!\n");
 					break；
 				}
 			}
@@ -70,17 +69,28 @@ void create_index(char *tableName,char *Attributename){
 	}
 }
 
-void drop_index(char *tableName,char *Attributename){
-	int value=find_indexfile(tableName,Attributename);
-	if(value==-1){
-		printf("error:the indexfile is not exist!\n");
-	}
-	else{
-
+void drop_index(char *tableName,char *Attributename){						//删除索引文件
+for(int i=0;i<MAX_FILE_NUM;i++){
+		if(strcmp(DB->dataDict[i].tableName,tableName)==0){
+			for(int j=0;attr<DB->dataDict[i].attrNum;j++){
+				if(strcmp(DB->dataDict[i].attr[j].name,Attributename)==0){
+					if(DB->dataDict[i].attr[j].indexFile.fileID==0){
+						printf("error:the indexfile is not exist!\n");	
+					}
+					else{
+						DB->dataDict[i].attr[j].indexFile.fileID=0;
+						char *savePath = "../data/indexID";
+						int value=remove(savePath);
+						if(value==EOF)
+							printf("error:delete failed!\n");
+					}
+				}
+			}
+		}
 	}
 }
 
-int find_indexfile(char *tableName,char *Attributename){								//查找索引文件号
+int find_indexfile(char *tableName,char *Attributename){					//查找索引文件号
 	for(int i=0;i<MAX_FILE_NUM;i++){
 		if(strcmp(DB->dataDict[i].tableName,tableName)==0){
 			for(int j=0;attr<DB->dataDict[i].attrNum;j++){
@@ -104,4 +114,40 @@ void update_index(char *tableName, char *Attributename, Record* oldRecord, Recor
 {
 	delete_index(tableName, Attributename, oldRecord);
 	insert_index(tableName, *Attributename, newRecord);
+}
+
+void insert_index(char *tableName, char *Attributename, Record* record){		//索引插入结点
+	int value=find_indexfile(tableName,Attributename);
+	if(value==-1){
+		printf("error:the indexfile is not exist!\n");
+	}
+	else{
+		struct TreeRecord indexRecord;
+		indexRecord.posPage=record.pageNo;
+		indexRecord.recordID=record.recordID;
+		file_getrecordAttribute(record.pageNo,record.recordID,tableName,Attributename,indexRecord.key,indexRecord.posOffset);
+		FILE *index;
+		index=fopen("../data/indexID","ab+");
+		int result=insert(index, indexRecord);							
+		if(result==-1){
+			printf("error:insert failed!\n");
+		}
+	}
+}
+
+void delete_index(char *tableName, char *Attributename, Record* record){		//索引删除结点
+	int value=find_indexfile(tableName,Attributename);
+	if(value==-1){
+		printf("error:the indexfile is not exist!\n");
+	}
+	else{
+		struct TreeRecord indexRecord;
+		file_getrecordAttribute(record.pageNo,record.recordID,tableName,Attributename,indexRecord.key,indexRecord.posOffset);
+		FILE *index;
+		index=fopen("../data/indexID","ab+");
+		int result=del(index, indexRecord.key);							
+		if(result==-1){
+			printf("error:delete failed!\n");
+		}
+	}
 }
