@@ -91,6 +91,7 @@ int main()
 			record_insert.pos = b* 2;
            	insert(fp,record_insert);
 			printf("insert succeed");
+			/*
 
 			Node node;
 			getRoot(fp, node);
@@ -101,6 +102,8 @@ int main()
 			fseek(fp, rootOffSet, SEEK_SET);
 			fread(&node, 1, sizeof(node), fp);
 			showTree(fp,node);
+			*/
+			goto print;
 		 
 
             break;
@@ -112,6 +115,7 @@ int main()
 			scanf("%d",&a);
            	del(fp,a);
 			printf("delet succeed");
+			/*
 
 			Node node;
 			getRoot(fp, node);
@@ -122,8 +126,10 @@ int main()
 			fseek(fp, rootOffSet, SEEK_SET);
 			fread(&node, 1, sizeof(node), fp);
 			showTree(fp,node);
-			
-            break;
+			*/
+
+            //break;
+		print:
 		case 5:
 			Node node;
 			getRoot(fp, node);
