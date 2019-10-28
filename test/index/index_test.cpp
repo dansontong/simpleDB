@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
 	recordList = searchRecord("Supplier","S_SUPPKEY","9840");
 	while(recordList != NULL) 
 	{
-		deleteRecord(sup_dictID, "S_SUPPKEY", recordList);
+		deleteRecord("Supplier", "S_SUPPKEY", recordList);
 		recordList++;
 	}
 	drop_index("Supplier","S_SUPPKEY");
