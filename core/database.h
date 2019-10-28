@@ -73,7 +73,7 @@ int database_memToDisk();
 // 记录相关
 void insertRecord(int dictID, char *str);
 void deleteRecord(int dictID, Record *record);
-Record searchRecord(char* tableName,char* attrName, char* attribute);
+Record* searchRecord(char* tableName,char* attrName, char* attribute);
 
 
 // 表相关
