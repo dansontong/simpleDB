@@ -84,8 +84,10 @@ struct Record file_writeFile(int FileID, int length,char *str){
 		exit(0);
 	}
 
-	long CurpageNo = DB->dbMeta.fileMeta[0].segList[i].firstPageNo;				
-	long pagenum = DB->dbMeta.fileMeta[0].segList[i].pageNum;
+	// long CurpageNo = DB->dbMeta.fileMeta[0].segList[i].firstPageNo;				
+	// long pagenum = DB->dbMeta.fileMeta[0].segList[i].pageNum;
+	long CurpageNo = DB->dbMeta.fileMeta[0].firstPageNo;				
+	long pagenum = DB->dbMeta.fileMeta[0].pageNum;
 	int fileno = i;
 	int sizeofpagehead = sizeof(struct PageMeta);
 	int sizeofrecord = sizeof(struct OffsetInPage);									//读取该文件的信息
@@ -97,6 +99,7 @@ struct Record file_writeFile(int FileID, int length,char *str){
 	OffsetInPage preoffset,curoffset;							//页里的记录索引的结构体，定义在file.h里
 	long currecordpos,curoffsetpos;								//前一个是指当前记录索引的位置，第二个是指当前记录的位置
 	for(int i=0;i<pagenum;i++){									//该循环是为了遍历所有的页找出能存放该记录的页
+		// printf("page:%d,空闲空间：%ld\n",i,pagehead.freeSpace);
 		if(pagehead.freeSpace<=length+sizeofrecord){
 			if(pagehead.nextPageNo==-1){
 				break;
