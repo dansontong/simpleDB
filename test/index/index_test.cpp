@@ -40,10 +40,10 @@ int main(int argc, char* argv[]) {
 		//printf("%s\n", buff);
 	}
 	create_index("Supplier","S_SUPPKEY");
-	Record record = {.pageNo = -1,};
-	record = searchRecord("Supplier","S_SUPPKEY","Not_exist_for_test");
-	record = searchRecord("Supplier","S_SUPPKEY","9840");
-	if(record.pageNo != -1) // 初始设置为-1
+	Record *recordList;
+	recordList = searchRecord("Supplier","S_SUPPKEY","Not_exist_for_test");
+	recordList = searchRecord("Supplier","S_SUPPKEY","9840");
+	if(recordList != NULL) 
 	{
 		deleteRecord(sup_dictID, &record);
 	}
