@@ -48,7 +48,18 @@ int search(FILE *index, int key)//找出给定的键值在 B+树中的位置
 	if (pos == node.count || node.pair[pos].key != key)
 		return -1;
 	else
-		return node.pair[pos].pos;
+	{
+		cout << "node.type " << node.type << endl;
+		cout << "node.parent " << node.parent << endl;
+		cout << "node.count " << node.count << endl;
+		cout << "node.pair[pos].key " << node.pair[pos].key<<endl; 
+		cout << "node.pair[pos].pos " << node.pair[pos].pos << endl;
+		cout << "node.pair[pos].posPage " << node.pair[pos].posPage << endl;
+		cout << "node.pair[pos].posOffset" << node.pair[pos].posOffset << endl;
+		cout << "node.pair[pos].recordID " << node.pair[pos].recordID << endl;
+	return node.pair[pos].pos;
+	}
+		
 }
 
 int searchTreeRecord(Node &node, int key)
