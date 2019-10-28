@@ -169,7 +169,7 @@ void search_index(char *tableName, char *attributeName, char* Attribute, Record*
 		FILE *index;
 		index=fopen("../data/indexID","rb");
 		int key = atoi(Attribute);
-		int result=search(index, key)
+		int result=search(index, key);
 		if(result==-1)
 		{
 			printf("error:search failed!\n");
