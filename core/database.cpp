@@ -227,10 +227,11 @@ void deleteRecord(int dictID, Record *record)
 
 }
 
-Record searchRecord(char* tableName,char* attrName, char* attribute)
+Record searchRecord(char* tableName, char* attrName, char* attribute)
 {
-	Record record;
-	search_index(tableName, char *attributeName, char* Attribute, Record* recordList)
+	Record* recordList;//尚未申请内存，careful！
+	
+	search_index(tableName, attrName, attribute, recordList)
 	
 
 	return record;
