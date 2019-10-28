@@ -231,7 +231,7 @@ Record searchRecord(char* tableName, char* attrName, char* attribute)
 {
 	Record* recordList;//尚未申请内存，careful！
 	
-	search_index(tableName, attrName, attribute, recordList)
+	search_index(tableName, attrName, attribute, recordList);
 	
 
 	return record;
