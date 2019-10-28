@@ -222,9 +222,9 @@ void insertRecord(int dictID, char *str)
 	}
 }
 
-void deleteRecord(int dictID, Record *record)
+void deleteRecord(char *tableName, char *attributeName, Record *record)
 {
-
+	delete_index(tableName, attributeName, record);
 }
 
 Record* searchRecord(char* tableName, char* attrName, char* attribute)
