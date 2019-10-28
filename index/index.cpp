@@ -122,8 +122,9 @@ void insert_index(char *tableName, char *Attributename, Record* record){		//ç´¢å
 		indexRecord.recordID=record->recordID;
 		file_getrecordAttribute(record->pageNo,record->recordID,tableName,Attributename,tmpKey,indexRecord.posOffset);
 		indexRecord.key = atoi(tmpKey);
+
 		FILE *index;
-		index=fopen("../data/indexID","ab+");
+		index=fopen("../data/indexID","rb+");
 		int result=insert(index, indexRecord);							
 		if(result==-1){
 			printf("error:insert failed!\n");
@@ -142,7 +143,7 @@ void delete_index(char *tableName, char *Attributename, Record* record){		//ç´¢å
 		file_getrecordAttribute(record->pageNo,record->recordID,tableName,Attributename,tmpKey,indexRecord.posOffset);
 		indexRecord.key = atoi(tmpKey);
 		FILE *index;
-		index=fopen("../data/indexID","ab+");
+		index=fopen("../data/indexID","rb+");
 		int result=del(index, indexRecord.key);							
 		if(result==-1){
 			printf("error:delete failed!\n");
@@ -154,4 +155,24 @@ void update_index(char *tableName, char *Attributename, Record* oldRecord, Recor
 {
 	delete_index(tableName, Attributename, oldRecord);
 	insert_index(tableName, Attributename, newRecord);
+}
+
+void search_index(char *tableName, char *attributeName, char* Attribute, Record* recordList)
+{
+	int value=find_indexfile(tableName,attributeName);
+	if(value==-1)
+	{
+		printf("error:the indexfile is not exist!\n");
+	}
+	else
+	{
+		FILE *index;
+		index=fopen("../data/indexID","rb");
+		int key = (int)Attribute;
+		int result=search(index, key)
+		if(result==-1)
+		{
+			printf("error:search failed!\n");
+		}
+	}
 }
