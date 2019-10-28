@@ -25,5 +25,5 @@ fseek(FILE *stream, long offset, int fromwhere);//文件流 偏移量(用正负�
 3, 数据库核心:    txg，包括core/database.h-cpp, config.h  
 4, 简易日志系统:  txg，包括log文件夹  
 5, 查询编译器:    txg，包括parser文件夹（来自github）  
-6, 索引-B+树:     lh ，包括/index/BPlusTree/b_plus_tree.h-cpp
+6, 索引-B+树:     lh ，包括/index/BPlusTree/b_plus_tree.h-cpp  
 7，索引-接口：     ly，包括/index/index.h-cpp
