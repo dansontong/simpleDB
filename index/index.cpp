@@ -168,7 +168,7 @@ void search_index(char *tableName, char *attributeName, char* Attribute, Record*
 	{
 		FILE *index;
 		index=fopen("../data/indexID","rb");
-		int key = (int)Attribute;
+		int key = atoi(Attribute);
 		int result=search(index, key)
 		if(result==-1)
 		{
