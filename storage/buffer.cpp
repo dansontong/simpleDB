@@ -209,6 +209,10 @@ long Buf_StrategyLRU()
             minVisit = bmeta.visitTime;
         }
     }
+    if(buf_id == -1){
+        buf_id = 0;
+    }
+    printf("buf_id:%d\n", buf_id);
     assert(buf_id >= 0 && buf_id < BUFFER_NUM);
     return buf_id;
 }

@@ -1,4 +1,7 @@
-#include<stdio.h>
+#ifndef B_PLUS_TREE_H_INCLUDE
+#define B_PLUS_TREE_H_INCLUDE
+
+#include <stdio.h>
 
 //最大节点数
 #define MAX 10
@@ -47,3 +50,5 @@ void mergeNode(FILE *index, Node &left, Node &right);
 void ensmallKey(FILE *index, Node &nod);
 void changeParent(FILE *index, Node &node, int child, int parent);
 void showTree(FILE *index,Node &node);
+
+#endif

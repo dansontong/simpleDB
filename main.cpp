@@ -37,30 +37,18 @@ int main(int argc, char* argv[])
 		printf("insert line No.%d\n", count++);
 		//printf("%s\n", buff);
 	}
-	//delete record
-	deleteRecord(int sup_dictID, char *str);
+	create_index("Supplier","S_SUPPKEY");
+	Record record = searchRecord("Supplier","S_SUPPKEY","Not_exist_for_test");
+	Record record = searchRecord("Supplier","S_SUPPKEY","9840");
+	if(record != NULL)
+	{
+		deleteRecord(sup_dictID, record);
+	}
+	drop_index("Supplier","S_SUPPKEY");
 
 
 
 	database_showDbInfo();
-
-	// int fileID = file_createFile(&dbMeta, TABLE_FILE, 1);
-	// printf("创建文件%d成功！\n", fileID);
-	// //int fileID = 0;
-	// int num = 2000;
-	// for (int i = 0; i < num; i++) {
-	// 	struct Student stu = { i, "abc", 30 + i, 5000 + i };
-	// 	char str[1000];
-	// 	sprintf(str, "%ld", stu.rid);
-	// 	strcat(str, stu.name); 
-	// 	char tmp[100];
-	// 	sprintf(tmp, "%d", stu.age); 
-	// 	sprintf(tmp, "%d", stu.weight); 
-	// 	strcat(str, tmp);
-	// 	if (i % 10 == 0)
-	// 		printf("str: %s\n", str);
-	// 	file_writeFile(&dbMeta, fileID, strlen(str), str);
-	// }
 
 	database_closeDB();
 }

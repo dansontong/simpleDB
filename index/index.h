@@ -1,3 +1,6 @@
+#ifndef INDEX_H_INCLUDE
+#define INDEX_H_INCLUDE
+
 #include "config.h"
 #include "file.h"
 #include "buffer.h"
@@ -16,11 +19,11 @@
 // }TreeRecord;      //索引的记录
 
 
-void create_index(struct DataBase *DB,char *tableName,char *attributename);
+void create_index(char *tableName,char *attributename);
 
-void drop_index(struct DataBase *DB,char *tableName,char *attributename);
+void drop_index(char *tableName,char *attributename);
 
-void insert_index(char *tableName, char *attributename, char* attribute, Record* record, char* offset);
+void insert_index(char *tableName, char *attributename, Record* record);
 
 void delete_index(char *tableName, char *attributename, Record* record);
 
@@ -28,3 +31,5 @@ void update_index(char *tableName, char *attributename, Record* oldRecord, Recor
 
 void search_index(char *tableName, char *attributeName, char* Attribute, Record* recordList);
 
+
+#endif

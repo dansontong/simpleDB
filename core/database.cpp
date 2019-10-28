@@ -18,6 +18,7 @@ void database_initDB(struct DataBase *db, char *fileName)
 	{
 		printf("DataBase isn't exist, creating new dataBase.\n");
 		database_createDbFile(fileName);
+		DB->dbFile = fopen(fileName, "rb");
 	}
 	
 	size_t sizeRead = fread(&(DB->dbMeta), sizeof(struct DbMeta), 1, DB->dbFile);
@@ -27,8 +28,8 @@ void database_initDB(struct DataBase *db, char *fileName)
 	// 在文件中定位到bitMap开始的位置，令文件指针指向这里
 	fseek(DB->dbFile, DB->dbMeta.bitMapAddr, SEEK_SET);
 	sizeRead = fread(DB->freeSpaceBitMap, DB->dbMeta.bitMapSize, 1, DB->dbFile);// 从文件中读取bitMap的内容
-	//fclose(dbFile);
-	// DB->dbFile = fopen(fileName, "rb+");
+	fclose(DB->dbFile);
+	DB->dbFile = fopen(fileName, "rb+");
 
 	//加载 数据字典
 	int fid = DB->dbMeta.dataDictFid;
@@ -197,30 +198,40 @@ void insertRecord(int dictID, char *str)
 	int length = strlen(str);
 	Record record = file_writeFile(fileID, length, str);
 	
-	char *recordStr;
-	char *attribute;
-	file_getrecord(record.pageNo,record.recordID,recordStr);
+	char recordStr[1000]; //假设记录最长1000个字节
+	// char *attribute;
+	file_getrecord(record.pageNo,record.recordID, recordStr);
 	int i;
-	char *offset;
+	// char *offset;
 	for(i=0; i<DB->dataDict[dictID].attrNum; i++)
 	{
 		if( DB->dataDict[dictID].attr[i].indexFile.fileID != 0 )
 		{		
-			offset = recordStr+DB->dataDict[dictID].attr[i].offset; //TODO：是否需要加上record?
-			if(i<DB->dataDict[dictID].attrNum-1)
-			{
-				memcpy(attribute,recordStr+DB->dataDict[dictID].attr[i].offset,DB->dataDict[dictID].attr[i+1].offset-DB->dataDict[dictID].attr[i].offset);//一般情况：位置为record的起始地址加上属性的偏移量，长度为该下一条属性的偏移量减去该属性的偏移量
-			}
-			else
-			{
-				memcpy(attribute,recordStr+DB->dataDict[dictID].attr[i].offset,DB->dataDict[dictID].attrLength-DB->dataDict[dictID].attr[i].offset);//当该属性为最后一个属性时，长度为总属性长度减去该属性的偏移量
-			}
-			insert_index(DB->dataDict[dictID].tableName, DB->dataDict[dictID].attr[i].name, attribute, &record, offset);			
+			// offset = recordStr+DB->dataDict[dictID].attr[i].offset; //TODO：是否需要加上record?
+			// if(i<DB->dataDict[dictID].attrNum-1)
+			// {
+			// 	memcpy(attribute,recordStr+DB->dataDict[dictID].attr[i].offset,DB->dataDict[dictID].attr[i+1].offset-DB->dataDict[dictID].attr[i].offset);//一般情况：位置为record的起始地址加上属性的偏移量，长度为该下一条属性的偏移量减去该属性的偏移量
+			// }
+			// else
+			// {
+			// 	memcpy(attribute,recordStr+DB->dataDict[dictID].attr[i].offset,DB->dataDict[dictID].attrLength-DB->dataDict[dictID].attr[i].offset);//当该属性为最后一个属性时，长度为总属性长度减去该属性的偏移量
+			// }
+			insert_index(DB->dataDict[dictID].tableName, DB->dataDict[dictID].attr[i].name, &record);
+			printf("------- insert_index success -------\n");
 		}
-	}	
+	}
 }
 
-void deleteRecord(int dictID, char *str)
+void deleteRecord(int dictID, Record *record)
 {
 
+}
+
+Record searchRecord(char* tableName,char* attrName, char* attribute)
+{
+	Record record;
+
+
+
+	return record;
 }
