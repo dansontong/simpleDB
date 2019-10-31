@@ -17,7 +17,8 @@ fseek(FILE *stream, long offset, int fromwhere);//文件流 偏移量(用正负�
 4, DB在database.h 和 file.cpp中作为全局变量，后续需要多个数据库，需要改成c++类实现   
 5, b+树模块测试如果之前文件存在会有问题，待解决。  
 6，目前索引模块测试index_test.cpp中查找9840的记录，查找失败，待解决。  
-7, buffer模块，201行的TODO,运行曾出现过215行Buf_StrategyLRU函数的assert(buf_id>=0)失败，待解决
+7, buffer模块，201行的TODO,运行曾出现过215行Buf_StrategyLRU函数的assert(buf_id>=0)失败，待解决  
+8, 查到的元组从磁盘解析出来。  
   
   
 **模块分工**：  
