@@ -7,7 +7,7 @@
 #include<string>
 using namespace std;
 
-#define INDEX_DAT "b_plus_tree_index.dat"
+#define INDEX_DAT "../../data/b_plus_tree_index.dat"
 
 
 int main()
@@ -21,7 +21,7 @@ int main()
     int y = 0;
 		fp=fopen(INDEX_DAT,"rb+");
 	if (fp == NULL){
-		printf("index is null,rebuild index....\n");//Ë÷ÒıÎÄ¼ş²»´æÔÚ£¬ÖØĞÂ½¨Á¢Ë÷Òı
+		printf("index is null,rebuild index....\n");//ç´¢å¼•æ–‡ä»¶ä¸å­˜åœ¨ï¼Œé‡æ–°å»ºç«‹ç´¢å¼•
 		FILE *fp_create;
 		fp_create=fopen (INDEX_DAT, "wb");
 		fclose(fp_create);
@@ -57,7 +57,7 @@ int main()
         {
         case 1:
 	
-			rewind(fp);//Ïàµ±ÓÚfseek£¨ÎÄ¼şÖ¸Õë£¬0,0£©£¬¼òµ¥À´Ëµ£¬¾ÍÊÇÊ¹ÎÄ¼şÄÚµÄÖ¸Ïò×Ö½ÚµÄÖ¸Õë»Øµ½¿ªÍ·£¬ÖØĞÂÖ¸ÏòµÚÒ»¸ö×Ö½Ú
+			rewind(fp);//ç›¸å½“äºfseekï¼ˆæ–‡ä»¶æŒ‡é’ˆï¼Œ0,0ï¼‰ï¼Œç®€å•æ¥è¯´ï¼Œå°±æ˜¯ä½¿æ–‡ä»¶å†…çš„æŒ‡å‘å­—èŠ‚çš„æŒ‡é’ˆå›åˆ°å¼€å¤´ï¼Œé‡æ–°æŒ‡å‘ç¬¬ä¸€ä¸ªå­—èŠ‚
 			
 			for (k= 0; k<=ret; k++)
 			{
