@@ -15,7 +15,7 @@ buffer: storage/buffer_test.cpp
 	# $(cc) $(CXXFLAGS) $(INCLUDE) storage/pageBitMap_test.cpp  -o pageBitMap_test.o
 	# $(CXX) $(CFLAGS_parser) parser/parser_test.cpp -o parser_test.o -lsqlparser
 	$(cc) $(CXXFLAGS) $(INCLUDE) index/index_test.cpp $(src_index) -o index_test.o
-	# $(cc) $(CXXFLAGS) $(INCLUDE) index/bPlusTree_test.cpp $(src_bPtree) -o bPlusTree_test.o
+	# $(cc) $(CXXFLAGS)  -I ../index/BPlusTree index/bPlusTree_test.cpp $(src_bPtree) -o bPlusTree_test.o
 	# ./buffer_test.o
 	# ./log_test.o
 	# ./pageBitMap_test.o
