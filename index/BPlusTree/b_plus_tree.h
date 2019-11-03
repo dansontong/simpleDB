@@ -3,13 +3,13 @@
 
 #include <stdio.h>
 
-//×î´ó½ÚµãÊı
+//æœ€å¤§èŠ‚ç‚¹æ•°
 #define MAX 10
-//×îĞ¡½ÚµãÊı
+//æœ€å°èŠ‚ç‚¹æ•°
 #define MIN 5
-//ÄÚ²¿½ÚµãÎª 0
+//å†…éƒ¨èŠ‚ç‚¹ä¸º 0
 #define NODE 0
-//Ò¶½ÚµãÎª 1
+//å¶èŠ‚ç‚¹ä¸º 1
 #define LEAF 1
 
 #define LEFT 0
@@ -19,21 +19,21 @@
 
 typedef struct
 {
-	int key;//¼ÇÂ¼µÄ¼üÖµ
-	int pos;//½ÚµãÀïÃæ¼ÇÂ¼µÄÏà¶ÔÎ»ÖÃ
-	int posPage;//Ò³ºÅ
-	char* posOffset;//Æ«ÒÆÁ¿
-	int recordID;   //¼ÇÂ¼ID
-}TreeRecord;//B+Ê÷½ÚµãÉÏµÄ¼ÇÂ¼
+	int key;//è®°å½•çš„é”®å€¼
+	int pos;//èŠ‚ç‚¹é‡Œé¢è®°å½•çš„ç›¸å¯¹ä½ç½®
+	int posPage;//é¡µå·
+	char* posOffset;//åç§»é‡
+	int recordID;   //è®°å½•ID
+}TreeRecord;//B+æ ‘èŠ‚ç‚¹ä¸Šçš„è®°å½•
 
 typedef struct Node
 {
-	int type;//½ÚµãµÄÖÖÀà ·ÖÎªÒ¶½Úµã ×óº¢×Ó ÓÒº¢×Ó
-	int count;//recordµÄ¸öÊı
+	int type;//èŠ‚ç‚¹çš„ç§ç±» åˆ†ä¸ºå¶èŠ‚ç‚¹ å·¦å­©å­ å³å­©å­
+	int count;//recordçš„ä¸ªæ•°
 	TreeRecord pair[MAX];
-	int parent;//¸¸½ÚµãËùÔÚµÄÎ»ÖÃ
+	int parent;//çˆ¶èŠ‚ç‚¹æ‰€åœ¨çš„ä½ç½®
 	struct Node *NextLeaf;
-}Node;//B+Ê÷µÄ½Úµã
+}Node;//B+æ ‘çš„èŠ‚ç‚¹
 
 void getRoot(FILE *index, Node &node);
 int search(FILE *index, int key);
