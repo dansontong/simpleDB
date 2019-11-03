@@ -6,7 +6,7 @@
 using namespace std;
 
 /*
-//ĞèÒªµ÷ÓÃµÄº¯Êı
+//éœ€è¦è°ƒç”¨çš„å‡½æ•°
 void fwrite(int fileID, int length, char *str);
 int file_newFile(int type, long NeededPageNum);
 void fread(int FileID,char *str);
@@ -15,21 +15,21 @@ void fread(int FileID,char *str);
 void getRoot(FILE *index, Node &node)
 {
 	
-	int offset;//ÕâÊÇÒ»¸öÄÚ´æµØÖ· Æ«ÒÆÁ¿ ÕâºÃÏñ¾ÍÊÇÒ»¸öÕûĞÎ16Î» 4¸ö×Ö½Ú
-	rewind(index);//Ö¸ÏòÎÄ¼şµÄ¿ªÍ·
-	if (fread(&offset, 1, sizeof(offset), index) == 0)//²»³É¹¦»òÕß¶Áµ½ÎÄ¼şÄ©Î²·µ»Ø0
+	int offset;//è¿™æ˜¯ä¸€ä¸ªå†…å­˜åœ°å€ åç§»é‡ è¿™å¥½åƒå°±æ˜¯ä¸€ä¸ªæ•´å½¢16ä½ 4ä¸ªå­—èŠ‚
+	rewind(index);//æŒ‡å‘æ–‡ä»¶çš„å¼€å¤´
+	if (fread(&offset, 1, sizeof(offset), index) == 0)//ä¸æˆåŠŸæˆ–è€…è¯»åˆ°æ–‡ä»¶æœ«å°¾è¿”å›0
 	{
 		cout << "offset:" << offset<<endl;
 		offset = sizeof(offset);		
 		fwrite(&offset, 1, sizeof(offset), index);
-		fflush(index);//Çå³ı»º³åÇø£¬½«»º³åÇøÄÚÈİĞ´Èëµ½ÎÄ¼şÖĞ¡£
+		fflush(index);//æ¸…é™¤ç¼“å†²åŒºï¼Œå°†ç¼“å†²åŒºå†…å®¹å†™å…¥åˆ°æ–‡ä»¶ä¸­ã€‚
 	}
-	fseek(index, offset, SEEK_SET);//´ÓSEEK_SET£¨ÎÄ¼ş¿ªÍ·£©Î»ÖÃÆ«ÒÆoffset¸ö×Ö½Ú ÕâÀïÓ¦¸ÃÊÇÕıÏòÆ«ÒÆ
+	fseek(index, offset, SEEK_SET);//ä»SEEK_SETï¼ˆæ–‡ä»¶å¼€å¤´ï¼‰ä½ç½®åç§»offsetä¸ªå­—èŠ‚ è¿™é‡Œåº”è¯¥æ˜¯æ­£å‘åç§»
 	
-	if (fread(&node, 1, sizeof(node), index) == 0)//Ò»¸önodeµÄ´óĞ¡
+	if (fread(&node, 1, sizeof(node), index) == 0)//ä¸€ä¸ªnodeçš„å¤§å°
 	{
 		cout << "offset2:" << offset<<endl;
-		fseek(index, sizeof(node), SEEK_CUR);//SEEK_CUR µ±Ç°Î»ÖÃ
+		fseek(index, sizeof(node), SEEK_CUR);//SEEK_CUR å½“å‰ä½ç½®
 		node.count = 0;
 		node.parent = 0;
 		node.type = LEAF;
@@ -38,7 +38,7 @@ void getRoot(FILE *index, Node &node)
 	
 }
 
-int search(FILE *index, int key)//ÕÒ³ö¸ø¶¨µÄ¼üÖµÔÚ B+Ê÷ÖĞµÄÎ»ÖÃ
+int search(FILE *index, int key)//æ‰¾å‡ºç»™å®šçš„é”®å€¼åœ¨ B+æ ‘ä¸­çš„ä½ç½®
 {
 	Node node;
 	int pos;
@@ -64,17 +64,17 @@ int search(FILE *index, int key)//ÕÒ³ö¸ø¶¨µÄ¼üÖµÔÚ B+Ê÷ÖĞµÄÎ»ÖÃ
 
 int searchTreeRecord(Node &node, int key)
 {
-	//ÔÚ±¾½ÚµãÖĞÕÒµ½µÚÒ»¸ö±Èkey´óµÄÎ»ÖÃ
+	//åœ¨æœ¬èŠ‚ç‚¹ä¸­æ‰¾åˆ°ç¬¬ä¸€ä¸ªæ¯”keyå¤§çš„ä½ç½®
 	int i;
 	for (i = 0; i < node.count && key > node.pair[i].key; i++);
 	return i;
 }
 
-//Ñ°ÕÒÒ¶½Úµã
+//å¯»æ‰¾å¶èŠ‚ç‚¹
 void searchNode(FILE *index, Node &node, int key)
 {
 	int pos, offset;
-	if (node.type == LEAF){//½ÚµãÀàĞÍÎªÒ¶½ÚµãÊ±·µ»Ø
+	if (node.type == LEAF){//èŠ‚ç‚¹ç±»å‹ä¸ºå¶èŠ‚ç‚¹æ—¶è¿”å›
 		return;
 	}
 	else
@@ -88,7 +88,7 @@ void searchNode(FILE *index, Node &node, int key)
 	}
 } 
 
-//ÕÒµ½Ò¶½ÚµãÖ®ºó¾Í¿ÉÒÔÔÚÒ¶½Úµã²åÈë¼ÇÂ¼
+//æ‰¾åˆ°å¶èŠ‚ç‚¹ä¹‹åå°±å¯ä»¥åœ¨å¶èŠ‚ç‚¹æ’å…¥è®°å½•
 int insertTreeRecord(FILE *index, Node &node, TreeRecord record)
 {
 	
@@ -99,30 +99,30 @@ int insertTreeRecord(FILE *index, Node &node, TreeRecord record)
 	cout << endl;
 	if (pos == node.count || node.pair[pos].key != record.key)
 	{
-		// node.pair[pos].key != record.keyËµÃ÷¸Ã½ÚµãÖĞ»¹Ã»ÓĞ´æ´¢¸Ã¼ÇÂ¼£¬¿ÉÒÔ²åÈë
+		// node.pair[pos].key != record.keyè¯´æ˜è¯¥èŠ‚ç‚¹ä¸­è¿˜æ²¡æœ‰å­˜å‚¨è¯¥è®°å½•ï¼Œå¯ä»¥æ’å…¥
 		if (node.count < MAX)
 		{
 			for (cur = node.count; cur > pos; cur--)
 			{
-				//curÖ¸ÏòµÄÊÇ±¾½ÚµãÖĞµÄµÚÒ»¸ö¿ÕÎ»ÖÃ£¬Èô²åÈëµÄÔªËØÊÇ²åÔÚÒÑÓĞÔªËØµÄÖĞ¼äÄÇÃ´¾ÍĞèÒª°Ñ´óÓÚ´ı²åÈëÔªËØµÄËùÓĞÔªËØÍ³Í³ºóÒÆÒ»¸öÎ»ÖÃ¡£
+				//curæŒ‡å‘çš„æ˜¯æœ¬èŠ‚ç‚¹ä¸­çš„ç¬¬ä¸€ä¸ªç©ºä½ç½®ï¼Œè‹¥æ’å…¥çš„å…ƒç´ æ˜¯æ’åœ¨å·²æœ‰å…ƒç´ çš„ä¸­é—´é‚£ä¹ˆå°±éœ€è¦æŠŠå¤§äºå¾…æ’å…¥å…ƒç´ çš„æ‰€æœ‰å…ƒç´ ç»Ÿç»Ÿåç§»ä¸€ä¸ªä½ç½®ã€‚
 				node.pair[cur] = node.pair[cur - 1];
 			}
 			node.pair[pos] = record;
 			node.count++;
-			//»ØÍËµ½±¾½ÚµãµÄ³õÊ¼Î»ÖÃ£¬½«±¾´Î²åÈëµÄ¼üÖµĞ´½ø¸Ã½ÚµãÖĞ¡£
+			//å›é€€åˆ°æœ¬èŠ‚ç‚¹çš„åˆå§‹ä½ç½®ï¼Œå°†æœ¬æ¬¡æ’å…¥çš„é”®å€¼å†™è¿›è¯¥èŠ‚ç‚¹ä¸­ã€‚
 			fseek(index, -(int)sizeof(node), SEEK_CUR);
 			fwrite(&node, 1, sizeof(node), index);
 			fflush(index);
 			if (pos == node.count - 1 && node.parent != 0)
 			{
-				//ÈôÊÇÔÚ¸Ã½ÚµãµÄºóÃæ£¬²¢ÇÒ¸ÃÔªËØÓĞ¸¸½ÚµãµÄ»°£¬¾ÍÓĞ¿ÉÄÜ»áÔì³É¸¸½ÚµãÖĞµÄ·Ö¸ô¼üÖµĞèÒªĞŞ¸Ä¡£
-				//Òò´ËĞèÒªÈ¥²é¿´¸¸½Úµã,ÊÇ·ñĞèÒªĞèÒªĞŞ¸Ä·Ö¸ô¼üÖµ¡£
+				//è‹¥æ˜¯åœ¨è¯¥èŠ‚ç‚¹çš„åé¢ï¼Œå¹¶ä¸”è¯¥å…ƒç´ æœ‰çˆ¶èŠ‚ç‚¹çš„è¯ï¼Œå°±æœ‰å¯èƒ½ä¼šé€ æˆçˆ¶èŠ‚ç‚¹ä¸­çš„åˆ†éš”é”®å€¼éœ€è¦ä¿®æ”¹ã€‚
+				//å› æ­¤éœ€è¦å»æŸ¥çœ‹çˆ¶èŠ‚ç‚¹,æ˜¯å¦éœ€è¦éœ€è¦ä¿®æ”¹åˆ†éš”é”®å€¼ã€‚
 				cout << "alter parent node" << endl;
 				enlargeKey(index, node);
 			}
 		}
 		else
-			//½ÚµãÒÑÂú£¬½øĞĞ·ÖÁÑ
+			//èŠ‚ç‚¹å·²æ»¡ï¼Œè¿›è¡Œåˆ†è£‚
 			splitNode(index, node, record, pos);
 		return 0;
 	}
@@ -133,15 +133,15 @@ int insertTreeRecord(FILE *index, Node &node, TreeRecord record)
 void splitNode(FILE *index, Node &nodea, TreeRecord record, int pos)
 {
 	
-	//nodea ·ÖÁÑÖ®Ç°µÄ½Úµã¡¢nodebÎªĞÂÔö½Úµã
+	//nodea åˆ†è£‚ä¹‹å‰çš„èŠ‚ç‚¹ã€nodebä¸ºæ–°å¢èŠ‚ç‚¹
 	Node nodeb, top;
 	TreeRecord recorda, recordb;
 	int cur;
-	//³õÊ¼»¯ĞÂ½Úµã
-	nodeb.type = nodea.type;//Á½½ÚµãµÄÀàĞÍ±£³ÖÒ»ÖÂ£¬ÒªÃ´¶¼ÊÇÒ¶×Ó½Úµã£¬ÒªÃ´¶¼ÊÇÄÚ²¿½Úµã¡£
-	nodeb.parent = nodea.parent;//Á½½ÚµãÓµÓĞ¹²Í¬µÄ¸¸½Úµã£¬±Ë´Ë³ÉÎªĞÖµÜ½Úµã
-	nodeb.count = (MAX + 1) / 2;//°Ñ×Ü¹²Òª·ÖÁÑµÄ¼üÖµµÄÊıÄ¿·ÖÒ»°ë¸øĞÂÔö½Úµã¡£
-	nodea.count = nodea.count - nodeb.count + 1;//Ê£ÏÂµÄÊıÄ¿Áô¸øÔ­À´µÄ½Úµã¡£
+	//åˆå§‹åŒ–æ–°èŠ‚ç‚¹
+	nodeb.type = nodea.type;//ä¸¤èŠ‚ç‚¹çš„ç±»å‹ä¿æŒä¸€è‡´ï¼Œè¦ä¹ˆéƒ½æ˜¯å¶å­èŠ‚ç‚¹ï¼Œè¦ä¹ˆéƒ½æ˜¯å†…éƒ¨èŠ‚ç‚¹ã€‚
+	nodeb.parent = nodea.parent;//ä¸¤èŠ‚ç‚¹æ‹¥æœ‰å…±åŒçš„çˆ¶èŠ‚ç‚¹ï¼Œå½¼æ­¤æˆä¸ºå…„å¼ŸèŠ‚ç‚¹
+	nodeb.count = (MAX + 1) / 2;//æŠŠæ€»å…±è¦åˆ†è£‚çš„é”®å€¼çš„æ•°ç›®åˆ†ä¸€åŠç»™æ–°å¢èŠ‚ç‚¹ã€‚
+	nodea.count = nodea.count - nodeb.count + 1;//å‰©ä¸‹çš„æ•°ç›®ç•™ç»™åŸæ¥çš„èŠ‚ç‚¹ã€‚
 	for (cur = MAX; cur > pos && cur >= nodea.count; cur--)
 		cout << "test1" << endl;
 		nodeb.pair[cur - nodea.count] = nodea.pair[cur - 1];
@@ -157,7 +157,7 @@ void splitNode(FILE *index, Node &nodea, TreeRecord record, int pos)
 		//cout << "test3" << endl;
 		nodeb.pair[pos - nodea.count] = record;
 		for (cur--; cur >= nodea.count; cur--)
-			//°ÑÔ­À´½ÚµãaÖĞµÄ·Ö³öÈ¥µÄÔªËØÒÆµ½½ÚµãbÖĞ¡£
+			//æŠŠåŸæ¥èŠ‚ç‚¹aä¸­çš„åˆ†å‡ºå»çš„å…ƒç´ ç§»åˆ°èŠ‚ç‚¹bä¸­ã€‚
 			nodeb.pair[cur - nodea.count] = nodea.pair[cur];
 	}
 	
@@ -171,7 +171,7 @@ void splitNode(FILE *index, Node &nodea, TreeRecord record, int pos)
 	fflush(index);
 	if (nodea.parent == 0)
 	{
-		/*--------------------ÎªÁËÏÔÊ¾´òÓ¡µÄĞÅÏ¢start----------------------*/
+		/*--------------------ä¸ºäº†æ˜¾ç¤ºæ‰“å°çš„ä¿¡æ¯start----------------------*/
 		cout << "Split node  when  dont have parents" << endl;
 		for (int temp = 0; temp < nodeb.count; temp++)
 		{
@@ -179,16 +179,16 @@ void splitNode(FILE *index, Node &nodea, TreeRecord record, int pos)
 		}
 		cout << endl;
 		cout << "create parent node" << endl;
-		/*--------------------ÎªÁËÏÔÊ¾´òÓ¡µÄĞÅÏ¢end----------------------*/
+		/*--------------------ä¸ºäº†æ˜¾ç¤ºæ‰“å°çš„ä¿¡æ¯end----------------------*/
 		top.count = 0;
-		top.type = NODE;//ÀàĞÍÎªÄÚ²¿½Úµã
+		top.type = NODE;//ç±»å‹ä¸ºå†…éƒ¨èŠ‚ç‚¹
 		top.parent = 0;
-		/*½«Á½¸öº¢×Ó½ÚµãºÍ¸¸½Úµã¹ØÁªÆğÀ´*/
+		/*å°†ä¸¤ä¸ªå­©å­èŠ‚ç‚¹å’Œçˆ¶èŠ‚ç‚¹å…³è”èµ·æ¥*/
 		fseek(index, 0, SEEK_END);
 		cur = ftell(index);
 		nodea.parent = cur;
 		nodeb.parent = cur;
-		//´ËÊ±½ÚµãaºÍ½ÚµãbµÄ¸¸½ÚµãÊôĞÔ¶¼ÓĞÁË¸³Öµ£¬ËùÒÔÖØĞÂ½«ÆäĞ´Èëµ½´ÅÅÌÉÏ¡£
+		//æ­¤æ—¶èŠ‚ç‚¹aå’ŒèŠ‚ç‚¹bçš„çˆ¶èŠ‚ç‚¹å±æ€§éƒ½æœ‰äº†èµ‹å€¼ï¼Œæ‰€ä»¥é‡æ–°å°†å…¶å†™å…¥åˆ°ç£ç›˜ä¸Šã€‚
 		fseek(index, recorda.pos, SEEK_SET);
 		fwrite(&nodea, 1, sizeof(nodea), index);
 		fflush(index);
@@ -199,7 +199,7 @@ void splitNode(FILE *index, Node &nodea, TreeRecord record, int pos)
 		insertTreeRecord(index, top, recorda);
 		insertTreeRecord(index, top, recordb);
 		rewind(index);
-		fwrite(&cur, 1, sizeof(cur), index);//½«µ±Ç°¸ù½ÚµãµÄÎ»ÖÃĞ´µ½Õû¸öÎÄ¼şµÄÆäÊµÎ»ÖÃ£¬Ò²¾ÍÊÇÄÇ¸öoffsetÖĞ¡£
+		fwrite(&cur, 1, sizeof(cur), index);//å°†å½“å‰æ ¹èŠ‚ç‚¹çš„ä½ç½®å†™åˆ°æ•´ä¸ªæ–‡ä»¶çš„å…¶å®ä½ç½®ï¼Œä¹Ÿå°±æ˜¯é‚£ä¸ªoffsetä¸­ã€‚
 		fflush(index);
 	}
 	else
@@ -208,7 +208,7 @@ void splitNode(FILE *index, Node &nodea, TreeRecord record, int pos)
 		fseek(index, recorda.pos, SEEK_SET);
 		fwrite(&nodea, 1, sizeof(nodea), index);
 		fflush(index);
-		//fseek(index, recordb.pos, SEEK_SET);//ÆäÊµÕâÀï¿ÉÒÔĞ´ÈërecordbµÄ£¬ÒòÎªÖ®Ç°ÒÑ¾­Ğ´¹ıÁË£¬²¢ÇÒÖ®ºóÃ»ÓĞĞŞ¸Ä¡£
+		//fseek(index, recordb.pos, SEEK_SET);//å…¶å®è¿™é‡Œå¯ä»¥å†™å…¥recordbçš„ï¼Œå› ä¸ºä¹‹å‰å·²ç»å†™è¿‡äº†ï¼Œå¹¶ä¸”ä¹‹åæ²¡æœ‰ä¿®æ”¹ã€‚
 		//fwrite(&nodeb, 1, sizeof(nodeb), index);
 		//fflush(index);
 		fseek(index, nodea.parent, SEEK_SET);
@@ -227,15 +227,15 @@ void splitNode(FILE *index, Node &nodea, TreeRecord record, int pos)
 		for (cur = 0; cur < nodeb.count; cur++){
 			cout << "nodeb.pair[cur].key" << nodeb.pair[cur].key << endl;
 			cout << "recordb   " << recordb.key << endl;
-			//ÓÉÓÚnode½Úµã·ÖÁÑÖ®ºóµÄÄÇĞ©º¢×ÓÔªËØÖØĞÂ·Öµ½ÁËÓÒÃæµÄ½Úµãµ±ÖĞ
-			//µ«ÊÇÕâ¼¸¸öº¢×ÓÔªËØµÄ¸¸½ÚµãÈÔÈ»ÊÇÎ´·ÖÁÑÖ®Ç°µÄÄÇ¸ö½Úµã¡£
-			//ËùÒÔĞèÒªÏÖÔÚ°Ñ·ÖÁÑ³öÈ¥µÄº¢×Ó½ÚµãµÄ¸¸½Úµã¸Ä±ä³ÉĞÂ·ÖÁÑµÄÕâ¸ö½Úµã£¬Ò²¾ÍÊÇËùÎ½µÄchange parent
+			//ç”±äºnodeèŠ‚ç‚¹åˆ†è£‚ä¹‹åçš„é‚£äº›å­©å­å…ƒç´ é‡æ–°åˆ†åˆ°äº†å³é¢çš„èŠ‚ç‚¹å½“ä¸­
+			//ä½†æ˜¯è¿™å‡ ä¸ªå­©å­å…ƒç´ çš„çˆ¶èŠ‚ç‚¹ä»ç„¶æ˜¯æœªåˆ†è£‚ä¹‹å‰çš„é‚£ä¸ªèŠ‚ç‚¹ã€‚
+			//æ‰€ä»¥éœ€è¦ç°åœ¨æŠŠåˆ†è£‚å‡ºå»çš„å­©å­èŠ‚ç‚¹çš„çˆ¶èŠ‚ç‚¹æ”¹å˜æˆæ–°åˆ†è£‚çš„è¿™ä¸ªèŠ‚ç‚¹ï¼Œä¹Ÿå°±æ˜¯æ‰€è°“çš„change parent
 			changeParent(index, node, nodeb.pair[cur].pos, recordb.pos);
 		}
 	}
 }
 
-//¶ÔÓÚ¸ø¶¨µÄÒ»¸ö¡°¼üÖµ¡ªÖ¸Õë¶Ô¡±£¬°´ÕÕ B+Ê÷µÄ¶¨Òå£¬½«Æä²åÈëµ½¹æ¶¨µÄÒ¶½Úµã¡£
+//å¯¹äºç»™å®šçš„ä¸€ä¸ªâ€œé”®å€¼â€”æŒ‡é’ˆå¯¹â€ï¼ŒæŒ‰ç…§ B+æ ‘çš„å®šä¹‰ï¼Œå°†å…¶æ’å…¥åˆ°è§„å®šçš„å¶èŠ‚ç‚¹ã€‚
 int insert(FILE *index, TreeRecord record)
 {
 	Node node;	
@@ -285,7 +285,7 @@ void enlargeKey(FILE *index, Node &node)
 	}
 }
 
-//É¾³ı½Úµã
+//åˆ é™¤èŠ‚ç‚¹
 int del(FILE *index, int key)
 {
 	cout << "start delete" << key << endl;
@@ -301,7 +301,7 @@ int del(FILE *index, int key)
 	cout <<  endl;
 	
 	searchNode(index, node, key);
-	cout << "find the leaf nodes to delete the record" << endl;//ÕÒµ½ÒªÉ¾³ı¼ÇÂ¼µÄÒ¶×Ó½Úµã
+	cout << "find the leaf nodes to delete the record" << endl;//æ‰¾åˆ°è¦åˆ é™¤è®°å½•çš„å¶å­èŠ‚ç‚¹
 	cout << "node record" << endl;
 	for (int i = 0; i < node.count; i++)
 	{
@@ -313,37 +313,37 @@ int del(FILE *index, int key)
 
 int delTreeRecord(FILE *index, Node &node, int key)
 {
-	Node left, right, top,root;//±íÊ¾´ıÉ¾³ıÔªËØËùÔÚ½ÚµãµÄ×óÁÚ½Úµã£¬ÓÒÁÚ½Úµã£¬ÒÔ¼°¸¸½Úµã
-	TreeRecord recon ,recol, recor, recot;//±íÊ¾¸¸½ÚµãÖĞ´ıÉ¾³ı½Úµã£¬×óÁÚ½Úµã£¬ÓÒÁÚ½ÚµãµÄ·Ö¸ôÔªËØ£¬ÒÔ¼°¸¸½ÚµãµÄ¸¸½Úµã¡£
+	Node left, right, top,root;//è¡¨ç¤ºå¾…åˆ é™¤å…ƒç´ æ‰€åœ¨èŠ‚ç‚¹çš„å·¦é‚»èŠ‚ç‚¹ï¼Œå³é‚»èŠ‚ç‚¹ï¼Œä»¥åŠçˆ¶èŠ‚ç‚¹
+	TreeRecord recon ,recol, recor, recot;//è¡¨ç¤ºçˆ¶èŠ‚ç‚¹ä¸­å¾…åˆ é™¤èŠ‚ç‚¹ï¼Œå·¦é‚»èŠ‚ç‚¹ï¼Œå³é‚»èŠ‚ç‚¹çš„åˆ†éš”å…ƒç´ ï¼Œä»¥åŠçˆ¶èŠ‚ç‚¹çš„çˆ¶èŠ‚ç‚¹ã€‚
 	int pos, tpos;
 	pos = searchTreeRecord(node, key);
 	cout << "delete pos:" << pos << endl;
 	if (pos == node.count)
-		return -1;//Ò»Ö±ÕÒµ½×îºóÒ»¸ö½ÚµãµÄÏÂÒ»¸öÎ»ÖÃ£¬´ú±íÃ»ÓĞÕÒµ½
+		return -1;//ä¸€ç›´æ‰¾åˆ°æœ€åä¸€ä¸ªèŠ‚ç‚¹çš„ä¸‹ä¸€ä¸ªä½ç½®ï¼Œä»£è¡¨æ²¡æœ‰æ‰¾åˆ°
 	else if (node.parent == 0 || node.count > MIN)
-	{//ÈôÃ»ÓĞ¸¸½Úµã£¬²¢ÇÒ´óÓÚ°ëÂú¸öÊı
+	{//è‹¥æ²¡æœ‰çˆ¶èŠ‚ç‚¹ï¼Œå¹¶ä¸”å¤§äºåŠæ»¡ä¸ªæ•°
 		int posTem = pos;
-		cout << "delete pos is root" << endl;//É¾³ıµÄÎ»ÖÃÊÇ¸ù½Úµã
+		cout << "delete pos is root" << endl;//åˆ é™¤çš„ä½ç½®æ˜¯æ ¹èŠ‚ç‚¹
 		cout << "delete pos:"<<pos << endl;
 		for (node.count--; posTem < node.count; posTem++)
-			node.pair[posTem] = node.pair[posTem + 1];//½«ºóÃæµÄÔªËØÍ³Í³ÏòÇ°ÒÆ¶¯
-		cout << "½«É¾³ıÎ»ÖÃºóµÄ¼ÇÂ¼Ç°ÒÆ" << endl;
-		cout << "this node" << endl;//´ËÊ±µÄnode½Úµã£º
+			node.pair[posTem] = node.pair[posTem + 1];//å°†åé¢çš„å…ƒç´ ç»Ÿç»Ÿå‘å‰ç§»åŠ¨
+		cout << "å°†åˆ é™¤ä½ç½®åçš„è®°å½•å‰ç§»" << endl;
+		cout << "this node" << endl;//æ­¤æ—¶çš„nodeèŠ‚ç‚¹ï¼š
 		cout << "node.count:" << node.count << endl;
 		if (node.parent == 0 && node.count == 1 && node.type == NODE)
 		{
 			cout << "the root have only one key after delete ,then this root will be delete,all chlid's parents will set 0" << endl;
-			//É¾³ıÔªËØÖ®ºó£¬¸ù½ÚµãÖĞÖ»ÓĞÒ»¸öÔªËØ£¬ÄÇÃ´Õâ¸ö¸ù½Úµã¾ÍÒª±»È¡Ïû£¬ËùÓĞº¢×ÓµÄ¸¸½ÚÉèÎª0
+			//åˆ é™¤å…ƒç´ ä¹‹åï¼Œæ ¹èŠ‚ç‚¹ä¸­åªæœ‰ä¸€ä¸ªå…ƒç´ ï¼Œé‚£ä¹ˆè¿™ä¸ªæ ¹èŠ‚ç‚¹å°±è¦è¢«å–æ¶ˆï¼Œæ‰€æœ‰å­©å­çš„çˆ¶èŠ‚è®¾ä¸º0
 			node.count = 0;
 			fseek(index, -(int)sizeof(node), SEEK_CUR);
 			fwrite(&node, 1, sizeof(node), index);
 			fflush(index);
 			rewind(index);
-			cout << "update the pos of root,alter the root to node's child node" << endl;//¸üĞÂroot½ÚµãµÄÎ»ÖÃ£¬½«root½Úµã¸ü¸ÄÎªnodeµÄº¢×Ó½Úµã
+			cout << "update the pos of root,alter the root to node's child node" << endl;//æ›´æ–°rootèŠ‚ç‚¹çš„ä½ç½®ï¼Œå°†rootèŠ‚ç‚¹æ›´æ”¹ä¸ºnodeçš„å­©å­èŠ‚ç‚¹
 			fwrite(&node.pair[0].pos, 1, sizeof(node.pair[0].pos), index);
 			fflush(index);
 			changeParent(index, node, node.pair[0].pos, 0);
-			cout << "the root:";//´ËÊ±µÄroot½ÚµãÎª£º
+			cout << "the root:";//æ­¤æ—¶çš„rootèŠ‚ç‚¹ä¸ºï¼š
 			getRoot(index, root);
 			for (int i = 0; i < root.count; i++)
 			{
@@ -356,49 +356,49 @@ int delTreeRecord(FILE *index, Node &node, int key)
 		}
 		else
 		{
-			//µ±½ÚµãÖĞÔªËØ¸öÊı´óÓÚ3µÄÊ±ºò£¬É¾³ıÍêÖ±½ÓË¢»Ø´ÅÅÌ
+			//å½“èŠ‚ç‚¹ä¸­å…ƒç´ ä¸ªæ•°å¤§äº3çš„æ—¶å€™ï¼Œåˆ é™¤å®Œç›´æ¥åˆ·å›ç£ç›˜
 			fseek(index, -(int)sizeof(node), SEEK_CUR);
 			fwrite(&node, 1, sizeof(node), index);
 			fflush(index);
 			if (node.parent != 0 && pos == node.count)
-				//ÈôÉ¾³ıÔªËØËùÔÚµÄ½ÚµãÓĞ¸¸½Úµã£¬ÇÒÉ¾³ıµÄÔªËØÊÇ½ÚµãÖĞ×îºóÒ»¸öÔªËØ£¬ÄÇÃ´¾ÍÒª¸Ä±ä¸¸½ÚµãÖĞ·Ö¸ôÔªËØµÄkey¡£
+				//è‹¥åˆ é™¤å…ƒç´ æ‰€åœ¨çš„èŠ‚ç‚¹æœ‰çˆ¶èŠ‚ç‚¹ï¼Œä¸”åˆ é™¤çš„å…ƒç´ æ˜¯èŠ‚ç‚¹ä¸­æœ€åä¸€ä¸ªå…ƒç´ ï¼Œé‚£ä¹ˆå°±è¦æ”¹å˜çˆ¶èŠ‚ç‚¹ä¸­åˆ†éš”å…ƒç´ çš„keyã€‚
 				ensmallKey(index, node);
 		}
 		return 0;
 	}
 	else
 	{
-		//cout << "É¾³ıº¯Êı" << endl;
-		//reconÕâ¸ö½ÚµãÓÃÀ´µ±ÔªËØÉ¾³ıÖ®ºó£¬¸üĞÂ¸¸½ÚµãÖĞ·Ö¸ôÔªËØ¡£
-		//ÒòÉ¾³ıÔªËØÖ®ºó£¬ËùÔÚ½ÚµãµÄ×îºóÒ»¸öÎ»ÖÃ½«»á±»¸üĞÂÎªÓÒÁÚ½ÚµãÖĞµÄµÚÒ»¸öÔªËØ£¬
-		//Òò´Ë¸¸½ÚµãÖĞµÄÓÃÓÚÕÒµ½¸Ã½ÚµãµÄÄÇ¸ö·Ö¸ôÔªËØÒ²ĞèÒª¸üĞÂ¡£
-		//reconµÄkey¾ÍÊÇ´ıÉ¾³ıÔªËØËùÔÚ½ÚµãµÄ×îºóÒ»¸öÔªËØ
-		//reconµÄpos¾ÍÊÇ´ıÉ¾³ıÔªËØËùÔÚ½ÚµãµÄÆğÊ¼µØÖ·
-		cout << "after delete,the records<Min, think to brow or merge" << endl;//É¾³ı¼ÇÂ¼ºó£¬¼ÇÂ¼Êı<Min,¿¼ÂÇÏò×óÓÒº¢×Ó½è»òÕßºÏ²¢
-		recon.key = node.pair[node.count - 1].key;//±¾ÔªËØËùÔÚ½ÚµãµÄ×îºóÒ»¸ökey
+		//cout << "åˆ é™¤å‡½æ•°" << endl;
+		//reconè¿™ä¸ªèŠ‚ç‚¹ç”¨æ¥å½“å…ƒç´ åˆ é™¤ä¹‹åï¼Œæ›´æ–°çˆ¶èŠ‚ç‚¹ä¸­åˆ†éš”å…ƒç´ ã€‚
+		//å› åˆ é™¤å…ƒç´ ä¹‹åï¼Œæ‰€åœ¨èŠ‚ç‚¹çš„æœ€åä¸€ä¸ªä½ç½®å°†ä¼šè¢«æ›´æ–°ä¸ºå³é‚»èŠ‚ç‚¹ä¸­çš„ç¬¬ä¸€ä¸ªå…ƒç´ ï¼Œ
+		//å› æ­¤çˆ¶èŠ‚ç‚¹ä¸­çš„ç”¨äºæ‰¾åˆ°è¯¥èŠ‚ç‚¹çš„é‚£ä¸ªåˆ†éš”å…ƒç´ ä¹Ÿéœ€è¦æ›´æ–°ã€‚
+		//reconçš„keyå°±æ˜¯å¾…åˆ é™¤å…ƒç´ æ‰€åœ¨èŠ‚ç‚¹çš„æœ€åä¸€ä¸ªå…ƒç´ 
+		//reconçš„poså°±æ˜¯å¾…åˆ é™¤å…ƒç´ æ‰€åœ¨èŠ‚ç‚¹çš„èµ·å§‹åœ°å€
+		cout << "after delete,the records<Min, think to brow or merge" << endl;//åˆ é™¤è®°å½•åï¼Œè®°å½•æ•°<Min,è€ƒè™‘å‘å·¦å³å­©å­å€Ÿæˆ–è€…åˆå¹¶
+		recon.key = node.pair[node.count - 1].key;//æœ¬å…ƒç´ æ‰€åœ¨èŠ‚ç‚¹çš„æœ€åä¸€ä¸ªkey
 		recon.pos = ftell(index) - sizeof(node);
-		//recot½ÚµãÖ¸Ïò¸ÃÔªËØµÄ¸¸½Úµã
+		//recotèŠ‚ç‚¹æŒ‡å‘è¯¥å…ƒç´ çš„çˆ¶èŠ‚ç‚¹
 		recot.pos = node.parent;
 		fseek(index, recot.pos, SEEK_SET);
 		fread(&top, 1, sizeof(top), index);
-		cout << "find node.parent" << endl;//ÕÒµ½nodeµÄ¸¸Ç×½Úµã
+		cout << "find node.parent" << endl;//æ‰¾åˆ°nodeçš„çˆ¶äº²èŠ‚ç‚¹
 		cout << "top record" << endl;
 		for (int i = 0; i < top.count; i++)
 		{
 			cout << top.pair[i].key << "   ";
 		}
 		cout << endl;
-		recot.key = top.pair[top.count - 1].key;//recot½ÚµãµÄkeyÖµÊÇ¸ÃÔªËØµÄ¸¸½ÚµãµÄ×îºóÒ»¸ökey
+		recot.key = top.pair[top.count - 1].key;//recotèŠ‚ç‚¹çš„keyå€¼æ˜¯è¯¥å…ƒç´ çš„çˆ¶èŠ‚ç‚¹çš„æœ€åä¸€ä¸ªkey
 	//	cout << "recot.key" << recot.key << endl;
-		tpos = searchTreeRecord(top, key);//ÔÚ´ıÉ¾³ıÔªËØµÄ¸¸½ÚµãÖĞÕÒµ½µÚÒ»¸ö±ÈËü´óµÄÎ»ÖÃ
+		tpos = searchTreeRecord(top, key);//åœ¨å¾…åˆ é™¤å…ƒç´ çš„çˆ¶èŠ‚ç‚¹ä¸­æ‰¾åˆ°ç¬¬ä¸€ä¸ªæ¯”å®ƒå¤§çš„ä½ç½®
 		cout <<"tpos:"<< tpos << endl;
 		if (tpos == top.count - 1)
-		{//ÈôÉ¾³ıµÄÎ»ÖÃÊÇ½ÚµãÖĞµÄ×îºóÒ»¸öÔªËØ
+		{//è‹¥åˆ é™¤çš„ä½ç½®æ˜¯èŠ‚ç‚¹ä¸­çš„æœ€åä¸€ä¸ªå…ƒç´ 
 			cout << "no right child" << endl;
 			recol = top.pair[tpos - 1];
 			fseek(index, recol.pos, SEEK_SET);
 			fread(&left, 1, sizeof(left), index);
-			cout << "find left child's leaf" << endl;//ÕÒµ½×óº¢×ÓµÄÒ¶×Ó½Úµã
+			cout << "find left child's leaf" << endl;//æ‰¾åˆ°å·¦å­©å­çš„å¶å­èŠ‚ç‚¹
 			cout << "left.count:" << left.count << endl;
 			for (int i = 0; i < left.count; i++)
 			{
@@ -425,11 +425,11 @@ int delTreeRecord(FILE *index, Node &node, int key)
 			}
 			else
 			{
-				cout << "left records<Min" << endl;//×óº¢×ÓµÄ¼ÇÂ¼ÊıÄ¿Ğ¡ÓÚMin
+				cout << "left records<Min" << endl;//å·¦å­©å­çš„è®°å½•æ•°ç›®å°äºMin
 				for (node.count--; pos < node.count; pos++)
 					node.pair[pos] = node.pair[pos + 1];
 
-				cout << "mv the delete record next record" << endl;//½«nodeÖĞÉ¾³ı¼ÇÂ¼ºóÃæµÄ¼ÇÂ¼Ç°ÒÆ
+				cout << "mv the delete record next record" << endl;//å°†nodeä¸­åˆ é™¤è®°å½•åé¢çš„è®°å½•å‰ç§»
 				cout << "node.count:" << node.count << endl;
 				for (int i = 0; i < node.count; i++)
 				{
@@ -441,7 +441,7 @@ int delTreeRecord(FILE *index, Node &node, int key)
 						changeParent(index, right, node.pair[pos].pos, recol.pos);
 				}
 				mergeNode(index, left, node);
-				cout << "merge the left child and node" << endl;//½«×óº¢×ÓºÍnodeºÏ²¢
+				cout << "merge the left child and node" << endl;//å°†å·¦å­©å­å’Œnodeåˆå¹¶
 				fseek(index, recol.pos, SEEK_SET);
 				fwrite(&left, 1, sizeof(left), index);
 				fflush(index);
@@ -459,28 +459,28 @@ int delTreeRecord(FILE *index, Node &node, int key)
 					cout << node.pair[i].key << "   ";
 				}
 				cout << endl;
-				cout << "½«¸¸½ÚµãtposÓÒ±ßÒ»¸öÔªËØµÄÖ¸ÏòºÏ²¢ºóµÄ½Úµã£¬¼´node½ÚµãµÄÎ»ÖÃ" << endl;
+				cout << "å°†çˆ¶èŠ‚ç‚¹tposå³è¾¹ä¸€ä¸ªå…ƒç´ çš„æŒ‡å‘åˆå¹¶åçš„èŠ‚ç‚¹ï¼Œå³nodeèŠ‚ç‚¹çš„ä½ç½®" << endl;
 				recon.key = left.pair[left.count - 1].key;
 				recon.pos = recol.pos;
 				top.pair[tpos] = recon;
 				fseek(index, recot.pos, SEEK_SET);
 				fwrite(&top, 1, sizeof(top), index);
 				fflush(index);
-				cout << "delete the root's old record:" << recol.key << "delete" << endl;//½«¸¸½ÚµãÖĞµÄ¾ÉµÄ·Ö¸ôÔªËØ
+				cout << "delete the root's old record:" << recol.key << "delete" << endl;//å°†çˆ¶èŠ‚ç‚¹ä¸­çš„æ—§çš„åˆ†éš”å…ƒç´ 
 				cout << endl;
 				delTreeRecord(index, top, recol.key);
-				//×¢ÒâÕâÀïÉ¾³ıµÄ·Ö¸ôÔªËØÊÇ×óÁÚ½ÚµãµÄ·Ö¸ôÔªËØ¶ø²»ÊÇ±¾½ÚµãµÄ·Ö¸ôÔªËØ¡£ÒòÎª±¾½ÚµãµÄ·Ö¸ôÔªËØÊÇ
+				//æ³¨æ„è¿™é‡Œåˆ é™¤çš„åˆ†éš”å…ƒç´ æ˜¯å·¦é‚»èŠ‚ç‚¹çš„åˆ†éš”å…ƒç´ è€Œä¸æ˜¯æœ¬èŠ‚ç‚¹çš„åˆ†éš”å…ƒç´ ã€‚å› ä¸ºæœ¬èŠ‚ç‚¹çš„åˆ†éš”å…ƒç´ æ˜¯
 			}
 			if (top.parent != 0 && top.count != 0)
 				ensmallKey(index, top);
 		}
 		else
 		{
-			//É¾³ıµÄÔªËØÊÇ½ÚµãÖĞµÄÖĞ¼äÔªËØ
+			//åˆ é™¤çš„å…ƒç´ æ˜¯èŠ‚ç‚¹ä¸­çš„ä¸­é—´å…ƒç´ 
 			cout << "tpos!=top.count,have left child"<< endl;
 		//	cout << "top.pair[tpos]" << top.pair[tpos].key << endl;
 			recor = top.pair[tpos + 1];
-			//recor.pos´ú±í´ıÉ¾³ıÔªËØµÄËùÔÚ½ÚµãµÄÓÒÁÚ½ÚµãµÄµØÖ·¡£
+			//recor.posä»£è¡¨å¾…åˆ é™¤å…ƒç´ çš„æ‰€åœ¨èŠ‚ç‚¹çš„å³é‚»èŠ‚ç‚¹çš„åœ°å€ã€‚
 			fseek(index, recor.pos, SEEK_SET);
 		//	cout << "recor" << recor.key << endl;
 			fread(&right, 1, sizeof(right), index);
@@ -493,33 +493,33 @@ int delTreeRecord(FILE *index, Node &node, int key)
 			cout << endl;
 			if (right.count > MIN)
 			{
-				//ÓÒÁÚ½Úµã´óÓÚ3µÄÇé¿öÏÂ
-				transTreeRecord(index, node, right, LEFT, pos);//½«´ıÉ¾³ıÔªËØÉ¾µô
+				//å³é‚»èŠ‚ç‚¹å¤§äº3çš„æƒ…å†µä¸‹
+				transTreeRecord(index, node, right, LEFT, pos);//å°†å¾…åˆ é™¤å…ƒç´ åˆ æ‰
 				if (node.type == NODE)
 					changeParent(index, left, node.pair[node.count - 1].pos, recon.pos);
-				//ÔÚtransTreeRecordÍê³ÉÖ®ºó£º
-				//¸ÃÔªËØËùÔÚ½ÚµãµÄ×îºóÒ»¸öÔªËØ±»¸üĞÂÎªÓÒÁÚ½ÚµãÖĞµÄµÚÒ»¸öÔªËØ
-				//²¢ÇÒ¸üĞÂ¸¸½ÚµãÖĞµÄ·Ö¸ôÔªËØ
+				//åœ¨transTreeRecordå®Œæˆä¹‹åï¼š
+				//è¯¥å…ƒç´ æ‰€åœ¨èŠ‚ç‚¹çš„æœ€åä¸€ä¸ªå…ƒç´ è¢«æ›´æ–°ä¸ºå³é‚»èŠ‚ç‚¹ä¸­çš„ç¬¬ä¸€ä¸ªå…ƒç´ 
+				//å¹¶ä¸”æ›´æ–°çˆ¶èŠ‚ç‚¹ä¸­çš„åˆ†éš”å…ƒç´ 
 				recon.key = node.pair[node.count - 1].key;
 				top.pair[tpos] = recon;
-				//½«¸üĞÂºóµÄÓÒ½ÚµãĞ´»Ø´ÅÅÌ£¨µÚÒ»¸öÔªËØ±»ÒÆµ½Ç°Ò»¸ö½ÚµãÖĞ£©
+				//å°†æ›´æ–°åçš„å³èŠ‚ç‚¹å†™å›ç£ç›˜ï¼ˆç¬¬ä¸€ä¸ªå…ƒç´ è¢«ç§»åˆ°å‰ä¸€ä¸ªèŠ‚ç‚¹ä¸­ï¼‰
 				fseek(index, recor.pos, SEEK_SET);
 				fwrite(&right, 1, sizeof(right), index);
 				fflush(index);
-				//½«¸üĞÂºóµÄµ±Ç°½ÚµãĞ´»Ø´ÅÅÌ£¨Ä¿±êÉ¾³ıÔªËØ±»É¾µô£¬ÇÒÔö¼ÓÁËÓÒÁÚ½ÚµãµÄµÚÒ»¸öÔªËØ£©
+				//å°†æ›´æ–°åçš„å½“å‰èŠ‚ç‚¹å†™å›ç£ç›˜ï¼ˆç›®æ ‡åˆ é™¤å…ƒç´ è¢«åˆ æ‰ï¼Œä¸”å¢åŠ äº†å³é‚»èŠ‚ç‚¹çš„ç¬¬ä¸€ä¸ªå…ƒç´ ï¼‰
 				fseek(index, recon.pos, SEEK_SET);
 				fwrite(&node, 1, sizeof(node), index);
 				fflush(index);
-				//½«¸üĞÂºóµÄ¸¸½ÚµãĞ´»Ø´ÅÅÌ£¨¸¸½ÚµãÖĞµÄ·Ö¸ôÔªËØ¸üĞÂÁË£©
+				//å°†æ›´æ–°åçš„çˆ¶èŠ‚ç‚¹å†™å›ç£ç›˜ï¼ˆçˆ¶èŠ‚ç‚¹ä¸­çš„åˆ†éš”å…ƒç´ æ›´æ–°äº†ï¼‰
 				fseek(index, recot.pos, SEEK_SET);
 				fwrite(&top, 1, sizeof(top), index);
 				fflush(index);
 			}
 			else if (tpos != 0)
 			{
-				cout << "ÓÒº¢×Ó¹Ø¼ü×ÖµÄÊıÄ¿<Min,¿´Æä×óº¢×Ó"<< endl;
+				cout << "å³å­©å­å…³é”®å­—çš„æ•°ç›®<Min,çœ‹å…¶å·¦å­©å­"<< endl;
 				
-				//¼ÙÈçµ±Ç°½Úµã²»ÊÇµÚÒ»¸ö½ÚµãµÄ»°£¬ÓÉÓÚÓÒÁÚ½ÚµãµÄÒÑ¾­Ğ¡ÓÚ°ëÂú×´Ì¬£¬ËùÓĞ
+				//å‡å¦‚å½“å‰èŠ‚ç‚¹ä¸æ˜¯ç¬¬ä¸€ä¸ªèŠ‚ç‚¹çš„è¯ï¼Œç”±äºå³é‚»èŠ‚ç‚¹çš„å·²ç»å°äºåŠæ»¡çŠ¶æ€ï¼Œæ‰€æœ‰
 				recol = top.pair[tpos - 1];
 				fseek(index, recol.pos, SEEK_SET);
 				fread(&left, 1, sizeof(left), index);
@@ -532,14 +532,14 @@ int delTreeRecord(FILE *index, Node &node, int key)
 				cout << endl;
 				if (left.count > MIN)
 				{
-					//×óÁÚ½Úµã´óÓÚ3µÄÇéĞÎÏÂ
+					//å·¦é‚»èŠ‚ç‚¹å¤§äº3çš„æƒ…å½¢ä¸‹
 					transTreeRecord(index, left, node, RIGHT, pos);
 					if (node.type == NODE)
 						changeParent(index, right, node.pair[0].pos, recon.pos);
 					recon.key = node.pair[node.count - 1].key;
 					recol.key = left.pair[left.count - 1].key;
-					top.pair[tpos - 1] = recol;//ÖØĞÂ¸üĞÂ¸¸½ÚµãÖĞµÄ×ó·Ö¸ôÔªËØ
-					top.pair[tpos] = recon;//ÖØĞÂ¸üĞÂ¸¸½ÚµãÖĞµÄ·Ö¸ôÔªËØ
+					top.pair[tpos - 1] = recol;//é‡æ–°æ›´æ–°çˆ¶èŠ‚ç‚¹ä¸­çš„å·¦åˆ†éš”å…ƒç´ 
+					top.pair[tpos] = recon;//é‡æ–°æ›´æ–°çˆ¶èŠ‚ç‚¹ä¸­çš„åˆ†éš”å…ƒç´ 
 					fseek(index, recol.pos, SEEK_SET);
 					fwrite(&left, 1, sizeof(left), index);
 					fflush(index);
@@ -552,8 +552,8 @@ int delTreeRecord(FILE *index, Node &node, int key)
 				}
 				else
 				{
-					//×óÓÒ½ÚµãÖĞÈ«²¿ÊÇĞ¡ÓÚ»òµÈÓÚ3¸ö½Úµã
-					cout << "the counts of left childs<Min" << endl;//×óº¢×ÓÊıÄ¿<Min
+					//å·¦å³èŠ‚ç‚¹ä¸­å…¨éƒ¨æ˜¯å°äºæˆ–ç­‰äº3ä¸ªèŠ‚ç‚¹
+					cout << "the counts of left childs<Min" << endl;//å·¦å­©å­æ•°ç›®<Min
 					for (node.count--; pos < node.count; pos++)
 						node.pair[pos] = node.pair[pos + 1];
 					if (right.type == NODE)
@@ -561,11 +561,11 @@ int delTreeRecord(FILE *index, Node &node, int key)
 						for (pos = 0; pos < right.count; pos++)
 							changeParent(index, left, right.pair[pos].pos, recon.pos);
 					}
-					mergeNode(index, node, right);//ºÍÓÒ½Úµã½øĞĞºÏ²¢
-					cout << "merge the right child and node" << endl;//nodeºÍÓÒº¢×Ó½øĞĞºÏ²¢
+					mergeNode(index, node, right);//å’Œå³èŠ‚ç‚¹è¿›è¡Œåˆå¹¶
+					cout << "merge the right child and node" << endl;//nodeå’Œå³å­©å­è¿›è¡Œåˆå¹¶
 					fseek(index, recor.pos, SEEK_SET);
 					fwrite(&right, 1, sizeof(right), index);
-					cout << "right£º" << endl;
+					cout << "rightï¼š" << endl;
 					cout << "right.count:" << right.count << endl;
 					for (int i = 0; i < right.count; i++)
 					{
@@ -575,7 +575,7 @@ int delTreeRecord(FILE *index, Node &node, int key)
 					fflush(index);
 					fseek(index, recon.pos, SEEK_SET);
 					fwrite(&node, 1, sizeof(node), index);
-					cout << "node£º" << endl;
+					cout << "nodeï¼š" << endl;
 					cout << "node.count:" << node.count << endl;
 					cout << "node.record" << endl;
 					for (int i = 0; i < node.count; i++)
@@ -584,23 +584,23 @@ int delTreeRecord(FILE *index, Node &node, int key)
 					}
 					cout << endl;
 					fflush(index);
-					//ÒòÎªÏÖÔÚ¸Ã½ÚµãµÄ×îºóÒ»¸öÖµÒÑ¾­±ä³ÉÔ­À´µÄÓÒÁÚ½ÚµãÖĞµÄ×îºóÒ»¸ö¡£
-					//ËùÒÔµ±Ç°½ÚµãµÄ·Ö¸ôÔªËØ±ä³ÉÓÒÁÚ½ÚµãµÄ·Ö¸ôÔªËØ
-					//Ö®ºóÉ¾³ıµôÔ­À´µÄÄÇ¸ö·Ö¸ôÔªËØ¾Í¿ÉÒÔ
+					//å› ä¸ºç°åœ¨è¯¥èŠ‚ç‚¹çš„æœ€åä¸€ä¸ªå€¼å·²ç»å˜æˆåŸæ¥çš„å³é‚»èŠ‚ç‚¹ä¸­çš„æœ€åä¸€ä¸ªã€‚
+					//æ‰€ä»¥å½“å‰èŠ‚ç‚¹çš„åˆ†éš”å…ƒç´ å˜æˆå³é‚»èŠ‚ç‚¹çš„åˆ†éš”å…ƒç´ 
+					//ä¹‹ååˆ é™¤æ‰åŸæ¥çš„é‚£ä¸ªåˆ†éš”å…ƒç´ å°±å¯ä»¥
 					cout << "top:" << endl;
 					for (int i = 0; i < top.count; i++)
 					{
 						cout << top.pair[i].key << "   ";
 					}
-					cout <<"½«¸¸½ÚµãtposÓÒ±ßÒ»¸öÔªËØµÄÖ¸ÏòºÏ²¢ºóµÄ½Úµã£¬¼´node½ÚµãµÄÎ»ÖÃ" << endl;
-					recor.pos = recon.pos;//°Ñµ±Ç°½ÚµãÔÚ¸¸½ÚµãÖĞ·Ö¸ôÔªËØµÄpos£¬¸³Öµ¸øÓÒÁÚµãÔÚ¸¸½ÚµãÖĞ·Ö¸ôÔªËØµÄpos
-					top.pair[tpos + 1] = recor;//¸üĞÂ¸¸½ÚµãÖĞµÄÓÒÁÚ·Ö¸ôÔªËØ
+					cout <<"å°†çˆ¶èŠ‚ç‚¹tposå³è¾¹ä¸€ä¸ªå…ƒç´ çš„æŒ‡å‘åˆå¹¶åçš„èŠ‚ç‚¹ï¼Œå³nodeèŠ‚ç‚¹çš„ä½ç½®" << endl;
+					recor.pos = recon.pos;//æŠŠå½“å‰èŠ‚ç‚¹åœ¨çˆ¶èŠ‚ç‚¹ä¸­åˆ†éš”å…ƒç´ çš„posï¼Œèµ‹å€¼ç»™å³é‚»ç‚¹åœ¨çˆ¶èŠ‚ç‚¹ä¸­åˆ†éš”å…ƒç´ çš„pos
+					top.pair[tpos + 1] = recor;//æ›´æ–°çˆ¶èŠ‚ç‚¹ä¸­çš„å³é‚»åˆ†éš”å…ƒç´ 
 					fseek(index, recot.pos, SEEK_SET);
 					fwrite(&top, 1, sizeof(top), index);
 					fflush(index);
-					//É¾³ı¸¸½ÚµãÖĞµÄµ±Ç°ÔªËØµÄ¾É·Ö¸ôÔªËØ£¬
+					//åˆ é™¤çˆ¶èŠ‚ç‚¹ä¸­çš„å½“å‰å…ƒç´ çš„æ—§åˆ†éš”å…ƒç´ ï¼Œ
 					
-					//cout << "delete the root's old record:" << recol.key << "delete" << endl;//½«¸¸½ÚµãÖĞµÄ¾ÉµÄ·Ö¸ôÔªËØ
+					//cout << "delete the root's old record:" << recol.key << "delete" << endl;//å°†çˆ¶èŠ‚ç‚¹ä¸­çš„æ—§çš„åˆ†éš”å…ƒç´ 
 					cout <<"delete the root's old record:"<<recon.key<<"delete" << endl;
 					cout << endl;
 					delTreeRecord(index, top, recon.key);
@@ -609,7 +609,7 @@ int delTreeRecord(FILE *index, Node &node, int key)
 			}
 			else
 			{
-				//´ıÉ¾³ıÔªËØËùÔÚµÄ½ÚµãÊÇÆä¸¸½ÚµãÖĞµÄµÚÒ»¸ö½Úµã£¬¼´ËùÔÚ½ÚµãÃ»ÓĞ×ó½Úµã
+				//å¾…åˆ é™¤å…ƒç´ æ‰€åœ¨çš„èŠ‚ç‚¹æ˜¯å…¶çˆ¶èŠ‚ç‚¹ä¸­çš„ç¬¬ä¸€ä¸ªèŠ‚ç‚¹ï¼Œå³æ‰€åœ¨èŠ‚ç‚¹æ²¡æœ‰å·¦èŠ‚ç‚¹
 				for (node.count--; pos < node.count; pos++)
 					node.pair[pos] = node.pair[pos + 1];
 				if (right.type == NODE)
@@ -641,20 +641,20 @@ void transTreeRecord(FILE *index, Node &left, Node &right, int dir, int pos)
 	if (dir == RIGHT)
 	{
 		for (; pos > 0; pos--)
-			right.pair[pos] = right.pair[pos - 1];//½«´ıÉ¾³ıÔªËØµÄÇ°ÃæµÄÔªËØÍ³Í³ºóÒÆ
-		right.pair[0] = left.pair[left.count-1];//½«×óÁÚ½ÚµãÖĞµÄ×îºóÒ»¸öÔªËØÒÆ¶¯µ½µ±Ç°½ÚµãÖĞµÄµÚÒ»¸öÔªËØµÄÎ»ÖÃ¡£
+			right.pair[pos] = right.pair[pos - 1];//å°†å¾…åˆ é™¤å…ƒç´ çš„å‰é¢çš„å…ƒç´ ç»Ÿç»Ÿåç§»
+		right.pair[0] = left.pair[left.count-1];//å°†å·¦é‚»èŠ‚ç‚¹ä¸­çš„æœ€åä¸€ä¸ªå…ƒç´ ç§»åŠ¨åˆ°å½“å‰èŠ‚ç‚¹ä¸­çš„ç¬¬ä¸€ä¸ªå…ƒç´ çš„ä½ç½®ã€‚
 		left.count--;
 	}
 	else
 	{
 		for (; pos < left.count - 1; pos++)
-			left.pair[pos] = left.pair[pos + 1];//½«´ıÉ¾³ıÔªËØµÄºóÃæµÄÔªËØÍ³Í³Ç°ÒÆ
+			left.pair[pos] = left.pair[pos + 1];//å°†å¾…åˆ é™¤å…ƒç´ çš„åé¢çš„å…ƒç´ ç»Ÿç»Ÿå‰ç§»
 		left.pair[pos] = right.pair[0];
-		//ÒòÎª¸Ã½Úµã¼ÈÈ»ÓĞÓÒÁÚ½Úµã£¬ËµÃ÷µ±Ç°½ÚµãÖÁÉÙ´¦ÓÚ°ëÂú×´Ì¬¡£
-		//ÓÖÓÉÓÚÓÒÁÚ½ÚµãÖĞµÄ¸öÊı´óÓÚ°ëÂú¸öÊı£¬ÒÆ¶¯Ò»¸ökeyÖ®ºó£¬½ÚµãÈÔÈ»»á´¦ÓÚ°ëÂú×´Ì¬
-		//½«ÓÒÁÚ½ÚµãÖĞµÄµÚÒ»¸ökeyÒÆ¶¯µ½µ±Ç°½ÚµãÖĞ£¬Ê¹µÃÄ¿Ç°½ÚµãÈÔÈ»ÊÇ´¦ÓÚ°ëÂú×´Ì¬
+		//å› ä¸ºè¯¥èŠ‚ç‚¹æ—¢ç„¶æœ‰å³é‚»èŠ‚ç‚¹ï¼Œè¯´æ˜å½“å‰èŠ‚ç‚¹è‡³å°‘å¤„äºåŠæ»¡çŠ¶æ€ã€‚
+		//åˆç”±äºå³é‚»èŠ‚ç‚¹ä¸­çš„ä¸ªæ•°å¤§äºåŠæ»¡ä¸ªæ•°ï¼Œç§»åŠ¨ä¸€ä¸ªkeyä¹‹åï¼ŒèŠ‚ç‚¹ä»ç„¶ä¼šå¤„äºåŠæ»¡çŠ¶æ€
+		//å°†å³é‚»èŠ‚ç‚¹ä¸­çš„ç¬¬ä¸€ä¸ªkeyç§»åŠ¨åˆ°å½“å‰èŠ‚ç‚¹ä¸­ï¼Œä½¿å¾—ç›®å‰èŠ‚ç‚¹ä»ç„¶æ˜¯å¤„äºåŠæ»¡çŠ¶æ€
 		right.count--;
-		//½«´ıÉ¾³ıÔªËØµÄºóÃæµÄÔªËØÍ³Í³Ç°ÒÆÒ»¸ö
+		//å°†å¾…åˆ é™¤å…ƒç´ çš„åé¢çš„å…ƒç´ ç»Ÿç»Ÿå‰ç§»ä¸€ä¸ª
 		for (pos = 0; pos < right.count; pos++)
 			right.pair[pos] = right.pair[pos + 1];
 	}
@@ -662,8 +662,8 @@ void transTreeRecord(FILE *index, Node &left, Node &right, int dir, int pos)
 
 void mergeNode(FILE *index, Node &left, Node &right)
 {
-	//¼ÈÈ»ÒªºÏ²¢£¬ÔÙ´ÎÇéĞÎÏÂµÄÒşº¬Ìõ¼şÊÇ£ºµ±Ç°½ÚµãÉ¾³ıÔªËØÖ®ºó¸öÊı<=2,ÓÒÁÚ½ÚµãµÄ¸öÊı<=3,
-	//ËùÒÔÁ½ÕßÖ®ºÍµÄ¸öÊı<=5,Òò´ËÒ»¶¨ÊÇºÏ²¢Ö®ºó£¬Ô­À´ÓÒÁÚ½ÚµãÖĞµÄÔªËØÈ«²¿ÒÆ¶¯µ½µ±Ç°½ÚµãÖĞ¡£
+	//æ—¢ç„¶è¦åˆå¹¶ï¼Œå†æ¬¡æƒ…å½¢ä¸‹çš„éšå«æ¡ä»¶æ˜¯ï¼šå½“å‰èŠ‚ç‚¹åˆ é™¤å…ƒç´ ä¹‹åä¸ªæ•°<=2,å³é‚»èŠ‚ç‚¹çš„ä¸ªæ•°<=3,
+	//æ‰€ä»¥ä¸¤è€…ä¹‹å’Œçš„ä¸ªæ•°<=5,å› æ­¤ä¸€å®šæ˜¯åˆå¹¶ä¹‹åï¼ŒåŸæ¥å³é‚»èŠ‚ç‚¹ä¸­çš„å…ƒç´ å…¨éƒ¨ç§»åŠ¨åˆ°å½“å‰èŠ‚ç‚¹ä¸­ã€‚
 	int pos;
 	for (pos = 0; pos < right.count; pos++)
 		left.pair[pos + left.count] = right.pair[pos];
@@ -685,9 +685,9 @@ void changeParent(FILE *index, Node &node, int child, int parent)
 
 void ensmallKey(FILE *index, Node &node)
 {
-	//µ±É¾³ıµÄÔªËØÊÇÎ»ÓÚ½ÚµãÖĞµÄ×îºóÒ»¸öÊ±£¬¸¸½ÚµãÖĞµÄ·Ö¸ôÔªËØ¿ÉÄÜ»á·¢Éú±ä»¯£¬
-	//¼ÙÈç·¢Éú±ä»¯Ê±£¬ÄÇÃ´¸¸½ÚµãÔÚÆä¸¸½ÚµãÖĞµÄ·Ö¸ôÔªËØÒ²ÊÇĞèÒª¸üĞÂµÄ¡£
-	//Õâ¸ö¹ı³ÌÊÇµİ¹éµÄ
+	//å½“åˆ é™¤çš„å…ƒç´ æ˜¯ä½äºèŠ‚ç‚¹ä¸­çš„æœ€åä¸€ä¸ªæ—¶ï¼Œçˆ¶èŠ‚ç‚¹ä¸­çš„åˆ†éš”å…ƒç´ å¯èƒ½ä¼šå‘ç”Ÿå˜åŒ–ï¼Œ
+	//å‡å¦‚å‘ç”Ÿå˜åŒ–æ—¶ï¼Œé‚£ä¹ˆçˆ¶èŠ‚ç‚¹åœ¨å…¶çˆ¶èŠ‚ç‚¹ä¸­çš„åˆ†éš”å…ƒç´ ä¹Ÿæ˜¯éœ€è¦æ›´æ–°çš„ã€‚
+	//è¿™ä¸ªè¿‡ç¨‹æ˜¯é€’å½’çš„
 	int key, pos;
 	key = node.pair[node.count - 1].key;
 	fseek(index, node.parent, SEEK_SET);
