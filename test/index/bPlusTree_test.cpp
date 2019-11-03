@@ -7,6 +7,8 @@
 #include<string>
 using namespace std;
 
+//#define INDEX_DAT "b_plus_tree_index.dat"
+
 #define INDEX_DAT "../../data/b_plus_tree_index.dat"
 
 

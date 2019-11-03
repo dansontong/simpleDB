@@ -40,15 +40,19 @@ int main(int argc, char* argv[]) {
 		//printf("%s\n", buff);
 	}
 	create_index("Supplier","S_SUPPKEY");
+	printf("------ creat index in %s for table %s -----\n", "Supplier","S_SUPPKEY");
 	Record *recordList;
 	recordList = searchRecord("Supplier","S_SUPPKEY","Not_exist_for_test");
 	recordList = searchRecord("Supplier","S_SUPPKEY","9840");
+	printf("------ search record by index in column '%s' for table '%s' with value '%s' -----\n","S_SUPPKEY","Supplier","9840");
 	while(recordList != NULL) 
 	{
 		deleteRecord("Supplier", "S_SUPPKEY", recordList);
+		printf("------ delete index in %s for table %s -----\n","S_SUPPKEY","Supplier");
 		recordList++;
 	}
 	drop_index("Supplier","S_SUPPKEY");
+	printf("------ drop index in %s for table %s -----\n","S_SUPPKEY","Supplier");
 
 
 
