@@ -14,7 +14,7 @@ extern struct DataBase *DB; /* 全局共享 */
  *                  file                          *
  **************************************************/
 //-1表示文件创建失败
-int file_newFile(int type, long NeededPageNum){
+int file_newFile(int tableType,int type, long NeededPageNum){
 	if(DB->dbMeta.currFileNum>=MAX_FILE_NUM||DB->dbMeta.blockFree<NeededPageNum){
 		printf("空闲空间不足，文件创建失败！/n");
 		exit(0);	
@@ -48,10 +48,14 @@ int file_newFile(int type, long NeededPageNum){
 			fwrite(&pagemeta,sizeof(pagemeta),1,DB->dbFile);
 		}
 		for( i = 0;i<MAX_FILE_NUM;i++){
-			if(DB->dbMeta.fileMeta[0].segList[i].id<0){
+			if(DB->dbMeta.fileMeta[0].id<0){
 				break;
 			}
 		}
+		DB->dbMeta.fileMeta[i].id=id;
+		DB->dbMeta.fileMeta[i].type=tableType;
+		DB->dbMeta.fileMeta[i].firstPageNo=NewPages；
+		DB->dbMeta.fileMeta[i].pageNum=NeededPageNum;
 		DB->dbMeta.fileMeta[0].segList[i].id=id;
 		DB->dbMeta.fileMeta[0].segList[i].type=type;
 		DB->dbMeta.fileMeta[0].segList[i].firstPageNo=NewPages;
@@ -299,6 +303,8 @@ bool file_getrecord(long pageNo,int recordID,char *record){
 
 bool file_getrecordAttribute(long pageNo,int recordID,char* tablename,char* Attributename,char* Attribute,char* posOffset){
 	char *record;
+	bool flag;
+
 	if(file_getrecord(pageNo,recordID,record)){//返回该条记录
 		int i=0;
 		for(i=0;i<MAX_FILE_NUM;i++){
@@ -310,15 +316,11 @@ bool file_getrecordAttribute(long pageNo,int recordID,char* tablename,char* Attr
 					int j=0;
 					for(j=0;j<DB->dataDict[i].attrNum;j++){//查找属性，根据属性名找到属性在记录中的具体位置
 						if(strcmp(DB->dataDict[i].attr[j].name,Attributename)==0){
-							if(j<DB->dataDict[i].attrNum-1){
-								memcpy(Attribute,record+DB->dataDict[i].attr[j].offset,DB->dataDict[i].attr[j+1].offset-DB->dataDict[i].attr[j].offset);//一般情况：位置为record的起始地址加上属性的偏移量，长度为该下一条属性的偏移量减去该属性的偏移量
-								posOffset=record+DB->dataDict[i].attr[j].offset;
+							if(getValueByAttrID(record, j, Attribute)>0){
 								return true;
 							}
 							else{
-								memcpy(Attribute,record+DB->dataDict[i].attr[j].offset,DB->dataDict[i].attrLength-DB->dataDict[i].attr[j].offset);//当该属性为最后一个属性时，长度为总属性长度减去该属性的偏移量
-								posOffset=record+DB->dataDict[i].attr[j].offset;
-								return true;
+								return false;
 							}
 							
 						}
@@ -332,6 +334,28 @@ bool file_getrecordAttribute(long pageNo,int recordID,char* tablename,char* Attr
 	}
 }
 
+int getValueByAttrID(char *str, int index, char *result){
+	int length = strlen(str);
+	int j = 0, k = 0;
+	int start = 0;
+	for (int i = 0; i <= length; i++) {
+		if (str[i] == '|' || i == length){
+			if (k == index){
+				result[j] = '\0';
+				return start;
+			}
+			else{
+				start = i + 1;
+				k++;
+				memset(result, 0, length);
+				j = 0;
+			}
+		}
+		else
+			result[j++] = str[i];
+	}
+	return -1;
+}
 void file_fseek(int fileID, long offset, int fromwhere)
 {
 
