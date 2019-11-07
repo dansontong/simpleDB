@@ -14,7 +14,7 @@ extern struct DataBase *DB; /* 全局共享 */
  *                  file                          *
  **************************************************/
 //-1表示文件创建失败
-int file_newFile(int tableType,int type, long NeededPageNum){
+int file_newFile(int type, long NeededPageNum){
 	if(DB->dbMeta.currFileNum>=MAX_FILE_NUM||DB->dbMeta.blockFree<NeededPageNum){
 		printf("空闲空间不足，文件创建失败！/n");
 		exit(0);	
@@ -53,11 +53,10 @@ int file_newFile(int tableType,int type, long NeededPageNum){
 			}
 		}
 		DB->dbMeta.fileMeta[i].id=id;
-		DB->dbMeta.fileMeta[i].type=tableType;
+		DB->dbMeta.fileMeta[i].type=type;
 		DB->dbMeta.fileMeta[i].firstPageNo=NewPages；
 		DB->dbMeta.fileMeta[i].pageNum=NeededPageNum;
 		DB->dbMeta.fileMeta[0].segList[i].id=id;
-		DB->dbMeta.fileMeta[0].segList[i].type=type;
 		DB->dbMeta.fileMeta[0].segList[i].firstPageNo=NewPages;
 		DB->dbMeta.fileMeta[0].segList[i].pageNum=NeededPageNum;
 		DB->dbMeta.blockFree=DB->dbMeta.blockFree-NeededPageNum;
@@ -333,7 +332,6 @@ bool file_getrecordAttribute(long pageNo,int recordID,char* tablename,char* Attr
 		return false;
 	}
 }
-
 int getValueByAttrID(char *str, int index, char *result){
 	int length = strlen(str);
 	int j = 0, k = 0;
