@@ -172,8 +172,6 @@ long Buf_LoadPage(BufTag btag)
     char *blockStart = Buf_GetBlock(newBufId);
     assert(blockStart != NULL);
 
-    // // just for test
-    // TestLoad(blockStart);
     // 从外存读取一个块
     file_read_sd(btag.pageNo, blockStart);
     newbmeta->bufMode = BM_isValid;
@@ -194,25 +192,32 @@ long Buf_StrategyLRU()
 {
     long buf_id = -1;
     long minVisit = UTCNowTimestamp();
-    int i;
-    for (i = 0; i < BUFFER_NUM; i++)
+    int i;    
+    printf("start schedule\n");
+
+    // TODO bug ：可能选不出合适的块
+    do
     {
-        BufMeta bmeta = bufMetas[i];
-        // TODO 没有想好这部分的处理，什么状态的缓存块参与淘汰
-        if (bmeta.bufMode == BM_ioProgress)
+        for (i = 0; i < BUFFER_NUM; i++)
         {
-            continue;
+            BufMeta bmeta = bufMetas[i];
+            // TODO 没有想好这部分的处理，什么状态的缓存块参与淘汰
+            if (bmeta.bufMode == BM_free){
+                // 出现空闲块直接返回
+                break;
+            }
+            if (bmeta.bufMode == BM_ioProgress)
+            {
+                continue;
+            }
+            if (bmeta.visitTime < minVisit)
+            {
+                buf_id = i;
+                minVisit = bmeta.visitTime;
+            }
         }
-        if (bmeta.visitTime < minVisit)
-        {
-            buf_id = i;
-            minVisit = bmeta.visitTime;
-        }
-    }
-    if(buf_id == -1){
-        buf_id = 0;
-    }
-    printf("buf_id:%d\n", buf_id);
+    } while (buf_id == -1);
+    printf("buf schedule buf_id:%d\n", buf_id);
     assert(buf_id >= 0 && buf_id < BUFFER_NUM);
     return buf_id;
 }
@@ -230,7 +235,11 @@ bool Buf_Remove(long bufId)
 
     // 检查缓存块能否删除
     // BufMode不为空、不在io_progress等状态
-    if (bmeta->bufMode == BM_free || bmeta->bufMode == BM_ioProgress)
+    if (bmeta->bufMode ==  BM_free){
+        // buf为free不用删除，直接返回
+        return true;
+    }
+    if (bmeta->bufMode == BM_ioProgress)
     {
         log_Error("buffer needed remove mode is free or in io process.");
         return false;
@@ -249,7 +258,7 @@ bool Buf_Remove(long bufId)
 
     // 当前块符合释放条件，将该块放回freelist里
     bmeta->bufMode = BM_free;
-    bmeta->visitTime = 0;
+    bmeta->visitTime = UTCNowTimestamp();
     Buf_ClearBufTag(&(bmeta->bTag));
     if (freeBlockHead == BUF_FREE_LIST_EMPTY)
     {
@@ -262,7 +271,6 @@ bool Buf_Remove(long bufId)
         bmeta->fNext = freeBlockHead;
         freeBlockHead = bufId;
     }
-
 
     return true;
 }
@@ -296,7 +304,7 @@ char *Buf_GetBlock(long bufId)
 
 void Buf_HitBlockById(long bufid)
 {
-    assert(bufid>=0 && bufid < BUFFER_NUM);
+    assert(bufid >= 0 && bufid < BUFFER_NUM);
     BufMeta *bmeta;
     bmeta = &(bufMetas[bufid]);
     bmeta->visitTime = UTCNowTimestamp();

@@ -82,7 +82,7 @@ void page_recover_allpages();
 // record 
 bool file_getrecord(long pageNo,int recordID,char *record);//record 存储返回的记录
 bool file_getrecordAttribute(long pageNo,int recordID,char* Attributename,char*Attribute,char* tablename,char* posOffset);//Attribute存储返回的属性值
-int getValueByAttrID(char *str, int index, char *result)//根据记录和属性在表头的下标返回具体的属性值
+int getValueByAttrID(char *str, int index, char *result);//根据记录和属性在表头的下标返回具体的属性值
 //bool getRecord(int fileID, int recordID, char *record);//fileID->table, recordID->record
 //bool getRecordAttr(int fileID, int recordID, char AttrName char *recordAttr);//fileID->table, recordID->record
 
