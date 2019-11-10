@@ -366,7 +366,7 @@ int page_isEmpty(unsigned long bit_map,int position)
  {
 	unsigned long result = 0x00000001;
 	// bug 
-	// 原始：SIZE_OF_LONG-position
+	// 原始：32-position
 	result = result<<(SIZE_OF_LONG*8-position);
 	result = result & bit_map;
 	if (result == 0) {
