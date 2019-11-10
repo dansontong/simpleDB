@@ -104,9 +104,9 @@ void database_createDbFile(char *fileName)
 	db.dbMeta.fileMeta[0].state = 1;
 	memset(db.dbMeta.fileMeta[0].segList, -1, sizeof(struct Segment) * SEGMENT_NUM);
 
-	// 为空闲空间映射表分配空间，所有的初始化为-1，表示空闲
+	// 为空闲空间映射表分配空间，所有的初始化为0，表示空闲
 	db.freeSpaceBitMap = (unsigned long *)malloc(db.dbMeta.bitMapSize);
-	memset(db.freeSpaceBitMap, -1, db.dbMeta.bitMapSize);
+	memset(db.freeSpaceBitMap, 0, db.dbMeta.bitMapSize);
 
 	db.dbFile = fopen(fileName, "wb");
 	// 把初始化的相关参数写到数据库文件头部
