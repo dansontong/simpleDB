@@ -398,43 +398,55 @@ void page_setbitmap(unsigned long *bit_map,int position,int value)
 	
 }
 
-int page_requestPage(long NeededPageNum)
+long page_requestPage(long NeededPageNum)
 {
-	int flag = 0;
-
-	for(int i=0;i<DB->dbMeta.blockNum;i++){
-		int p_num = i/(8*sizeof(long));
-		int position = i- p_num*8*sizeof(long)+1;
-		
+	if(DB->dbMeta.blockFree<0){
+		printf("没有空闲的页，分配失败！\n");
+		return -1;
+	}
+	
+	long i,j;
+	long p_num,position;
+	long count;
+	long NewPages;
+	for( i=0;i<DB->dbMeta.blockNum;i++){
+		p_num = i/(8*sizeof(long));
+		position = i- p_num*8*sizeof(long)+1;
+		count = 0;
 		if(page_isEmpty(*(DB->freeSpaceBitMap+p_num),position)==0){
-			int count = 0;
-			for(int j=i;j<DB->dbMeta.blockNum;j++){
-				p_num = j/(8*sizeof(long));
-				position = j- p_num*8*sizeof(long)+1;
+			for(j=i;j<DB->dbMeta.blockNum;j++){
 				if(page_isEmpty(*(DB->freeSpaceBitMap+p_num),position)==0){
 					count++;
 				}
 				else{
 					break;
 				}
-			}
-			if(count==NeededPageNum){
-				int NewPages = i;
-				for(int j=0;j<NeededPageNum;j++){
-					p_num = (i+j)/(8*sizeof(long));
-					position =i+j- p_num*8*sizeof(long)+1;
-					page_setbitmap(DB->freeSpaceBitMap+p_num,position,1);
+				if(count==NeededPageNum){
+					break;
 				}
-				flag = 1;
-				return NewPages;
-			}
-			else{
-				i = i+count;
 			}
 			
 		}
+		if(count==NeededPageNum){
+			break;	
+		}
+		else{
+			i = i+count;
+			
+		}
 	}
-	if(flag ==0){
+	if(count==NeededPageNum){
+		NewPages=i;
+		for(j=0;j<NeededPageNum;j++){
+			p_num = (i+j)/(8*sizeof(long));
+			position =i+j- p_num*8*sizeof(long)+1;
+			page_setbitmap(DB->freeSpaceBitMap+p_num,position,1);
+		}
+		DB->dbMeta.blockFree-=NeededPageNum;
+		printf("1");
+		return NewPages;
+	}
+	else{
 		return -1;
 	}
 }

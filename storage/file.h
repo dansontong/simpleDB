@@ -70,7 +70,7 @@ void file_fseek(int fileID, long offset, int fromwhere);//文件流 偏移量(�
 int page_isEmpty(unsigned long bit_map,int position);
 void page_setbitmap(unsigned long *bit_map,int position,int value);
 
-int page_requestPage(long NeededPageNum);
+long page_requestPage(long NeededPageNum);
 
 void page_recover_onepage(int PageNo);
 void page_recover_allpages();
