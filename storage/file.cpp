@@ -53,8 +53,8 @@ int file_newFile(int type, long NeededPageNum){
 			}
 		}
 		DB->dbMeta.fileMeta[i].id=id;
-		DB->dbMeta.fileMeta[i].type=type;
-		DB->dbMeta.fileMeta[i].firstPageNo=NewPages；
+		DB->dbMeta.fileMeta[i].fileType=type;
+		DB->dbMeta.fileMeta[i].firstPageNo=NewPages;
 		DB->dbMeta.fileMeta[i].pageNum=NeededPageNum;
 		DB->dbMeta.fileMeta[0].segList[i].id=id;
 		DB->dbMeta.fileMeta[0].segList[i].firstPageNo=NewPages;
@@ -365,7 +365,9 @@ void file_fseek(int fileID, long offset, int fromwhere)
 int page_isEmpty(unsigned long bit_map,int position)
  {
 	unsigned long result = 0x00000001;
-	result = result<<(SIZE_OF_LONG-position);
+	// bug 
+	// 原始：SIZE_OF_LONG-position
+	result = result<<(32-position);
 	result = result & bit_map;
 	if (result == 0) {
 		return 0;
