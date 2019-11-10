@@ -367,7 +367,7 @@ int page_isEmpty(unsigned long bit_map,int position)
 	unsigned long result = 0x00000001;
 	// bug 
 	// 原始：SIZE_OF_LONG-position
-	result = result<<(32-position);
+	result = result<<(SIZE_OF_LONG*8-position);
 	result = result & bit_map;
 	if (result == 0) {
 		return 0;
@@ -387,7 +387,7 @@ void page_setbitmap(unsigned long *bit_map,int position,int value)
 		return;
 	}
 	unsigned long  result = 0x00000001;
-	result = result<<(SIZE_OF_LONG-position);
+	result = result<<(SIZE_OF_LONG*8-position);
 	if(value==1){
 		*bit_map = result+*bit_map;
 	}
@@ -406,12 +406,12 @@ int page_requestPage(long NeededPageNum)
 		int p_num = i/(8*sizeof(long));
 		int position = i- p_num*8*sizeof(long)+1;
 		
-		if(page_isEmpty(*(DB->freeSpaceBitMap)+p_num,position)==0){
+		if(page_isEmpty(*(DB->freeSpaceBitMap+p_num),position)==0){
 			int count = 0;
 			for(int j=i;j<DB->dbMeta.blockNum;j++){
 				p_num = j/(8*sizeof(long));
 				position = j- p_num*8*sizeof(long)+1;
-				if(page_isEmpty(*(DB->freeSpaceBitMap)+p_num,position)==0){
+				if(page_isEmpty(*(DB->freeSpaceBitMap+p_num),position)==0){
 					count++;
 				}
 				else{
