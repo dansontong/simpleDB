@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
 	drop_index("Supplier","S_SUPPKEY");
 	printf("------ drop index in %s for table %s -----\n","S_SUPPKEY","Supplier");
 
-
+	
 
 	database_showDbInfo();
 
