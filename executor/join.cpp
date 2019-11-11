@@ -2,7 +2,7 @@
 #include "database.h"
 #include "buffer.h"
 #include "log.h"
-#include "join.h"
+#include "executor.h"
 
 extern struct DataBase *DB; /* 全局共享 */
 
@@ -33,12 +33,12 @@ int nestedLoopJoin(int employee_dictID, int department_dictID) {
     }
 
     int table1_fid = table1.fileID;
-    long table1_pageno = DB->dbMeta.fileMeta[table1_fid].fileFirstPageNo;
-    long table1_pagenum = long pagenum = DB->dbMeta.fileMeta[table1_fid].filePageNum;
+    long table1_pageno = DB->dbMeta.fileMeta[table1_fid].firstPageNo;
+    long table1_pagenum = long pagenum = DB->dbMeta.fileMeta[table1_fid].pageNum;
 
     int table2_fid = table2.fileID;
-    long table2_pageno = DB->dbMeta.fileMeta[table2_fid].fileFirstPageNo;
-    long table2_pagenum = long pagenum = DB->dbMeta.fileMeta[table2_fid].filePageNum;
+    long table2_pageno = DB->dbMeta.fileMeta[table2_fid].firstPageNo;
+    long table2_pagenum = long pagenum = DB->dbMeta.fileMeta[table2_fid].pageNum;
     //p1
     int tmp_table_ID = createTmpTable2(DB,table1,table2,table1_pub_attr,table2_pub_attr);
     if (tmp_table_ID < 0){
@@ -52,7 +52,7 @@ int nestedLoopJoin(int employee_dictID, int department_dictID) {
     int *buffID = (int*)malloc(table2_pageNum);
     for (int x = 0; x < outer; x++){
         for (int y = 0; y < SIZE_BUFF - 1 && y < table2_pagenum; y++) {
-            int mapNo = reqPage(DB, table1_pageno);
+            int mapNo = page_requestPage(DB, table1_pageno);
             struct PageMeta ph;
             struct BufTag buftag = Buf_GenerateTag(CurpageNo);
             memcpy(&ph, Buf_ReadBuffer(buftag), SIZE_PAGEHEAD);
@@ -65,7 +65,7 @@ int nestedLoopJoin(int employee_dictID, int department_dictID) {
         }
 
         for (int z = 0; z < table1_pagenum; z++) {
-            int emp_mapNo = reqPage(DB, table1_pageno);
+            int emp_mapNo = page_requestPage(DB, table1_pageno);
             struct PageMeta emp_ph;
             memcpy(&emp_ph, Buf_ReadBuffer(emp_mapNo), SIZE_PAGEDB);//head
             for (int k = 0; k < emp_ph.pageNo; k++) {
@@ -148,15 +148,15 @@ int SortJoin(int table1loyee_dictID, int department_dictID) {
     Table *tmp_table1 = &(DB->dataDict[tmp_table_table1]);
     Table *tmp_table2 = &(DB->dataDict[tmp_table_table2]);
 
-    long table1_pageno = DB->dbMeta.fileMeta[tmp_table1->fid].fileFirstPageNo;
-    long table1_pagenum = DB->dbMeta.fileMeta[tmp_table1->fid].filePageNum;
+    long table1_pageno = DB->dbMeta.fileMeta[tmp_table1->fid].firstPageNo;
+    long table1_pagenum = DB->dbMeta.fileMeta[tmp_table1->fid].pageNum;
 
-    long table2_pageno = DB->dbMeta.fileMeta[tmp_table2->fid].fileFirstPageNo;
-    long table2_pagenum = DB->dbMeta.fileMeta[tmp_table2->fid].filePageNum;
+    long table2_pageno = DB->dbMeta.fileMeta[tmp_table2->fid].firstPageNo;
+    long table2_pagenum = DB->dbMeta.fileMeta[tmp_table2->fid].pageNum;
 
     for (int j = 0; j < table2_pagenum; j++)
     {
-        int mapNo_table2 = reqPage(DB, table2_pageno);
+        int mapNo_table2 = page_requestPage(DB, table2_pageno);
         struct PageMeta ph_table2;
         memcpy(&ph_table2,  Buf_ReadBuffer(mapNo_table2), SIZE_PAGEDB);//SIZE_PAGEDB
         for (int i = 0; i < ph_table2.pageNo; i++)
@@ -168,7 +168,7 @@ int SortJoin(int table1loyee_dictID, int department_dictID) {
 
             for (int x = 0; x < pageNum_table1; x++)
             {
-                int mapNo_table1 = reqPage(DB, pageNo_table1);
+                int mapNo_table1 = page_requestPage(DB, pageNo_table1);
                 struct pageDB ph_table1;
                 memcpy(&ph_table1,  Buf_ReadBuffer(mapNo_table1), SIZE_PAGEDB);
                 bool flag = false;
@@ -327,14 +327,14 @@ int SortJoin(int table1_dictID, int table2_dictID) {
     Table *tmp_table1 = &(DB->dataDict[tmp_table_table1]);
     Table *tmp_table2 = &(DB->dataDict[tmp_table_table2]);
 
-    long table1_pageno = DB->dbMeta.fileMeta[tmp_table1->fid].fileFirstPageNo;
-    long table1_pagenum = DB->dbMeta.fileMeta[tmp_table1->fid].filePageNum;
+    long table1_pageno = DB->dbMeta.fileMeta[tmp_table1->fid].firstPageNo;
+    long table1_pagenum = DB->dbMeta.fileMeta[tmp_table1->fid].pageNum;
 
-    long table2_pageno = DB->dbMeta.fileMeta[tmp_table2->fid].fileFirstPageNo;
-    long table2_pagenum = DB->dbMeta.fileMeta[tmp_table2->fid].filePageNum;
+    long table2_pageno = DB->dbMeta.fileMeta[tmp_table2->fid].firstPageNo;
+    long table2_pagenum = DB->dbMeta.fileMeta[tmp_table2->fid].pageNum;
 
     for (int j = 0; j < table2_pagenum; j++) {
-        int mapNo_table2 = reqPage(DB, table2_pageno);
+        int mapNo_table2 = page_requestPage(DB, table2_pageno);
         struct PageMeta ph_table2;
         memcpy(&ph_table2,  Buf_ReadBuffer(mapNo_table2), SIZE_PAGEDB);//SIZE_PAGEDB
         for (int i = 0; i < ph_table2.pageNo; i++) {
@@ -344,7 +344,7 @@ int SortJoin(int table1_dictID, int table2_dictID) {
             int pd = getValueByAttrID(record_table2, table2_pub_attr, val_table2);
 
             for (int x = 0; x < pageNum_table1; x++) {
-                int mapNo_table1 = reqPage(DB, pageNo_table1);
+                int mapNo_table1 = page_requestPage(DB, pageNo_table1);
                 struct pageDB ph_table1;
                 memcpy(&ph_table1,  Buf_ReadBuffer(mapNo_table1), SIZE_PAGEDB);//SIZE_PAGEDB
                 bool flag = false;
@@ -480,15 +480,15 @@ int nestedLoopJoinByThree(int table1_dictID, int table2_dictID, int table3_dictI
         return -1;
     }
     int table1_fid = table1.fileID;
-    long table1_pageno = DB->dbMeta.fileMeta[table1_fid].fileFirstPageNo;
-    long table1_pageNum = long pagenum =DB->dbMeta.fileMeta[table1_fid].filePageNum;
+    long table1_pageno = DB->dbMeta.fileMeta[table1_fid].firstPageNo;
+    long table1_pageNum = long pagenum =DB->dbMeta.fileMeta[table1_fid].pageNum;
 
     int table3_fid = table3.fileID;
-    long table3_pageNo = DB->dbMeta.fileMeta[table3_fid].fileFirstPageNo;
-    long table3_pageNum = DB->dbMeta.fileMeta[table3_fid].filePageNum;
+    long table3_pageNo = DB->dbMeta.fileMeta[table3_fid].firstPageNo;
+    long table3_pageNum = DB->dbMeta.fileMeta[table3_fid].pageNum;
 
 
-    int tmp_table_dictID = createTmpTable2(DB, table1, table3, table1_pub_attr, table3_pub_attr);
+    int tmp_table_dictID = createTmpTable2(table1, table3, table1_pub_attr, table3_pub_attr);
     if (tmp_table_dictID < 0){
         printf("创建临时表失败\n");
         return -1;
@@ -496,12 +496,14 @@ int nestedLoopJoinByThree(int table1_dictID, int table2_dictID, int table3_dictI
     Table *tmp = &(DB->dataDict[tmp_table_dictID]);
 
     int *buffID = (int*)malloc(table3_pageNum);
-    int m = SIZE_BUFF - 1;
+    int m = BUFFER_NUM - 1;
     int outer = table3_pageNum / m + 1;
+    struct BufTag buftag;
     for (int x = 0; x < outer; x++){
         for (int y = 0; y < m && y < table3_pageNum; y++) {
-            int mapNo = reqPage(DB, table3_pageNo);
-            struct pageDB ph;
+            int mapNo = page_requestPage(table3_pageNo);
+            struct pageHead ph;
+            buftag = Buf_GenerateTag(mapNo);
             memcpy(&ph, Buf_ReadBuffer(buftag), SIZE_PAGEHEAD);
             DB->buff.map[mapNo].isPin = true; //PIN住
             buffID[y] = mapNo;
@@ -512,7 +514,7 @@ int nestedLoopJoinByThree(int table1_dictID, int table2_dictID, int table3_dictI
         }
 
         for (int z = 0; z < table1_pageNum; z++) {
-            int table1_mapNo = reqPage(DB, table1_pageNo);
+            int table1_mapNo = page_requestPage(table1_pageNo);
             struct PageMeta table1_ph;
             memcpy(&table1_ph, Buf_ReadBuffer(table1_mapNo), SIZE_PAGEDB);
             for (int k = 0; k < table1_ph.pageNo; k++) {
