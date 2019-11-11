@@ -27,10 +27,7 @@ using namespace std;
 
 // file 配置参数
 #define MAX_FILE_NUM     100  //最大文件数量
-#define MAP_FILE         0
-#define TABLE_FILE      1    //表文件
-#define DATA_DICT_FILE   2    //数据字典文件
-#define INDEX_FILE_BTREE 3
+
 
 // page 配置参数
 #define PAGE_SIZE BLOCK_SIZE//页大小==文件块大小
@@ -43,7 +40,10 @@ using namespace std;
 #define SEGMENT_NUM 5       //文件的段数
 
 // hash
-#define BUCKET_NUM 100
+#define BUCKET_NUM 101
+
+// file 配置参数
+#define RECORD_MAX_SIZE 300 //记录最长长度
 
 typedef enum{
 	INT_TYPE = 0,
@@ -54,6 +54,14 @@ typedef enum{
 	VARCHAR_TYPE = 5,
 	DATE_TYPE = 6,
 }DATA_TYPE;
+
+typedef enum{
+	MAP_FILE = 0,
+	TABLE_FILE = 1,      //表文件
+	DATA_DICT_FILE = 2,  //数据字典文件
+	INDEX_FILE_BTREE = 3,// BplusTree_file
+	TMP_TABLE_FILE = 4,  // tmpTable_file
+}FILE_TYPE;
 
 const static char dataTypeName[7][10]={"INT","LONG","FLOAT","DOUBLE","CHAR","VARCHAR","DATE"};
 

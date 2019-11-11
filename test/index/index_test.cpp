@@ -1,6 +1,7 @@
 #include "database.h"
 #include "log.h"
 #include "index.h"
+#include "executor.h"
 
 
 int main(int argc, char* argv[]) {
