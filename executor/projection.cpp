@@ -2,6 +2,7 @@
 #include "database.h"
 #include "buffer.h"
 #include "log.h"
+#include "tmptable.h"
 
 //==================== global variable ====================
 extern struct DataBase *DB; /* 全局共享 */
@@ -17,7 +18,7 @@ int projection(int dictID,char* attributename){//attributename为投影所需的
 	int querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
-		if(DB->dbMeta.fileMeta[i]id==fileID){						//
+		if(DB->dbMeta.fileMeta[i].id==fileID){						//
 			querypage=DB->dbMeta.fileMeta[0].segList[i].firstPageNo;			//
 			break;																//
 		}																		//
@@ -26,6 +27,8 @@ int projection(int dictID,char* attributename){//attributename为投影所需的
 		printf("该文件id对应的文件不存在！");
 		exit(0);
 	}
+	int sizeofpagehead = sizeof(struct PageMeta);
+	int sizeofrecord = sizeof(struct OffsetInPage);	
 	long CurpageNo = DB->dbMeta.fileMeta[querypage].firstPageNo;				
 	long pagenum = DB->dbMeta.fileMeta[querypage].pageNum;
 	char* one_attribute = (char * )malloc(MAX_NAME_LENGTH);
@@ -36,7 +39,7 @@ int projection(int dictID,char* attributename){//attributename为投影所需的
 	for(int j=0;j<=strlen(attributename);j++){
 		if(attributename[j]=='|'||j==strlen(attributename)){
 			for(int m=0;m<DB->dataDict[dictID].attrNum;m++){
-				if(strcmp(one_attribute,DB->dataDict[dicID].attr[m])==0){
+				if(strcmp(one_attribute,DB->dataDict[dictID].attr[m].name)==0){
 					attributeindex[attributenum]=m;
 				}
 			}
@@ -48,7 +51,7 @@ int projection(int dictID,char* attributename){//attributename为投影所需的
 			charnum++;
 		}
 	}
-	int pageno = creat_tmptable(DB->dataDict[dictID]);
+	int pageno = create_tmptable(DB->dataDict[dictID]);
 	if(pageno<0){
 		printf("临时表创建失败");
 	}
@@ -77,12 +80,13 @@ int projection(int dictID,char* attributename){//attributename为投影所需的
 				}
 				else{
 					strcat(new_record,attribute);
-					if(m<attribute-1){
+					if(m<attributenum-1){
 						strcat(new_record,"|");
 					}
 				}
-				insert_onerecord(dictID,new_record);
+				
 			}
+			insert_onerecord(dictID,new_record);
 			if(pagehead.nextPageNo<0){
 				break;
 			}
