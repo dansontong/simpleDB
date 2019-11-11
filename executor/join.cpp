@@ -65,9 +65,9 @@ int nestedLoopJoin(int employee_dictID, int department_dictID) {
         }
 
         for (int z = 0; z < table1_pagenum; z++) {
-            int emp_mapNo = page_requestPage(DB, table1_pageno);
+            int emp_mapNo = page_requestPage(table1_pageno);
             struct PageMeta emp_ph;
-            memcpy(&emp_ph, Buf_ReadBuffer(emp_mapNo), SIZE_PAGEDB);//head
+            memcpy(&emp_ph, Buf_ReadBuffer(emp_mapNo), PAGEHEAD_SIZE);//head
             for (int k = 0; k < emp_ph.pageNo; k++) {
                 char *emp_record = (char*)malloc(table1.attrLength);
                 char *emp_value = (char*)malloc(table1.attrLength);
@@ -76,7 +76,7 @@ int nestedLoopJoin(int employee_dictID, int department_dictID) {
                 if (pe < 0)  exit(0);
                 for (int y = 0; y < SIZE_BUFF - 1 && y < table2_pagenum; y++){
                     struct PageMeta table2_ph;
-                    memcpy(&table2_ph, Buf_ReadBuffer(buffID[y]), SIZE_PAGEDB);
+                    memcpy(&table2_ph, Buf_ReadBuffer(buffID[y]), PAGEHEAD_SIZE);
                     for (int i = 0; i < table2_ph.pageNo; i++) {//curRecordNUm
                         char *table2_record = (char*)malloc(table2.attrLength);
                         getNextRecord(buffID[y], i, table2_record);//head
@@ -91,7 +91,7 @@ int nestedLoopJoin(int employee_dictID, int department_dictID) {
                             strcpy(res, table2_record);
                             strcat(res, table2_record + pd + strlen(table2_value) + 1);
                             strcat(res, "\\ |");
-                            insertOneRecord(DB, tmp_table_ID, res);//head
+                            insertOneRecord(tmp_table_ID, res);//head
                         }
                     }
                 }
@@ -133,7 +133,7 @@ int SortJoin(int table1loyee_dictID, int department_dictID) {
         printf("两表没有公用属性\n");
         return -1;
     }
-    int tmp_table_dictID = createTmpTable2(DB, table1, table2, table1_pub_attr, table2_pub_attr);
+    int tmp_table_dictID = createTmpTable2(table1, table2, table1_pub_attr, table2_pub_attr);
     if (tmp_table_dictID < 0)
     {
         printf("创建临时表失败\n");
@@ -156,9 +156,9 @@ int SortJoin(int table1loyee_dictID, int department_dictID) {
 
     for (int j = 0; j < table2_pagenum; j++)
     {
-        int mapNo_table2 = page_requestPage(DB, table2_pageno);
+        int mapNo_table2 = page_requestPage(table2_pageno);
         struct PageMeta ph_table2;
-        memcpy(&ph_table2,  Buf_ReadBuffer(mapNo_table2), SIZE_PAGEDB);//SIZE_PAGEDB
+        memcpy(&ph_table2,  Buf_ReadBuffer(mapNo_table2), PAGEHEAD_SIZE);//PAGEHEAD_SIZE
         for (int i = 0; i < ph_table2.pageNo; i++)
         {
             char *record_table2 = (char*)malloc(tmp_table2->attrLength);
@@ -168,9 +168,9 @@ int SortJoin(int table1loyee_dictID, int department_dictID) {
 
             for (int x = 0; x < pageNum_table1; x++)
             {
-                int mapNo_table1 = page_requestPage(DB, pageNo_table1);
+                int mapNo_table1 = page_requestPage(pageNo_table1);
                 struct pageDB ph_table1;
-                memcpy(&ph_table1,  Buf_ReadBuffer(mapNo_table1), SIZE_PAGEDB);
+                memcpy(&ph_table1,  Buf_ReadBuffer(mapNo_table1), PAGEHEAD_SIZE);
                 bool flag = false;
                 for (int y = 0; y < ph_table1.pageNo; y++)
                 {
@@ -244,7 +244,7 @@ int HashJoin(int table1loyee_dictID, int department_dictID){
         printf("两表没有公共特性\n");
         return -1;
     }
-    int tmp_table_dictID = createTmpTable2(DB, table1, , table1_pub_attr, table2_pub_attr);
+    int tmp_table_dictID = createTmpTable2(table1, , table1_pub_attr, table2_pub_attr);
     if (tmp_table_dictID < 0){
         printf("创建临时表失败\n");
         return -1;
@@ -254,8 +254,8 @@ int HashJoin(int table1loyee_dictID, int department_dictID){
     multimap<int, long> m_table2[BUCKET_NUM];
 
 
-    HashRelation(DB, table1, table1_pub_attr, m_table1);//HashRelation
-    HashRelation(DB, table2, table2_pub_attr, m_table2);//HashRelation
+    HashRelation(table1, table1_pub_attr, m_table1);//HashRelation
+    HashRelation(table2, table2_pub_attr, m_table2);//HashRelation
 
     for (int i = 0; i < BUCKET_NUM; i++) {
         map<int, long>::iterator it_table1, it_table2;
@@ -264,8 +264,8 @@ int HashJoin(int table1loyee_dictID, int department_dictID){
                 if (it_table1->first == it_table2->first){
                     char* record_table1 = (char*)malloc(table1.attrLength);
                     char* record_table2 = (char*)malloc(table2.attrLength);
-                    queryRecordByLogicID(DB, it_table1->second, record_table1);
-                    queryRecordByLogicID(DB, it_table2->second, record_table2);
+                    queryRecordByLogicID(it_table1->second, record_table1);
+                    queryRecordByLogicID(it_table2->second, record_table2);
 
                     char* val_table2 = new char[strlen(record_table2)];
                     int pd = getValueByAttrID(record_table2, table2_pub_attr, val_table2);
@@ -276,7 +276,7 @@ int HashJoin(int table1loyee_dictID, int department_dictID){
                     strcat(res, "|");
                     strncat(res, record_table2, pd);
                     strcat(res, record_table2 + pd + strlen(val_table2) + 1);
-                    insertOneRecord(DB, tmp_table_dictID, result);
+                    insertOneRecord(tmp_table_dictID, result);
                 }
                 else if (it_table1->first > it_table2->first) {
                     break;
@@ -334,9 +334,9 @@ int SortJoin(int table1_dictID, int table2_dictID) {
     long table2_pagenum = DB->dbMeta.fileMeta[tmp_table2->fid].pageNum;
 
     for (int j = 0; j < table2_pagenum; j++) {
-        int mapNo_table2 = page_requestPage(DB, table2_pageno);
+        int mapNo_table2 = page_requestPage(table2_pageno);
         struct PageMeta ph_table2;
-        memcpy(&ph_table2,  Buf_ReadBuffer(mapNo_table2), SIZE_PAGEDB);//SIZE_PAGEDB
+        memcpy(&ph_table2,  Buf_ReadBuffer(mapNo_table2), PAGEHEAD_SIZE);//PAGEHEAD_SIZE
         for (int i = 0; i < ph_table2.pageNo; i++) {
             char *record_table2 = (char*)malloc(tmp_table2->attrLength);
             getNextRecord(mapNo_table2, i, record_table2);
@@ -344,9 +344,9 @@ int SortJoin(int table1_dictID, int table2_dictID) {
             int pd = getValueByAttrID(record_table2, table2_pub_attr, val_table2);
 
             for (int x = 0; x < pageNum_table1; x++) {
-                int mapNo_table1 = page_requestPage(DB, pageNo_table1);
+                int mapNo_table1 = page_requestPage(pageNo_table1);
                 struct pageDB ph_table1;
-                memcpy(&ph_table1,  Buf_ReadBuffer(mapNo_table1), SIZE_PAGEDB);//SIZE_PAGEDB
+                memcpy(&ph_table1,  Buf_ReadBuffer(mapNo_table1), PAGEHEAD_SIZE);//PAGEHEAD_SIZE
                 bool flag = false;
                 for (int y = 0; y < ph_table1.pageNo; y++){
                     char *record_table1 = (char*)malloc(tmp_table1->attrLength);
@@ -360,7 +360,7 @@ int SortJoin(int table1_dictID, int table2_dictID) {
                         strcat(result, "|");
                         strncat(result, record_table2, pd);
                         strcat(result, record_table2 + pd + strlen(val_table2) + 1);
-                        insertOneRecord(DB, tmp_table_dictID, result);
+                        insertOneRecord(tmp_table_dictID, result);
                     }
                     else if (strcmp(val_table1, val_table2) > 0){
                         flag = true;
@@ -409,7 +409,7 @@ int HashJoin(int table1loyee_dictID, int department_dictID){
         printf("两表没有公共特性\n");
         return -1;
     }
-    int tmp_table_dictID = createTmpTable2(DB, table1, table1_pub_attr, table2_pub_attr);
+    int tmp_table_dictID = createTmpTable2(table1, table1_pub_attr, table2_pub_attr);
     if (tmp_table_dictID < 0){
         printf("创建临时表失败\n");
         return -1;
@@ -419,8 +419,8 @@ int HashJoin(int table1loyee_dictID, int department_dictID){
     multimap<int, long> m_table2[BUCKET_NUM];
 
 
-    HashRelation(DB, table1, table1_pub_attr, m_table1);//HashRelation
-    HashRelation(DB, table2, table2_pub_attr, m_table2);//HashRelation
+    HashRelation(table1, table1_pub_attr, m_table1);//HashRelation
+    HashRelation(table2, table2_pub_attr, m_table2);//HashRelation
 
     for (int i = 0; i < BUCKET_NUM; i++) {
         map<int, long>::iterator it_table1, it_table2;
@@ -429,8 +429,8 @@ int HashJoin(int table1loyee_dictID, int department_dictID){
                 if (it_table1->first == it_table2->first){
                     char* record_table1 = (char*)malloc(table1.attrLength);
                     char* record_table2 = (char*)malloc(table2.attrLength);
-                    queryRecordByLogicID(DB, it_table1->second, record_table1);
-                    queryRecordByLogicID(DB, it_table2->second, record_table2);
+                    queryRecordByLogicID(it_table1->second, record_table1);
+                    queryRecordByLogicID(it_table2->second, record_table2);
 
                     char* val_table2 = new char[strlen(record_table2)];
                     int pd = getValueByAttrID(record_table2, table2_pub_attr, val_table2);
@@ -441,7 +441,7 @@ int HashJoin(int table1loyee_dictID, int department_dictID){
                     strcat(res, "|");
                     strncat(res, record_table2, pd);
                     strcat(res, record_table2 + pd + strlen(val_table2) + 1);
-                    insertOneRecord(DB, tmp_table_dictID, result);
+                    insertOneRecord(tmp_table_dictID, result);
                 }
                 else if (it_table1->first > it_table2->first) {
                     break;
@@ -458,16 +458,16 @@ int HashJoin(int table1loyee_dictID, int department_dictID){
 }
 
 
-int nestedLoopJoinByThree(int table1_dictID, int table2_dictID, int table3_dictID){
+int nestedLoopJoinByThree(int table1_dictID, int table2_dictID, int table2_dictID){
     Table table1 = DB->dataDict[table1_dictID]; 
     Table table2 = DB->dataDict[table2_dictID]; 
-    Table table3 = DB->dataDict[table3_dictID];
+    Table table2 = DB->dataDict[table2_dictID];
 
-    int table1_pub_attr = 0, table3_pub_attr = 0;
+    int table1_pub_attr = 0, table2_pub_attr = 0;
     bool isFound = false;
     for (table1_pub_attr = 0; table1_pub_attr < table1.attrNum; table1_pub_attr++) {
-        for (table3_pub_attr = 0; table3_pub_attr < table3.attrNum; table3_pub_attr++) {
-            if (table1.attr[table1_pub_attr] == table3.attr[table3_pub_attr]){
+        for (table2_pub_attr = 0; table2_pub_attr < table2.attrNum; ttable2_pub_attr++) {
+            if (table1.attr[table1_pub_attr] == table2.attr[table2_pub_attr]){
                 isFound = true;
                 break;
             }
@@ -480,43 +480,45 @@ int nestedLoopJoinByThree(int table1_dictID, int table2_dictID, int table3_dictI
         return -1;
     }
     int table1_fid = table1.fileID;
-    long table1_pageno = DB->dbMeta.fileMeta[table1_fid].firstPageNo;
-    long table1_pageNum = long pagenum =DB->dbMeta.fileMeta[table1_fid].pageNum;
+    long table1_pageNo = DB->dbMeta.fileMeta[table1_fid].firstPageNo;
+    long table1_pageNum = DB->dbMeta.fileMeta[table1_fid].pageNum;
 
-    int table3_fid = table3.fileID;
-    long table3_pageNo = DB->dbMeta.fileMeta[table3_fid].firstPageNo;
-    long table3_pageNum = DB->dbMeta.fileMeta[table3_fid].pageNum;
+    int table2_fid = table2.fileID;
+    long table2_pageNo = DB->dbMeta.fileMeta[table2_fid].firstPageNo;
+    long table2_pageNum = DB->dbMeta.fileMeta[table2_fid].pageNum;
 
 
-    int tmp_table_dictID = createTmpTable2(table1, table3, table1_pub_attr, table3_pub_attr);
+    int tmp_table_dictID = createTmpTable2(table1, table2, table1_pub_attr, table2_pub_attr);
     if (tmp_table_dictID < 0){
         printf("创建临时表失败\n");
         return -1;
     }
     Table *tmp = &(DB->dataDict[tmp_table_dictID]);
 
-    int *buffID = (int*)malloc(table3_pageNum);
+    int *buffID = (int*)malloc(table2_pageNum);
     int m = BUFFER_NUM - 1;
-    int outer = table3_pageNum / m + 1;
+    int outer = table2_pageNum / m + 1;
     struct BufTag buftag;
     for (int x = 0; x < outer; x++){
-        for (int y = 0; y < m && y < table3_pageNum; y++) {
-            int mapNo = page_requestPage(table3_pageNo);
-            struct pageHead ph;
+        for (int y = 0; y < m && y < table2_pageNum; y++) {
+            int mapNo = page_requestPage(table2_pageNo);
+            struct PageMeta ph;
             buftag = Buf_GenerateTag(mapNo);
-            memcpy(&ph, Buf_ReadBuffer(buftag), SIZE_PAGEHEAD);
-            DB->buff.map[mapNo].isPin = true; //PIN住
+            memcpy(&ph, Buf_ReadBuffer(buftag), PAGEHEAD_SIZE);
+            // DB->buff.map[mapNo].isPin = true; //PIN住
+            // buf_pin(mapNo); // TODO: add this func==> ma-na-bo
             buffID[y] = mapNo;
             if (ph.nextPageNo < 0)
                 break;
             else
-                table3_pageno = ph.nextPageNo;
+                table2_pageNo = ph.nextPageNo;
         }
 
         for (int z = 0; z < table1_pageNum; z++) {
             int table1_mapNo = page_requestPage(table1_pageNo);
             struct PageMeta table1_ph;
-            memcpy(&table1_ph, Buf_ReadBuffer(table1_mapNo), SIZE_PAGEDB);
+            buftag = Buf_GenerateTag(table1_mapNo);
+            memcpy(&table1_ph, Buf_ReadBuffer(buftag), PAGEHEAD_SIZE);
             for (int k = 0; k < table1_ph.pageNo; k++) {
                 char *table1_record = (char*)malloc(table1.attrLength);
                 getNextRecord(table1_mapNo, k, table1_record);
@@ -524,11 +526,12 @@ int nestedLoopJoinByThree(int table1_dictID, int table2_dictID, int table3_dictI
                 int pe = getValueByAttrID(table1_record, table1_pub_attr, table1_value);
                 if (pe < 0)
                     exit(0);
-                for (int y = 0; y < m && y < table3_pagenum; y++){
-                    int table3_mapNo = buffID[y];
-                    struct PageMeta table3_ph;
-                    memcpy(&table3_ph, DB->buff.data[table2_mapNo], SIZE_PAGEDB);
-                    for (int i = 0; i < table3_ph.pageNo; i++) {
+                for (int y = 0; y < m && y < table2_pageNum; y++){
+                    int table2_mapNo = buffID[y];
+                    struct PageMeta table2_ph;
+                    buftag = Buf_GenerateTag(table2_mapNo);
+                    memcpy(&table2_ph, Buf_ReadBuffer(buftag), PAGEHEAD_SIZE);
+                    for (int i = 0; i < table2_ph.pageNo; i++) {
                         char *table2_record = (char*)malloc(table2.attrLength);
                         getNextRecord(table2_mapNo, i, table2_record);
                         char *table2_value = (char*)malloc(table2.attrLength);
@@ -541,7 +544,7 @@ int nestedLoopJoinByThree(int table1_dictID, int table2_dictID, int table3_dictI
                             strcat(res, "|");
                             strncat(res, table2_record, pd);
                             strcat(res, table2_record + pd + strlen(table2_value) + 1);
-                            insertOneRecord(DB, tmp_table_dictID, result);
+                            insertOneRecord(tmp_table_dictID, res);
                         }
                     }
                 }

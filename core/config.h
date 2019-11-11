@@ -21,6 +21,7 @@ using namespace std;
 #define BIT_MAP_ADDR 2048               // 位示图起始位置 
 #define MAX_NAME_LENGTH 50              //表名,属性名等名字的最大长度
 #define MAX_ATTRIBUTE_NUM 20            //表中属性个数上限
+#define PAGEHEAD_SIZE sizeof(struct PageMeta)
 //TODO: 需测试确保dbMeta不会超出1024，否则位示图数据将会与之重叠，会出现未知错误
 
 // file 配置参数
