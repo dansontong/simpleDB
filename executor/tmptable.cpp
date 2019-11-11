@@ -2,6 +2,7 @@
 #include "database.h"
 #include "buffer.h"
 #include "log.h"
+#include "executor.h"
 
 //==================== global variable ====================
 extern struct DataBase *DB; /* 全局共享 */
@@ -128,19 +129,20 @@ void insert_onerecord(int dictID,char *record){//dictID为DB->dataDict[]的下�
 	}
 }
 
-void HashRelation(struct dbSysHead *head, Relation rl, int pub_attr, multimap<int, long> *m) {
-	int rl_fid = rl.fileID;
-	long pageNo = head->desc.fileDesc[rl_fid].fileFirstPageNo;
-	long pageNum = head->desc.fileDesc[rl_fid].filePageNum;
+void HashRelation(Table tbl, int pub_attr, multimap<int, long> *m) {
+	int tbl_fid = tbl.fileID;
+	long pageNo = DB->dbMeta.fileMeta[tbl_fid].firstPageNo;
+	long pageNum = DB->dbMeta.fileMeta[tbl_fid].pageNum;
 
+	struct BufTag buftag;
 	for (int i = 0; i < pageNum; i++) {
-		int mapNo = reqPage(head, pageNo);
 		struct pageHead ph;
-		memcpy(&ph, head->buff.data[mapNo], SIZE_PAGEHEAD);
+		buftag = Buf_GenerateTag(pageNo);
+		memcpy(&ph, Buf_ReadBuffer(buftag), PAGEMETA_SIZE);
 		for (int j = 0; j < ph.curRecordNum; j++) {
-			char *record = (char*)malloc(rl.recordLength);
-			long logicID = getNextRecord(head, mapNo, j, record);
-			char *val = (char*)malloc(rl.recordLength);
+			char *record = (char*)malloc(tbl.attrLength);
+			long logicID = getNextRecord(pageNo, j, record);
+			char *val = (char*)malloc(tbl.attrLength);
 			getValueByAttrID(record, pub_attr, val);
 			//暂时只考虑要进行hash的属性为int类型的情况
 			int int_val = atoi(val);

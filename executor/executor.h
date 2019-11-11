@@ -1,7 +1,6 @@
 #ifndef EXECUTOR_H_INCLUDE
 #define EXECUTOR_H_INCLUDE
 
-#include <map>
 #include "config.h"
 #include "buffer.h"
 
@@ -22,7 +21,7 @@ int projection(int dictID,char* attributename);//返回投影所在的临时表�
 // ==================== join.cpp ========================
 int createTmpTableAfterSort(Table t1,int n);
 int createTmpTable2(Table table1,Table table2,int table1_pub_attr,int table2_pub_attr);
-Record* getNextRecord(int emp, int k, char* emp_record);
+long getNextRecord(int emp, int k, char* emp_record);
 void insertOneRecord(int tmp_table_ID, char*res);
 
 int SortJoin(int table1loyee_dictID, int department_dictID);
