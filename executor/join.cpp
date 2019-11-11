@@ -71,7 +71,7 @@ int nestedLoopJoin(int employee_dictID, int department_dictID) {
             for (int k = 0; k < emp_ph.pageNo; k++) {
                 char *emp_record = (char*)malloc(table1.attrLength);
                 char *emp_value = (char*)malloc(table1.attrLength);
-                getNextRecord(DB, emp_mapNo, k, emp_record);//读取下一条记录
+                getNextRecord(emp_mapNo, k, emp_record);//读取下一条记录
                 int pe = getValueByAttrID(emp_record, table1_pub_attr, table1_value);
                 if (pe < 0)  exit(0);
                 for (int y = 0; y < SIZE_BUFF - 1 && y < table2_pagenum; y++){
@@ -79,7 +79,7 @@ int nestedLoopJoin(int employee_dictID, int department_dictID) {
                     memcpy(&table2_ph, Buf_ReadBuffer(buffID[y]), SIZE_PAGEDB);
                     for (int i = 0; i < table2_ph.pageNo; i++) {//curRecordNUm
                         char *table2_record = (char*)malloc(table2.attrLength);
-                        getNextRecord(DB, buffID[y], i, table2_record);//head
+                        getNextRecord(buffID[y], i, table2_record);//head
                         char *table2_value = (char*)malloc(table2.attrLength);
                         int pd = getValueByAttrID(table2_record, table2_pub_attr, table2_value);
                         if (pd < 0) exit(0);
@@ -162,7 +162,7 @@ int SortJoin(int table1loyee_dictID, int department_dictID) {
         for (int i = 0; i < ph_table2.pageNo; i++)
         {
             char *record_table2 = (char*)malloc(tmp_table2->attrLength);
-            getNextRecord(DB, mapNo_table2, i, record_table2);
+            getNextRecord(mapNo_table2, i, record_table2);
             char *val_table2 = (char*)malloc(strlen(record_table2));
             int pd = getValueByAttrID(record_table2, table2_pub_attr, val_table2);
 
@@ -175,7 +175,7 @@ int SortJoin(int table1loyee_dictID, int department_dictID) {
                 for (int y = 0; y < ph_table1.pageNo; y++)
                 {
                     char *record_table1 = (char*)malloc(tmp_table1->attrLength);
-                    getNextRecord(DB, mapNo_table1, y, record_table1);
+                    getNextRecord(mapNo_table1, y, record_table1);
                     char* val_table1 = (char*)malloc(strlen(record_table1));
                     getValueByAttrID(record_table1, table1_pub_attr, val_table1);
                     if (strcmp(val_table1, val_table2) == 0)
@@ -186,7 +186,7 @@ int SortJoin(int table1loyee_dictID, int department_dictID) {
                         strcat(result, "|");
                         strncat(result, record_table2, pd);
                         strcat(result, record_table2 + pd + strlen(val_table2) + 1);
-                        insertOneRecord(DB, tmp_table_dictID, result);
+                        insertOneRecord(tmp_table_dictID, result);
                     }
                     else if (strcmp(val_table1, val_table2) > 0)
                     {
@@ -339,7 +339,7 @@ int SortJoin(int table1_dictID, int table2_dictID) {
         memcpy(&ph_table2,  Buf_ReadBuffer(mapNo_table2), SIZE_PAGEDB);//SIZE_PAGEDB
         for (int i = 0; i < ph_table2.pageNo; i++) {
             char *record_table2 = (char*)malloc(tmp_table2->attrLength);
-            getNextRecord(DB, mapNo_table2, i, record_table2);
+            getNextRecord(mapNo_table2, i, record_table2);
             char *val_table2 = (char*)malloc(strlen(record_table2));
             int pd = getValueByAttrID(record_table2, table2_pub_attr, val_table2);
 
@@ -350,7 +350,7 @@ int SortJoin(int table1_dictID, int table2_dictID) {
                 bool flag = false;
                 for (int y = 0; y < ph_table1.pageNo; y++){
                     char *record_table1 = (char*)malloc(tmp_table1->attrLength);
-                    getNextRecord(DB, mapNo_table1, y, record_table1);
+                    getNextRecord(mapNo_table1, y, record_table1);
                     char* val_table1 = (char*)malloc(strlen(record_table1));
                     getValueByAttrID(record_table1, table1_pub_attr, val_table1);
                     if (strcmp(val_table1, val_table2) == 0){
@@ -517,7 +517,7 @@ int nestedLoopJoinByThree(int table1_dictID, int table2_dictID, int table3_dictI
             memcpy(&table1_ph, Buf_ReadBuffer(table1_mapNo), SIZE_PAGEDB);
             for (int k = 0; k < table1_ph.pageNo; k++) {
                 char *table1_record = (char*)malloc(table1.attrLength);
-                getNextRecord(DB, table1_mapNo, k, table1_record);
+                getNextRecord(table1_mapNo, k, table1_record);
                 char *table1_value = (char*)malloc(table1.attrLength);
                 int pe = getValueByAttrID(table1_record, table1_pub_attr, table1_value);
                 if (pe < 0)
@@ -528,7 +528,7 @@ int nestedLoopJoinByThree(int table1_dictID, int table2_dictID, int table3_dictI
                     memcpy(&table3_ph, DB->buff.data[table2_mapNo], SIZE_PAGEDB);
                     for (int i = 0; i < table3_ph.pageNo; i++) {
                         char *table2_record = (char*)malloc(table2.attrLength);
-                        getNextRecord(DB, table2_mapNo, i, table2_record);
+                        getNextRecord(table2_mapNo, i, table2_record);
                         char *table2_value = (char*)malloc(table2.attrLength);
                         int pd = getValueByAttrID(table2_record, table2_pub_attr, table2_value);
                         if (pd < 0) exit(0);

@@ -1,6 +1,7 @@
 #include "database.h"
 #include "log.h"
 #include "index.h"
+#include "executor.h"
 
 
 int main(int argc, char* argv[]) {
@@ -29,6 +30,7 @@ int main(int argc, char* argv[]) {
 	char buff[1000];
 	FILE *fp = fopen(tupleFile, "rb");
 	
+	//================ index_test ================
 	int count = 0;
 	while(NULL != fgets(buff, 1000, fp))
 	{
@@ -54,7 +56,12 @@ int main(int argc, char* argv[]) {
 	drop_index("Supplier","S_SUPPKEY");
 	printf("------ drop index in %s for table %s -----\n","S_SUPPKEY","Supplier");
 
-	
+	//================ executor_test ================
+	tableScanEqualSelector(0, )
+
+
+
+
 
 	database_showDbInfo();
 
