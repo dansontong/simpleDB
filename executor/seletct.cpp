@@ -35,13 +35,14 @@ int tableScanEqualSelector(int dictID,char* attri_name,char* value){
 			index=j;
 		}
 	}
-	if(attr_index<0){
+	int attrIndex = getAttrIndexByName(dictID, attri_name);
+	if(attrIndex<0){
 		printf("在表%s中不含有属性%s\n",table1.tableName,attri_name);
 	}
 	for(i=0;i<pagenum;i++){
 		struct PageMeta pagehead;
-		struct BufTag buftag = Buf_GenerateTag(CurpageNo);
-		memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);
+		struct BufTag buftag = Buf_GenerateTag(pageno);
+		memcpy(&pagehead,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
 		for(int j=0;j<pagehead.recordNum;j++){
 			char *record = (char*)malloc(100);//暂定该表的记录长度为100
 			file_getrecord(pageno,j,record);
@@ -66,8 +67,8 @@ int tableScanEqualSelector(int dictID,char* attri_name,char* value){
 	return tmptable;
 }
 int tableScanRangeSelector(int dictID,char* attri_name,char* min,char* max){
-	Table table1 = DB->dataDict[dictID].fileID;
-	int fileID = tablel.fileID;
+	Table table1 = DB->dataDict[dictID];
+	int fileID = table1.fileID;
 	int querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
@@ -80,8 +81,8 @@ int tableScanRangeSelector(int dictID,char* attri_name,char* min,char* max){
 		printf("该表应的文件不存在！");
 		exit(0);
 	}
-	long pageno = DB->dbMeta.fileMeta[fileID].fileFirstPageNo;
-	long pagenum = head->desc.fileMeta[fileID].filePageNum;
+	long pageno = DB->dbMeta.fileMeta[fileID].firstPageNo;
+	long pagenum = DB->dbMeta.fileMeta[fileID].pageNum;
 	int tmptable = create_tmptable(table1);
 	if(tmptable<0){
 		printf("创建临时表失败！\n");
@@ -93,13 +94,14 @@ int tableScanRangeSelector(int dictID,char* attri_name,char* min,char* max){
 			index=j;
 		}
 	}
-	if(attr_index<0){
+	int attrIndex = getAttrIndexByName(dictID, attri_name);
+	if(attrIndex<0){
 		printf("在表%s中不含有属性%s\n",table1.tableName,attri_name);
 	}
 	for(i=0;i<pagenum;i++){
 		struct PageMeta pagehead;
-		struct BufTag buftag = Buf_GenerateTag(CurpageNo);
-		memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);
+		struct BufTag buftag = Buf_GenerateTag(pageno);
+		memcpy(&pagehead,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
 		for(int j=0;j<pagehead.recordNum;j++){
 			char *record = (char*)malloc(100);//暂定该表的记录长度为100
 			file_getrecord(pageno,j,record);
@@ -119,8 +121,8 @@ int tableScanRangeSelector(int dictID,char* attri_name,char* min,char* max){
 					insert_onerecord(dictID,value_table);
 			}
 			//char类型
-			else if (rl.atb[attr_index].getType() == CHAR_TYPE) {
-				if (strcmp(min, val_table) <= 0 && strcmp(max, val_table) >= 0){
+			else if (table1.attr[attrIndex].type == CHAR_TYPE) {
+				if (strcmp(min, value_table) <= 0 && strcmp(max, value_table) >= 0){
 					insert_onerecord(dictID,value_table);
 				}
 			}
@@ -135,8 +137,8 @@ int tableScanRangeSelector(int dictID,char* attri_name,char* min,char* max){
 	return tmptable;
 }
 int tableScanUnEqualSelector(int dictID,char* attri_name,char* value){//非等值连接
-	Table table1 = DB->dataDict[dictID].fileID;
-	int fileID = tablel.fileID;
+	Table table1 = DB->dataDict[dictID];
+	int fileID = table1.fileID;
 	int querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
@@ -149,8 +151,8 @@ int tableScanUnEqualSelector(int dictID,char* attri_name,char* value){//非等�
 		printf("该表应的文件不存在！");
 		exit(0);
 	}
-	long pageno = DB->dbMeta.fileMeta[fileID].fileFirstPageNo;
-	long pagenum = head->desc.fileMeta[fileID].filePageNum;
+	long pageno = DB->dbMeta.fileMeta[fileID].firstPageNo;
+	long pagenum = DB->dbMeta.fileMeta[fileID].pageNum;
 	int tmptable = create_tmptable(table1);
 	if(tmptable<0){
 		printf("创建临时表失败！\n");
@@ -162,13 +164,14 @@ int tableScanUnEqualSelector(int dictID,char* attri_name,char* value){//非等�
 			index=j;
 		}
 	}
-	if(attr_index<0){
+	int attrIndex = getAttrIndexByName(dictID, attri_name);
+	if(attrIndex<0){
 		printf("在表%s中不含有属性%s\n",table1.tableName,attri_name);
 	}
 	for(i=0;i<pagenum;i++){
 		struct PageMeta pagehead;
-		struct BufTag buftag = Buf_GenerateTag(CurpageNo);
-		memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);
+		struct BufTag buftag = Buf_GenerateTag(pageno);
+		memcpy(&pagehead,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
 		for(int j=0;j<pagehead.recordNum;j++){
 			char *record = (char*)malloc(100);//暂定该表的记录长度为100
 			file_getrecord(pageno,j,record);
@@ -193,8 +196,8 @@ int tableScanUnEqualSelector(int dictID,char* attri_name,char* value){//非等�
 	return tmptable;
 }
 int tableScanMinRangeSelector(int dictID,char* attri_name,char* min){//只有最小值
-	Table table1 = DB->dataDict[dictID].fileID;
-	int fileID = tablel.fileID;
+	Table table1 = DB->dataDict[dictID];
+	int fileID = table1.fileID;
 	int querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
@@ -207,8 +210,8 @@ int tableScanMinRangeSelector(int dictID,char* attri_name,char* min){//只有最
 		printf("该表应的文件不存在！");
 		exit(0);
 	}
-	long pageno = DB->dbMeta.fileMeta[fileID].fileFirstPageNo;
-	long pagenum = head->desc.fileMeta[fileID].filePageNum;
+	long pageno = DB->dbMeta.fileMeta[fileID].firstPageNo;
+	long pagenum = DB->dbMeta.fileMeta[fileID].pageNum;
 	int tmptable = create_tmptable(table1);
 	if(tmptable<0){
 		printf("创建临时表失败！\n");
@@ -220,13 +223,14 @@ int tableScanMinRangeSelector(int dictID,char* attri_name,char* min){//只有最
 			index=j;
 		}
 	}
-	if(attr_index<0){
+	int attrIndex = getAttrIndexByName(dictID, attri_name);
+	if(attrIndex<0){
 		printf("在表%s中不含有属性%s\n",table1.tableName,attri_name);
 	}
 	for(i=0;i<pagenum;i++){
 		struct PageMeta pagehead;
-		struct BufTag buftag = Buf_GenerateTag(CurpageNo);
-		memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);
+		struct BufTag buftag = Buf_GenerateTag(pageno);
+		memcpy(&pagehead,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
 		for(int j=0;j<pagehead.recordNum;j++){
 			char *record = (char*)malloc(100);//暂定该表的记录长度为100
 			file_getrecord(pageno,j,record);
@@ -246,8 +250,8 @@ int tableScanMinRangeSelector(int dictID,char* attri_name,char* min){//只有最
 					insert_onerecord(dictID,value_table);
 			}
 			//char类型
-			else if (rl.atb[attr_index].getType() == CHAR_TYPE) {
-				if (strcmp(min, val_table) <= 0 ){
+			else if (table1.attr[attrIndex].type == CHAR_TYPE) {
+				if (strcmp(min, value_table) <= 0 ){
 					insert_onerecord(dictID,value_table);
 				}
 			}
@@ -262,8 +266,8 @@ int tableScanMinRangeSelector(int dictID,char* attri_name,char* min){//只有最
 	return tmptable;
 }
 int tableScanMaxRangeSelector(int dictID,char* attri_name,char* max){//只有max值
-	Table table1 = DB->dataDict[dictID].fileID;
-	int fileID = tablel.fileID;
+	Table table1 = DB->dataDict[dictID];
+	int fileID = table1.fileID;
 	int querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
@@ -276,8 +280,8 @@ int tableScanMaxRangeSelector(int dictID,char* attri_name,char* max){//只有max
 		printf("该表应的文件不存在！");
 		exit(0);
 	}
-	long pageno = DB->dbMeta.fileMeta[fileID].fileFirstPageNo;
-	long pagenum = head->desc.fileMeta[fileID].filePageNum;
+	long pageno = DB->dbMeta.fileMeta[fileID].firstPageNo;
+	long pagenum = DB->dbMeta.fileMeta[fileID].pageNum;
 	int tmptable = create_tmptable(table1);
 	if(tmptable<0){
 		printf("创建临时表失败！\n");
@@ -289,13 +293,14 @@ int tableScanMaxRangeSelector(int dictID,char* attri_name,char* max){//只有max
 			index=j;
 		}
 	}
-	if(attr_index<0){
+	int attrIndex = getAttrIndexByName(dictID, attri_name);
+	if(attrIndex<0){
 		printf("在表%s中不含有属性%s\n",table1.tableName,attri_name);
 	}
 	for(i=0;i<pagenum;i++){
 		struct PageMeta pagehead;
-		struct BufTag buftag = Buf_GenerateTag(CurpageNo);
-		memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);
+		struct BufTag buftag = Buf_GenerateTag(pageno);
+		memcpy(&pagehead,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
 		for(int j=0;j<pagehead.recordNum;j++){
 			char *record = (char*)malloc(100);//暂定该表的记录长度为100
 			file_getrecord(pageno,j,record);
@@ -315,8 +320,8 @@ int tableScanMaxRangeSelector(int dictID,char* attri_name,char* max){//只有max
 					insert_onerecord(dictID,value_table);
 			}
 			//char类型
-			else if (rl.atb[attr_index].getType() == CHAR_TYPE) {
-				if ( strcmp(max, val_table) >= 0){
+			else if (table1.attr[attrIndex].type == CHAR_TYPE) {
+				if ( strcmp(max, value_table) >= 0){
 					insert_onerecord(dictID,value_table);
 				}
 			}

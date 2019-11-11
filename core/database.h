@@ -80,6 +80,7 @@ Record* searchRecord(char* tableName,char* attrName, char* attribute);
 int createTable( char *str);
 void insertAttr(Table *table, const char *name, DATA_TYPE type, int length,bool notNull);
 int getDictIDbyName(char *tableName);
+int getAttrIndexByName(int dictID, char *str);
 
 //字典相关
 int readDataDictionary();
