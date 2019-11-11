@@ -127,3 +127,29 @@ void insert_onerecord(int dictID,char *record){//dictID为DB->dataDict[]的下�
 		}
 	}
 }
+
+void HashRelation(struct dbSysHead *head, Relation rl, int pub_attr, multimap<int, long> *m) {
+	int rl_fid = rl.fileID;
+	long pageNo = head->desc.fileDesc[rl_fid].fileFirstPageNo;
+	long pageNum = head->desc.fileDesc[rl_fid].filePageNum;
+
+	for (int i = 0; i < pageNum; i++) {
+		int mapNo = reqPage(head, pageNo);
+		struct pageHead ph;
+		memcpy(&ph, head->buff.data[mapNo], SIZE_PAGEHEAD);
+		for (int j = 0; j < ph.curRecordNum; j++) {
+			char *record = (char*)malloc(rl.recordLength);
+			long logicID = getNextRecord(head, mapNo, j, record);
+			char *val = (char*)malloc(rl.recordLength);
+			getValueByAttrID(record, pub_attr, val);
+			//暂时只考虑要进行hash的属性为int类型的情况
+			int int_val = atoi(val);
+			int bid = hashToBucket(int_val);
+			m[bid].insert(pair<int, long>(int_val, logicID));
+		}
+		if (ph.nextPageNo < 0)
+			break;
+		else
+			pageNo = ph.nextPageNo;
+	}
+}
