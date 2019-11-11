@@ -97,12 +97,13 @@ void database_createDbFile(char *fileName)
 	db.dbMeta.dataAddr = FILE_DATA_ADDR;
 	db.dbMeta.currFileNum = 0;
 	db.dbMeta.dataDictFid = -1;
+	memset(db.dbMeta.fileMeta, -1, sizeof(struct FileMeta) * MAX_FILE_NUM);
 	//db.dbMeta.fileMeta[MAX_FILE_NUM] = new FileMeta[MAX_FILE_NUM];
-	db.dbMeta.fileMeta[0].id = 0;
-	strcpy(db.dbMeta.fileMeta[0].name, "0");
-	db.dbMeta.fileMeta[0].segNum = SEGMENT_NUM;
-	db.dbMeta.fileMeta[0].state = 1;
-	memset(db.dbMeta.fileMeta[0].segList, -1, sizeof(struct Segment) * SEGMENT_NUM);
+	// db.dbMeta.fileMeta[0].id = 0;
+	// strcpy(db.dbMeta.fileMeta[0].name, "0");
+	// db.dbMeta.fileMeta[0].segNum = SEGMENT_NUM;
+	// db.dbMeta.fileMeta[0].state = 1;
+	// memset(db.dbMeta.fileMeta[0].segList, -1, sizeof(struct Segment) * SEGMENT_NUM);
 
 	// 为空闲空间映射表分配空间，所有的初始化为0，表示空闲
 	db.freeSpaceBitMap = (unsigned long *)malloc(db.dbMeta.bitMapSize);
