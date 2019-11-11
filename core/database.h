@@ -43,7 +43,8 @@ struct Table{
 	char tableName[MAX_NAME_LENGTH];   //表名
 	Attribute attr[MAX_ATTRIBUTE_NUM]; //属性列表
 	int attrNum;  //属性个数
-	int attrLength;//属性总长度
+	int recordLength;//记录总长度
+	int recordNum;  //属性个数
 };
 
 // 数据存储信息
@@ -70,17 +71,6 @@ void database_showSegList(int fileID);
 int database_memToDisk();
 
 
-// 记录相关
-void insertRecord(int dictID, char *str);
-void deleteRecord(char *tableName, char *attributeName, Record *record);
-Record* searchRecord(char* tableName,char* attrName, char* attribute);
-
-
-// 表相关
-int createTable( char *str);
-void insertAttr(Table *table, const char *name, DATA_TYPE type, int length,bool notNull);
-int getDictIDbyName(char *tableName);
-int getAttrIndexByName(int dictID, char *str);
 
 //字典相关
 int readDataDictionary();

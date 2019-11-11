@@ -7,7 +7,7 @@ LIB_SRC =  -L../storage/*.cpp -L../core/*.cpp
 src = ../core ../storage ../index
 src_buf = $(shell find ../log ../core ../storage -name "*.cpp")
 src_bPtree = $(shell find ../log ../index/BPlusTree  -name "*.cpp")
-src_index = $(shell find ../log ../core ../storage ../index -name "*.cpp")
+src_index = $(shell find ../log ../core ../storage ../index ../executor -name "*.cpp")
 src_executor = $(shell find ../log ../core ../storage ../index ../executor -name "*.cpp")
 
 buffer: storage/buffer_test.cpp

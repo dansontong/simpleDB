@@ -4,7 +4,7 @@
 #include "log.h"
 
 //==================== global variable ====================
-extern struct DataBase *DB; /* È«¾Ö¹²Ïí */
+extern struct DataBase *DB; /* å…¨å±€å…±äº« */
 
 // void file_Init(struct DataBase *db)
 // {
@@ -13,10 +13,10 @@ extern struct DataBase *DB; /* È«¾Ö¹²Ïí */
 /**************************************************
  *                  file                          *
  **************************************************/
-//-1±íÊ¾ÎÄ¼ş´´½¨Ê§°Ü
-int file_newFile(int type, long NeededPageNum){
+//-1è¡¨ç¤ºæ–‡ä»¶åˆ›å»ºå¤±è´¥
+int file_newFile(FILE_TYPE fileType, long NeededPageNum){
 	if(DB->dbMeta.currFileNum>=MAX_FILE_NUM||DB->dbMeta.blockFree<NeededPageNum){
-		printf("¿ÕÏĞ¿Õ¼ä²»×ã£¬ÎÄ¼ş´´½¨Ê§°Ü£¡/n");
+		printf("ç©ºé—²ç©ºé—´ä¸è¶³ï¼Œæ–‡ä»¶åˆ›å»ºå¤±è´¥ï¼/n");
 		exit(0);	
 	}
 	int id = DB->dbMeta.currFileNum;
@@ -29,13 +29,13 @@ int file_newFile(int type, long NeededPageNum){
 			pagemeta.recordNum = 0;
 			pagemeta.pageNo = j;
 			if(i==0){
-				pagemeta.prePageNo=-1;//-1±íÊ¾Ã»ÓĞÇ°Ò³
+				pagemeta.prePageNo=-1;//-1è¡¨ç¤ºæ²¡æœ‰å‰é¡µ
 				pagemeta.nextPageNo=j+1;
 			}
 			else{
 				pagemeta.prePageNo=j-1;
 				if(j==NewPages+NeededPageNum-1){
-					pagemeta.nextPageNo=-1;//-1±íÊ¾Ã»ÓĞºóÒ³
+					pagemeta.nextPageNo=-1;//-1è¡¨ç¤ºæ²¡æœ‰åé¡µ
 					
 				}
 				else{
@@ -54,7 +54,7 @@ int file_newFile(int type, long NeededPageNum){
 			}
 		}
 		DB->dbMeta.fileMeta[i].id=id;
-		DB->dbMeta.fileMeta[i].fileType=type;
+		DB->dbMeta.fileMeta[i].fileType=fileType;
 		DB->dbMeta.fileMeta[i].firstPageNo=NewPages;
 		DB->dbMeta.fileMeta[i].pageNum=NeededPageNum;
 		DB->dbMeta.fileMeta[i].segList[i].id=id;
@@ -65,26 +65,26 @@ int file_newFile(int type, long NeededPageNum){
 		
 	}
 	else{
-		printf("Î´ÓĞ×ã¹»µÄÁ¬Ğø´æ´¢¿Õ¼ä£¬ÎÄ¼ş´´½¨Ê§°Ü£¡/n");
-		return -1;//-1±íÊ¾´´½¨Ê§°Ü
+		printf("æœªæœ‰è¶³å¤Ÿçš„è¿ç»­å­˜å‚¨ç©ºé—´ï¼Œæ–‡ä»¶åˆ›å»ºå¤±è´¥ï¼/n");
+		return -1;//-1è¡¨ç¤ºåˆ›å»ºå¤±è´¥
 	}
 	return id;
 	
 }
 
 struct Record file_writeFile(int FileID, int length,char *str){
-	Record record; // ·µ»Ø¸Õ´æÈëµÄ¼ÇÂ¼ÃèÊöĞÅÏ¢
+	Record record; // è¿”å›åˆšå­˜å…¥çš„è®°å½•æè¿°ä¿¡æ¯
 
 	int querypage=-1;
 	int i;
-	for( i=0;i<MAX_FILE_NUM;i++){                                               //ÕâÒ»¿éÊÇ²éÕÒÎÄ¼şÊÇ·ñ´æÔÚ
+	for( i=0;i<MAX_FILE_NUM;i++){                                               //è¿™ä¸€å—æ˜¯æŸ¥æ‰¾æ–‡ä»¶æ˜¯å¦å­˜åœ¨
 		if(DB->dbMeta.fileMeta[i].segList[i].id==FileID){						//
 			querypage=DB->dbMeta.fileMeta[i].segList[i].firstPageNo;			//
 			break;																//
 		}																		//
 	}
 	if(querypage==-1){
-		printf("¸ÃÎÄ¼şid¶ÔÓ¦µÄÎÄ¼ş²»´æÔÚ£¡");
+		printf("è¯¥æ–‡ä»¶idå¯¹åº”çš„æ–‡ä»¶ä¸å­˜åœ¨ï¼");
 		exit(0);
 	}
 
@@ -93,79 +93,79 @@ struct Record file_writeFile(int FileID, int length,char *str){
 	long CurpageNo = DB->dbMeta.fileMeta[i].firstPageNo;				
 	long pagenum = DB->dbMeta.fileMeta[i].pageNum;
 	int fileno = i;
-	int sizeofpagehead = sizeof(struct PageMeta);
-	int sizeofrecord = sizeof(struct OffsetInPage);									//¶ÁÈ¡¸ÃÎÄ¼şµÄĞÅÏ¢
+	int sizeofpageMeta = sizeof(struct PageMeta);
+	int sizeofrecord = sizeof(struct OffsetInPage);									//è¯»å–è¯¥æ–‡ä»¶çš„ä¿¡æ¯
 	rewind(DB->dbFile);					
 	bool isfound = false;
-	struct PageMeta pagehead;
+	struct PageMeta pageMeta;
 	struct BufTag buftag = Buf_GenerateTag(CurpageNo);
-	memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);						//¶ÁÈ¡µÚÒ»Ò³µÄÄÚÈİ²¢´æ·ÅÔÚpageheadÀï
-	OffsetInPage preoffset,curoffset;							//Ò³ÀïµÄ¼ÇÂ¼Ë÷ÒıµÄ½á¹¹Ìå£¬¶¨ÒåÔÚfile.hÀï
-	long currecordpos,curoffsetpos;								//Ç°Ò»¸öÊÇÖ¸µ±Ç°¼ÇÂ¼Ë÷ÒıµÄÎ»ÖÃ£¬µÚ¶ş¸öÊÇÖ¸µ±Ç°¼ÇÂ¼µÄÎ»ÖÃ
-	for(int i=0;i<pagenum;i++){									//¸ÃÑ­»·ÊÇÎªÁË±éÀúËùÓĞµÄÒ³ÕÒ³öÄÜ´æ·Å¸Ã¼ÇÂ¼µÄÒ³
-		// printf("page:%d,¿ÕÏĞ¿Õ¼ä£º%ld\n",i,pagehead.freeSpace);
-		if(pagehead.freeSpace<=length+sizeofrecord){
-			if(pagehead.nextPageNo==-1){
+	memcpy(&pageMeta,Buf_ReadBuffer(buftag),sizeofpageMeta);						//è¯»å–ç¬¬ä¸€é¡µçš„å†…å®¹å¹¶å­˜æ”¾åœ¨pageheadé‡Œ
+	OffsetInPage preoffset,curoffset;							//é¡µé‡Œçš„è®°å½•ç´¢å¼•çš„ç»“æ„ä½“ï¼Œå®šä¹‰åœ¨file.hé‡Œ
+	long currecordpos,curoffsetpos;								//å‰ä¸€ä¸ªæ˜¯æŒ‡å½“å‰è®°å½•ç´¢å¼•çš„ä½ç½®ï¼Œç¬¬äºŒä¸ªæ˜¯æŒ‡å½“å‰è®°å½•çš„ä½ç½®
+	for(int i=0;i<pagenum;i++){									//è¯¥å¾ªç¯æ˜¯ä¸ºäº†éå†æ‰€æœ‰çš„é¡µæ‰¾å‡ºèƒ½å­˜æ”¾è¯¥è®°å½•çš„é¡µ
+		// printf("page:%d,ç©ºé—²ç©ºé—´ï¼š%ld\n",i,pageMeta.freeSpace);
+		if(pageMeta.freeSpace<=length+sizeofrecord){
+			if(pageMeta.nextPageNo==-1){
 				break;
 			}
-			CurpageNo = pagehead.nextPageNo;
+			CurpageNo = pageMeta.nextPageNo;
 			buftag = Buf_GenerateTag(CurpageNo);
-			memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);
+			memcpy(&pageMeta,Buf_ReadBuffer(buftag),sizeofpageMeta);
 			continue;	
 		}
 		else{
-			memcpy(&preoffset,Buf_ReadBuffer(buftag)+sizeofpagehead,sizeofrecord);
+			memcpy(&preoffset,Buf_ReadBuffer(buftag)+sizeofpageMeta,sizeofrecord);
 			isfound = true;
-			if(pagehead.recordNum==0){
+			if(pageMeta.recordNum==0){
 				curoffset.recordID = 0;
 				curoffset.offset = length;
 				curoffset.isDeleted = false;
-				currecordpos = sizeofpagehead;
+				currecordpos = sizeofpageMeta;
 				curoffsetpos =  PAGE_SIZE - length;
 				
 				
 			}
 			else{
-				memcpy(&preoffset,Buf_ReadBuffer(buftag)+sizeofpagehead+(pagehead.recordNum-1)*sizeofrecord,sizeofrecord);
-				curoffset.recordID = pagehead.recordNum;
+				memcpy(&preoffset,Buf_ReadBuffer(buftag)+sizeofpageMeta+(pageMeta.recordNum-1)*sizeofrecord,sizeofrecord);
+				curoffset.recordID = pageMeta.recordNum;
 				curoffset.offset = preoffset.offset+length;
 				curoffset.isDeleted = false;
-				currecordpos = sizeofpagehead + sizeofrecord*pagehead.recordNum; //currecordpos µÈ¼ÛÓÚ£¬Ò³¶¥ÒÑ±»Õ¼¾İµÄ¿Õ¼ä´óĞ¡¡£Ò³Ç°Ãæ·ÅrecordÃèÊöĞÅÏ¢£¬¾ßÌårecordÊı¾İ´æÔÚÒ³µ×¡£
+				currecordpos = sizeofpageMeta + sizeofrecord*pageMeta.recordNum;//currecordposç­‰ä»·äº,é¡µé¡¶å·²è¢«å æ®çš„ç©ºé—´å¤§å°ã€‚é¡µå‰é¢æ”¾recordæè¿°ä¿¡æ¯ï¼Œå…·ä½“recordæ•°æ®å­˜åœ¨é¡µåº•ã€‚
 				curoffsetpos = PAGE_SIZE - preoffset.offset-length;
 			}
 			
 		}
-		pagehead.recordNum++;
-		pagehead.freeSpace=pagehead.freeSpace-length-sizeofrecord;
-		memcpy(Buf_ReadBuffer(buftag),&pagehead,sizeofpagehead);
+		pageMeta.recordNum++;
+		pageMeta.freeSpace=pageMeta.freeSpace-length-sizeofrecord;
+		memcpy(Buf_ReadBuffer(buftag),&pageMeta,sizeofpageMeta);
 		memcpy(Buf_ReadBuffer(buftag)+currecordpos,&curoffset,sizeofrecord);
 		memcpy(Buf_ReadBuffer(buftag)+curoffsetpos,str,length);
-		break;						//ÕÒµ½ºó¾Íbreak
+		break;						//æ‰¾åˆ°åå°±break
 	}
-	if(!isfound){					//Èô±éÀúÍêÃ»ÓĞÒ³¾ÍĞÂÉêÇëÒ»¸öÒ³¡£
+	if(!isfound){					//è‹¥éå†å®Œæ²¡æœ‰é¡µå°±æ–°ç”³è¯·ä¸€ä¸ªé¡µã€‚
 		long CurpageNo = page_requestPage(1);
 		if(CurpageNo>=0){
 			DB->dbMeta.blockFree=DB->dbMeta.blockFree-1;
 			file_print_freepace();
-			struct PageMeta pagemeta; //pagehead¾ÍÊÇÎ´ÉêÇëÇ°×îºóÒ»¸öÒ³
+			struct PageMeta pagemeta; //pageheadå°±æ˜¯æœªç”³è¯·å‰æœ€åä¸€ä¸ªé¡µ
 			pagemeta.nextPageNo=-1;
-			pagemeta.prePageNo=pagehead.pageNo;				
+			pagemeta.prePageNo=pageMeta.pageNo;				
 			pagemeta.pageNo=CurpageNo;
-			pagehead.nextPageNo = CurpageNo;		//½«ÕâÒ³¼ÓÔÚÕâ¸öÎÄ¼şÖĞ				
+			pageMeta.nextPageNo = CurpageNo;		//å°†è¿™é¡µåŠ åœ¨è¿™ä¸ªæ–‡ä»¶ä¸­		
 			pagemeta.recordNum = 1;
-			pagemeta.freeSpace = PAGE_SIZE - length - sizeofpagehead - sizeofrecord;
+			pagemeta.freeSpace = PAGE_SIZE - length - sizeofpageMeta - sizeofrecord;
 			curoffsetpos = PAGE_SIZE-length;
-			currecordpos = sizeofpagehead;
+			currecordpos = sizeofpageMeta;
 			curoffset.recordID = 0;
 			curoffset.offset = length;
 			curoffset.isDeleted = false;
 			buftag = Buf_GenerateTag(pagenum+1);
-			memcpy(Buf_ReadBuffer(buftag),&pagemeta,sizeofpagehead);
+			memcpy(Buf_ReadBuffer(buftag),&pagemeta,sizeofpageMeta);
 			memcpy(Buf_ReadBuffer(buftag)+currecordpos,&curoffset,sizeofrecord);
 			memcpy(Buf_ReadBuffer(buftag)+curoffsetpos,str,length);
-			memcpy(Buf_ReadBuffer(buftag),&pagehead,sizeofpagehead);
+			memcpy(Buf_ReadBuffer(buftag),&pageMeta,sizeofpageMeta);
 
-			DB->dbMeta.fileMeta[fileno].segList[0].pageNum++;
+			// DB->dbMeta.fileMeta[fileno].pageNum++;// TODO:mnb-1: unComment this line, and buffer.schedule suck in.
 		}
 	}
 	record.pageNo = CurpageNo;
@@ -179,44 +179,44 @@ void file_readFile(int FileID,char *str){
 			break;
 		}
 	}
-	int sizeofpagehead = sizeof(struct PageMeta);
+	int sizeofpageMeta = sizeof(struct PageMeta);
 	int sizeofrecord = sizeof(struct OffsetInPage);
 	long pagenum = DB->dbMeta.fileMeta[0].segList[i].pageNum;
 	long CurpageNo = DB->dbMeta.fileMeta[0].segList[i].firstPageNo;
 	OffsetInPage preoffset,curoffset;
-	struct PageMeta pagehead;
+	struct PageMeta pageMeta;
 	for(i=0;i<pagenum;i++){					
-		struct BufTag buftag = Buf_GenerateTag(CurpageNo);		//¸ù¾İÒ³ºÅ´Ó»º³åÇøµ÷È¡Ò³µÄÄÚÈİ
-		memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);//´òÓ¡Ò³µÄ»ù±¾ĞÅÏ¢
-		printf("µÚ%dºÅÎÄ¼şÖĞµÄµÚ%d¸öÒ³Ãæ\n",FileID,i+1);
-		printf("Ò³ºÅ£º%ld\n",pagehead.pageNo);
-		printf("Ç°¼ÌÒ³ºÅ£º%ld\n",pagehead.prePageNo);
-		printf("ºó¼ÌÒ³ºÅ£º%ld\n",pagehead.nextPageNo);
-		printf("¼ÇÂ¼¸öÊı£»%d\n",pagehead.recordNum);
-		printf("¿ÕÏĞ¿Õ¼ä£º%ld\n",pagehead.freeSpace);
-		if(pagehead.recordNum>0){
-			for(int j=0;j<pagehead.recordNum;j++){
+		struct BufTag buftag = Buf_GenerateTag(CurpageNo);		//æ ¹æ®é¡µå·ä»ç¼“å†²åŒºè°ƒå–é¡µçš„å†…å®¹
+		memcpy(&pageMeta,Buf_ReadBuffer(buftag),sizeofpageMeta);//æ‰“å°é¡µçš„åŸºæœ¬ä¿¡æ¯
+		printf("ç¬¬%då·æ–‡ä»¶ä¸­çš„ç¬¬%dä¸ªé¡µé¢\n",FileID,i+1);
+		printf("é¡µå·ï¼š%ld\n",pageMeta.pageNo);
+		printf("å‰ç»§é¡µå·ï¼š%ld\n",pageMeta.prePageNo);
+		printf("åç»§é¡µå·ï¼š%ld\n",pageMeta.nextPageNo);
+		printf("è®°å½•ä¸ªæ•°:%d\n",pageMeta.recordNum);
+		printf("ç©ºé—²ç©ºé—´ï¼š%ld\n",pageMeta.freeSpace);
+		if(pageMeta.recordNum>0){
+			for(int j=0;j<pageMeta.recordNum;j++){
 				int readlength;
-				if(j==0){																	//´òÓ¡Ò³µÄÃ¿Ìõ¼ÇÂ¼
-					memcpy(&curoffset,Buf_ReadBuffer(buftag)+sizeofpagehead,sizeofrecord);
+				if(j==0){																	//æ‰“å°é¡µçš„æ¯æ¡è®°å½•
+					memcpy(&curoffset,Buf_ReadBuffer(buftag)+sizeofpageMeta,sizeofrecord);
 					readlength = curoffset.offset;
 					memcpy(str,Buf_ReadBuffer(buftag)+PAGE_SIZE-curoffset.offset,readlength);
 					str[readlength] = '\0';
-					printf("¸ÃÒ³ÃæÖĞµÚ%d¼ÇÂ¼\n",j+1);
+					printf("è¯¥é¡µé¢ä¸­ç¬¬%dè®°å½•\n",j+1);
 					printf("%s\n",str);
 				}
 				else{
 					preoffset = curoffset;
-					memcpy(&curoffset,Buf_ReadBuffer(buftag)+sizeofpagehead+sizeofrecord*j,sizeofrecord);
+					memcpy(&curoffset,Buf_ReadBuffer(buftag)+sizeofpageMeta+sizeofrecord*j,sizeofrecord);
 					readlength = curoffset.offset-preoffset.offset;
 					memcpy(str,Buf_ReadBuffer(buftag)+PAGE_SIZE-curoffset.offset,readlength);
 					str[readlength] = '\0';
-					printf("¸ÃÒ³ÃæÖĞµÚ%d¼ÇÂ¼\n",j+1);
+					printf("è¯¥é¡µé¢ä¸­ç¬¬%dè®°å½•\n",j+1);
 					printf("%s\n",str);
 				}
 			}
 		}
-		long nextPno = pagehead.nextPageNo;
+		long nextPno = pageMeta.nextPageNo;
 		if(nextPno==-1){
 			break;
 		}
@@ -229,25 +229,25 @@ void file_readFile(int FileID,char *str){
 void file_deleteFile(int FileID){
 	int i;
 	for(i=0;i<MAX_FILE_NUM;i++){
-		if(DB->dbMeta.fileMeta[0].segList[i].id==FileID){			//ÕÒµ½ÎÄ¼ş¶ÔÓ¦µÄÒ³
+		if(DB->dbMeta.fileMeta[0].segList[i].id==FileID){			//æ‰¾åˆ°æ–‡ä»¶å¯¹åº”çš„é¡µ
 			break;
 		}
 	}
-	long pagenum = DB->dbMeta.fileMeta[0].segList[i].pageNum;			//¶ÁÈ¡µÚÒ»Ò³µÄĞÅÏ¢
+	long pagenum = DB->dbMeta.fileMeta[0].segList[i].pageNum;			//è¯»å–ç¬¬ä¸€é¡µçš„ä¿¡æ¯
 	long CurpageNo = DB->dbMeta.fileMeta[0].segList[i].firstPageNo;
 	long pageAddr = DB->dbMeta.dataAddr +CurpageNo * PAGE_SIZE;
-	int sizeofpagehead = sizeof(struct PageMeta);
+	int sizeofpageMeta = sizeof(struct PageMeta);
 	int sizeofrecord = sizeof(struct OffsetInPage);
 	long nextPage = -1;
-	struct PageMeta pagehead;
-	for(long j=0;j<pagenum;j++){							//±éÀúÃ¿Ò»Ò³
+	struct PageMeta pageMeta;
+	for(long j=0;j<pagenum;j++){							//éå†æ¯ä¸€é¡µ
 		rewind(DB->dbFile);
 		fseek(DB->dbFile,pageAddr,SEEK_SET);
-		size_t sizeRead = fread(&pagehead,sizeofpagehead,1,DB->dbFile);			//¶ÁÈ¡ÕâÒ»Ò³µÄÄÚÈİ
-		nextPage = pagehead.nextPageNo;
-		page_recover_onepage(pagehead.pageNo);				//É¾³ıÕâÒ»Ò³
+		size_t sizeRead = fread(&pageMeta,sizeofpageMeta,1,DB->dbFile);			//è¯»å–è¿™ä¸€é¡µçš„å†…å®¹
+		nextPage = pageMeta.nextPageNo;
+		page_recover_onepage(pageMeta.pageNo);				//åˆ é™¤è¿™ä¸€é¡µ
 		if(nextPage>0){
-			pageAddr = DB->dbMeta.dataAddr +nextPage * PAGE_SIZE;	//»ñÈ¡ĞÂµÄÒ»Ò³µÄµØÖ·
+			pageAddr = DB->dbMeta.dataAddr +nextPage * PAGE_SIZE;	//è·å–æ–°çš„ä¸€é¡µçš„åœ°å€
 		}
 		else{
 			break;
@@ -276,161 +276,6 @@ void file_print_freepace(){
 	
 }
 
-bool file_getrecord(long pageNo,int recordID,char *record){
-	
-	int sizeofpagehead = sizeof(struct PageMeta);
-	int sizeofrecord = sizeof(struct OffsetInPage);
-	OffsetInPage curoffset,preoffset;
-	struct BufTag buftag = Buf_GenerateTag(pageNo);
-	struct PageMeta pagehead;
-	memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);
-	if(recordID<0||recordID>pagehead.recordNum){
-		return false;
-	}
-	if(recordID>0){//ÅĞ¶ÏÊÇ·ñÊÇµÚÒ»¸ö¼ÇÂ¼
-		memcpy(&curoffset,Buf_ReadBuffer(buftag)+sizeofpagehead+sizeofrecord*recordID,sizeofrecord);
-		memcpy(&preoffset,Buf_ReadBuffer(buftag)+sizeofpagehead+sizeofrecord*(recordID-1),sizeofrecord);
-		memcpy(record,Buf_ReadBuffer(buftag)+PAGE_SIZE-curoffset.offset,curoffset.offset-preoffset.offset);//¼ÇÂ¼µÄÎ»ÖÃÎªÒ³µÄÆğÊ¼Î»ÖÃ¼ÓÉÏpagesize-¼ÇÂ¼¾àÀëÒ³Î²µÄ¾àÀë£¬¼ÇÂ¼³¤¶ÈÎª¸Ã¼ÇÂ¼¾àÀëÒ³Î²µÄÎ»ÖÃ¼õÈ¥ÉÏÒ»Ìõ¼ÇÂ¼¾àÀëÒ³Î²µÄÎ»ÖÃ
-		return true;
-	}
-	else{
-		memcpy(&curoffset,Buf_ReadBuffer(buftag)+sizeofpagehead+sizeofrecord*recordID,sizeofrecord);
-		memcpy(record,Buf_ReadBuffer(buftag)+PAGE_SIZE-curoffset.offset,curoffset.offset);//µÚÒ»Ìõ¼ÇÂ¼µÄ³¤¶ÈÎª¸Ã¼ÇÂ¼¾àÀëÒ³Î²µÄ¾àÀë
-		return true;
-	}
-	return false;
-}
-
-bool file_getrecordAttribute(long pageNo,int recordID,char* tablename,char* Attributename,char* Attribute,char* posOffset){
-	char *record;
-	bool flag;
-
-	if(file_getrecord(pageNo,recordID,record)){//·µ»Ø¸ÃÌõ¼ÇÂ¼
-		int i=0;
-		for(i=0;i<MAX_FILE_NUM;i++){
-			if(DB->dataDict[i].fileID<0){
-				return false;
-			}
-			else{
-				if(strcmp(DB->dataDict[i].tableName,tablename)==0){//²éÕÒ±í
-					int j=0;
-					for(j=0;j<DB->dataDict[i].attrNum;j++){//²éÕÒÊôĞÔ£¬¸ù¾İÊôĞÔÃûÕÒµ½ÊôĞÔÔÚ¼ÇÂ¼ÖĞµÄ¾ßÌåÎ»ÖÃ
-						if(strcmp(DB->dataDict[i].attr[j].name,Attributename)==0){
-							if(getValueByAttrID(record, j, Attribute)>0){
-								return true;
-							}
-							else{
-								return false;
-							}
-							
-						}
-					}
-				}
-			}
-		}
-	}
-	else{
-		return false;
-	}
-}
-int getValueByAttrID(char *str, int index, char *result){
-	int length = strlen(str);
-	int j = 0, k = 0;
-	int start = 0;
-	for (int i = 0; i <= length; i++) {
-		if (str[i] == '|' || i == length){
-			if (k == index){
-				result[j] = '\0';
-				return start;
-			}
-			else{
-				start = i + 1;
-				k++;
-				memset(result, 0, length);
-				j = 0;
-			}
-		}
-		else
-			result[j++] = str[i];
-	}
-	return -1;
-}
-long getlogicID(int fileID,long pageno,int recordno ){
-	long count=0;
-	int querypage=-1;
-	int i;
-	for( i=0;i<MAX_FILE_NUM;i++){                                               //ÕâÒ»¿éÊÇ²éÕÒÎÄ¼şÊÇ·ñ´æÔÚ
-		if(DB->dbMeta.fileMeta[i].segList[i].id==fileID){						//
-			querypage=DB->dbMeta.fileMeta[i].segList[i].firstPageNo;			//
-			break;																//
-		}																		//
-	}
-	if(querypage==-1){
-		printf("¸ÃÎÄ¼şid¶ÔÓ¦µÄÎÄ¼ş²»´æÔÚ£¡");
-		exit(0);
-	}
-
-	// long CurpageNo = DB->dbMeta.fileMeta[0].segList[i].firstPageNo;				
-	// long pagenum = DB->dbMeta.fileMeta[0].segList[i].pageNum;
-	long CurpageNo = DB->dbMeta.fileMeta[i].firstPageNo;				
-	long pagenum = DB->dbMeta.fileMeta[i].pageNum;
-	struct PageMeta pagehead;
-	for(i=0;i<pagenum;i++){
-		struct BufTag buftag = Buf_GenerateTag(CurpageNo);
-		memcpy(&pagehead,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
-		if(pagehead.nextPageNo=-1){
-			count = count+recordno;
-			return count;
-		}
-		else{
-			count = count+pagehead.recordNum;
-			CurpageNo = pagehead.nextPageNo;
-		}
-	}
-}
-bool getrecordbylogicID(int fileID,long logicID,char* result){
-	long count = 0;
-	int querypage=-1;
-	int i;
-	for( i=0;i<MAX_FILE_NUM;i++){                                               //ÕâÒ»¿éÊÇ²éÕÒÎÄ¼şÊÇ·ñ´æÔÚ
-		if(DB->dbMeta.fileMeta[i].segList[i].id==fileID){						//
-			querypage=DB->dbMeta.fileMeta[i].segList[i].firstPageNo;			//
-			break;																//
-		}																		//
-	}
-	if(querypage==-1){
-		printf("¸ÃÎÄ¼şid¶ÔÓ¦µÄÎÄ¼ş²»´æÔÚ£¡");
-		exit(0);
-	}
-	long CurpageNo = DB->dbMeta.fileMeta[i].firstPageNo;				
-	long pagenum = DB->dbMeta.fileMeta[i].pageNum;
-	struct PageMeta pagehead;
-	for(i=0;i<pagenum;i++){
-		struct BufTag buftag = Buf_GenerateTag(CurpageNo);
-		memcpy(&pagehead,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
-		if(pagehead.nextPageNo=-1){
-			if(count+pagehead.recordNum<logicID){
-				printf("logicIDÓĞ´íÎó£¡\n");
-				return false;
-			}
-			else{
-				file_getrecord(CurpageNo,recordno,result);
-				return true;
-			}
-		}
-		else{
-			if(count+pagehead.recordNum>=logicID){
-				file_getrecord(CurpageNo,recordno,result);
-				return true;
-			}
-			else{
-				count+=pagehead.recordNum;
-				CurpageNo = pagehead.nextPageNo;
-			}
-		}
-	}
-	return false;
-}
 void file_fseek(int fileID, long offset, int fromwhere)
 {
 
@@ -443,7 +288,7 @@ int page_isEmpty(unsigned long bit_map,int position)
  {
 	unsigned long result = 0x00000001;
 	// bug 
-	// Ô­Ê¼£º32-position
+	// Ã”Â­ÃŠÂ¼Â£Âº32-position
 	result = result<<(SIZE_OF_LONG*8-position);
 	result = result & bit_map;
 	if (result == 0) {
@@ -457,7 +302,7 @@ int page_isEmpty(unsigned long bit_map,int position)
 void page_setbitmap(unsigned long *bit_map,int position,int value)
 {
 	if(value!=0&&value!=1){
-		printf("valueµÄÖµ²»·ûºÏ¹æÔò!£¬Ö»ÄÜÊÇ0»ò1¡£/n");
+		printf("valueçš„å€¼ä¸ç¬¦åˆè§„åˆ™!ï¼Œåªèƒ½æ˜¯0æˆ–1ã€‚/n");
 		return ;
 	}
 	if(value==page_isEmpty(*bit_map,position)){
@@ -478,7 +323,7 @@ void page_setbitmap(unsigned long *bit_map,int position,int value)
 long page_requestPage(long NeededPageNum)
 {
 	if(DB->dbMeta.blockFree<0){
-		printf("Ã»ÓĞ¿ÕÏĞµÄÒ³£¬·ÖÅäÊ§°Ü£¡\n");
+		printf("æ²¡æœ‰ç©ºé—²çš„é¡µï¼Œåˆ†é…å¤±è´¥ï¼\n");
 		return -1;
 	}
 	

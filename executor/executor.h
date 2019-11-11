@@ -2,7 +2,11 @@
 #define EXECUTOR_H_INCLUDE
 
 #include "config.h"
+#include "database.h"
+#include "file.h"
 #include "buffer.h"
+#include "log.h"
+#include "tableOpt.h"	
 
 
 // ==================== select.cpp =====================
@@ -19,16 +23,12 @@ int projection(int dictID,char* attributename);//返回投影所在的临时表�
 
 
 // ==================== join.cpp ========================
-int createTmpTableAfterSort(Table t1,int n);
-int createTmpTable2(Table table1,Table table2,int table1_pub_attr,int table2_pub_attr);
-long getNextRecord(int emp, int k, char* emp_record);
-void insertOneRecord(int tmp_table_ID, char*res);
-
-int SortJoin(int table1loyee_dictID, int department_dictID);
 int nestedLoopJoin(int employee_dictID, int department_dictID);
-int HashJoin(int table1loyee_dictID, int department_dictID);
+int HashJoin(int employee_dictID, int department_dictID);
 int SortJoin(int table1_dictID, int table2_dictID);
-int HashJoin(int table1loyee_dictID, int department_dictID);
 int nestedLoopJoinByThree(int table1_dictID, int table2_dictID, int table3_dictID);
+
+void HashRelation( Table table1, int attrid, multimap<int, long> *mmap);//建立hash桶
+int hashToBucket(int value);
 
 #endif

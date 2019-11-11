@@ -5,7 +5,7 @@
 
 
 int main(int argc, char* argv[]) {
-	printf("====================== index_test begin ======\n");
+	printf("====================== executor_test begin ======\n");
 
 	//初始化数据库
 	DataBase DB;
@@ -23,8 +23,7 @@ int main(int argc, char* argv[]) {
 	
 	//创建表
 	char tableFile[30] = "../data/table_list";
-	int sup_dictID = createTable(tableFile);//后续需要改，要能根据parser解析结果自动创建表,目前只创建supplier表
-
+	int sup_dictID = createTable(tableFile);//后续需要改，要能根据parser解析结果自动创建表,目前只创建supplier,nation.tbl
 	//读入数据，插入记录
 	char tupleFile[30] = "../data/supplier.tbl";
 	char buff[1000];
@@ -41,6 +40,25 @@ int main(int argc, char* argv[]) {
 		printf("----- end insert line No.%d -----\n", count++);
 		//printf("%s\n", buff);
 	}
+
+	int nation_dictID = createTable2(tableFile);//后续需要改，要能根据parser解析结果自动创建表,目前只创建supplier,nation.tbl
+	//读入数据，插入记录
+	char tupleFile2[30] = "../data/nation.tbl";
+	fp = fopen(tupleFile2, "rb");
+	
+	//================ index_test ================
+	count = 0;
+	while(NULL != fgets(buff, 1000, fp))
+	{
+		strtok(buff, "\n");//使用换行符分割，相当于去掉换行符
+		//char *str = strtok(buff, "|");//使用|分割
+		Log(INFO, "----- begin insert line No.%d -----", count);
+		insertRecord(nation_dictID, buff);
+		printf("----- end insert line No.%d -----\n", count++);
+		//printf("%s\n", buff);
+	}
+
+
 	create_index("Supplier","S_SUPPKEY");
 	printf("------ creat index in %s for table %s -----\n", "Supplier","S_SUPPKEY");
 	Record *recordList;
@@ -56,19 +74,38 @@ int main(int argc, char* argv[]) {
 	drop_index("Supplier","S_SUPPKEY");
 	printf("------ drop index in %s for table %s -----\n","S_SUPPKEY","Supplier");
 
-	//================ executor_test ================
-	tableScanEqualSelector(0, "S_SUPPKEY", "Supplier#000009622");
+	//================ executor_test -- select ================
+	printf("------------------ begin ouput record == 2: ---------------------\n");
+	tableScanEqualSelector(0, "S_SUPPKEY", "2");
+	printf("------------------ begin ouput 8 >= record >= 4: ---------------------\n");
+	tableScanRangeSelector(0,"S_SUPPKEY","4","8");//根据给定的属性列上的属性值范围min-max进行选择，返回存储结果的临时表的下标
+	printf("------------------ begin ouput record <= 9: ---------------------\n");
+	tableScanMaxRangeSelector(0,"S_SUPPKEY","9");//只有max值
+	printf("------------------ begin ouput record >= 19: ---------------------\n");
+	tableScanMinRangeSelector(0,"S_SUPPKEY","19");//只有最小值
+	printf("------------------ begin ouput record != 2: ---------------------\n");
+	tableScanUnEqualSelector(0,"S_SUPPKEY","2");//非等值连接
+
+	//================ executor_test -- projection ================
+	printf("------------------ begin ouput project on S_SUPPKEY: ---------------------\n");
+	projection(0, "S_SUPPKEY");
+
+	//================ executor_test -- joint ================
+	printf("------------------ begin nestedLoopJoin: ---------------------\n");
+	nestedLoopJoin(sup_dictID, nation_dictID);
+	printf("------------------ begin HashJoin: ---------------------\n");
+	HashJoin(sup_dictID, nation_dictID);
 
 
 
-
+	printf("------------------ end executor_test ---------------------\n");
 
 	database_showDbInfo();
 
-	database_closeDB();
+	//database_closeDB();
 
 
 
 
-	printf("======================= index_test end ========\n");
+	printf("======================= executor_test end ========\n");
 }

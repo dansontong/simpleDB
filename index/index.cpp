@@ -3,6 +3,7 @@
 #include "buffer.h"
 #include "log.h"
 #include "index.h"
+#include "tableOpt.h"
 #include<stdio.h>
 
 //==================== file global variable ====================
@@ -51,7 +52,7 @@ void create_index(char *tableName,char *Attributename){
 			for(j=0;j<pagehead.recordNum;j++){
 				indexRecord.posPage=pagehead.pageNo;
 
-				file_getrecordAttribute(pagehead.pageNo,j,tableName,Attributename, tmpKey, indexRecord.posOffset);
+				getrecordAttribute(pagehead.pageNo,j,tableName,Attributename, tmpKey, indexRecord.posOffset);
 				indexRecord.key = atoi(tmpKey);									//目前只支持key值类型为int的列进行建索引。
         		indexRecord.recordID = j;
 				int value=insert(index, indexRecord);							//建立B+树索引
@@ -120,7 +121,7 @@ void insert_index(char *tableName, char *Attributename, Record* record){		//索�
 		TreeRecord indexRecord;
 		indexRecord.posPage=record->pageNo;
 		indexRecord.recordID=record->recordID;
-		file_getrecordAttribute(record->pageNo,record->recordID,tableName,Attributename,tmpKey,indexRecord.posOffset);
+		getrecordAttribute(record->pageNo,record->recordID,tableName,Attributename,tmpKey,indexRecord.posOffset);
 		indexRecord.key = atoi(tmpKey);
 
 		FILE *index;
@@ -140,7 +141,7 @@ void delete_index(char *tableName, char *Attributename, Record* record){		//索�
 	}
 	else{
 		TreeRecord indexRecord;
-		file_getrecordAttribute(record->pageNo,record->recordID,tableName,Attributename,tmpKey,indexRecord.posOffset);
+		getrecordAttribute(record->pageNo,record->recordID,tableName,Attributename,tmpKey,indexRecord.posOffset);
 		indexRecord.key = atoi(tmpKey);
 		FILE *index;
 		index=fopen("../data/indexID","rb+");

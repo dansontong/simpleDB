@@ -57,7 +57,7 @@ struct Record{
 
 // 文件管理-实现在file部分
 struct Record file_writeFile(int fileID, int length, char *str);
-int file_newFile(int type, long NeededPageNum);
+int file_newFile(FILE_TYPE fileType, long NeededPageNum);
 void file_readFile(int FileID,char *str);
 void file_deleteFile(int FileID);
 void file_read_sd(long pageNo, char *bufferpath); //提供给buffer模块，读取磁盘
@@ -78,15 +78,6 @@ void page_recover_allpages();
 
 // 段管理-实现在segment部分
 
-
-// record 
-bool getrecordbylogicID(int fileID,long logicID,char* result);//根据逻辑号获得record存入result
-long getlogicID(int fileID,long pageno,int recordno );//返回该条记录的logicID
-bool file_getrecord(long pageNo,int recordID,char *record);//record 存储返回的记录
-bool file_getrecordAttribute(long pageNo,int recordID,char* Attributename,char*Attribute,char* tablename,char* posOffset);//Attribute存储返回的属性值
-int getValueByAttrID(char *str, int index, char *result);//根据记录和属性在表头的下标返回具体的属性值
-//bool getRecord(int fileID, int recordID, char *record);//fileID->table, recordID->record
-//bool getRecordAttr(int fileID, int recordID, char AttrName char *recordAttr);//fileID->table, recordID->record
 
 
 
