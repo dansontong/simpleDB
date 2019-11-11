@@ -128,30 +128,27 @@ void insert_onerecord(int dictID,char *record){//dictID为DB->dataDict[]的下�
 		}
 	}
 }
-
-void HashRelation(Table tbl, int pub_attr, multimap<int, long> *m) {
-	int tbl_fid = tbl.fileID;
-	long pageNo = DB->dbMeta.fileMeta[tbl_fid].firstPageNo;
-	long pageNum = DB->dbMeta.fileMeta[tbl_fid].pageNum;
-
-	struct BufTag buftag;
+void HashRelation( Table table1, int attrid, multimap<int, long> *m) {
+	int fileid = table1.fileID;
+	long pageNo = DB->dbMeta.fileMeta[i].firstPageNo;
+	long pageNum = DB->dbMeta.fileMeta[i].pageNum;
+  struct PageMeta pagehead;
 	for (int i = 0; i < pageNum; i++) {
-		struct pageHead ph;
-		buftag = Buf_GenerateTag(pageNo);
-		memcpy(&ph, Buf_ReadBuffer(buftag), PAGEMETA_SIZE);
-		for (int j = 0; j < ph.curRecordNum; j++) {
+		struct BufTag buftag = Buf_GenerateTag(pageNo);
+		memcpy(&pagehead,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
+		for (int j = 0; j < pagehead.recordNum; j++) {
 			char *record = (char*)malloc(tbl.attrLength);
-			long logicID = getNextRecord(pageNo, j, record);
+			long logicID = getlogicID(fileid,pageNo,record);
 			char *val = (char*)malloc(tbl.attrLength);
-			getValueByAttrID(record, pub_attr, val);
+			getValueByAttrID(record,attid, val);
 			//暂时只考虑要进行hash的属性为int类型的情况
 			int int_val = atoi(val);
 			int bid = hashToBucket(int_val);
 			m[bid].insert(pair<int, long>(int_val, logicID));
 		}
-		if (ph.nextPageNo < 0)
+		if (pagehead.nextPageNo < 0)
 			break;
 		else
-			pageNo = ph.nextPageNo;
+			pageNo =pagehead.nextPageNo;
 	}
 }

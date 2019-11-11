@@ -355,6 +355,80 @@ int getValueByAttrID(char *str, int index, char *result){
 	}
 	return -1;
 }
+long getlogicID(int fileID,long pageno,int recordno ){
+	long count=0;
+	int querypage=-1;
+	int i;
+	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
+		if(DB->dbMeta.fileMeta[i].segList[i].id==FileID){						//
+			querypage=DB->dbMeta.fileMeta[i].segList[i].firstPageNo;			//
+			break;																//
+		}																		//
+	}
+	if(querypage==-1){
+		printf("该文件id对应的文件不存在！");
+		exit(0);
+	}
+
+	// long CurpageNo = DB->dbMeta.fileMeta[0].segList[i].firstPageNo;				
+	// long pagenum = DB->dbMeta.fileMeta[0].segList[i].pageNum;
+	long CurpageNo = DB->dbMeta.fileMeta[i].firstPageNo;				
+	long pagenum = DB->dbMeta.fileMeta[i].pageNum;
+	for(i=0;i<pagenum;i++){
+		struct BufTag buftag = Buf_GenerateTag(CurpageNo);
+		memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);
+		if(pagehead.nextPageNo=-1){
+			count = count+recordno;
+			return count;
+		}
+		else{
+			count = count+pagehead.recordNum;
+			CurpageNo = pagehead.nextPageNo;
+		}
+	}
+}
+void getrecordbylogicID(int fileID,long logicID,char* result){
+	long count = 0;
+	int querypage=-1;
+	int i;
+	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
+		if(DB->dbMeta.fileMeta[i].segList[i].id==FileID){						//
+			querypage=DB->dbMeta.fileMeta[i].segList[i].firstPageNo;			//
+			break;																//
+		}																		//
+	}
+	if(querypage==-1){
+		printf("该文件id对应的文件不存在！");
+		exit(0);
+	}
+	long CurpageNo = DB->dbMeta.fileMeta[i].firstPageNo;				
+	long pagenum = DB->dbMeta.fileMeta[i].pageNum;
+	for(i=0;i<pagenum;i++){
+		struct BufTag buftag = Buf_GenerateTag(CurpageNo);
+		memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);
+		if(pagehead.nextPageNo=-1){
+			if(count+pagehead.recordNum<logicID){
+				printf("logicID有错误！\n");
+				return false;
+			}
+			else{
+				file_getrecord(CurpageNo,recordno,result);
+				return true;
+			}
+			
+		}
+		else{
+			if(count+pagehead.recordNum>=logicID){
+				file_getrecord(CurpageNo,recordno,result);
+				return true;
+			}
+			else{
+				count+=pagehead.recordNum;
+				CurpageNo = pagehead.nextPageNo;
+			}
+		}
+	}
+}
 void file_fseek(int fileID, long offset, int fromwhere)
 {
 
