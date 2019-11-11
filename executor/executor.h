@@ -1,6 +1,7 @@
 #ifndef EXECUTOR_H_INCLUDE
 #define EXECUTOR_H_INCLUDE
 
+#include <map>
 #include "config.h"
 #include "buffer.h"
 

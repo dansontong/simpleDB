@@ -41,6 +41,9 @@ using namespace std;
 // segment
 #define SEGMENT_NUM 5       //文件的段数
 
+// hash
+#define BUCKET_NUM 100
+
 typedef enum{
 	INT_TYPE = 0,
 	LONG_TYPE = 1,

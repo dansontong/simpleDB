@@ -148,17 +148,19 @@ int SortJoin(int table1loyee_dictID, int department_dictID) {
     Table *tmp_table1 = &(DB->dataDict[tmp_table_table1]);
     Table *tmp_table2 = &(DB->dataDict[tmp_table_table2]);
 
-    long table1_pageno = DB->dbMeta.fileMeta[tmp_table1->fid].firstPageNo;
-    long table1_pagenum = DB->dbMeta.fileMeta[tmp_table1->fid].pageNum;
+    long table1_pageno = DB->dbMeta.fileMeta[tmp_table1->fileID].firstPageNo;
+    long table1_pagenum = DB->dbMeta.fileMeta[tmp_table1->fileID].pageNum;
 
-    long table2_pageno = DB->dbMeta.fileMeta[tmp_table2->fid].firstPageNo;
-    long table2_pagenum = DB->dbMeta.fileMeta[tmp_table2->fid].pageNum;
+    long table2_pageno = DB->dbMeta.fileMeta[tmp_table2->fileID].firstPageNo;
+    long table2_pagenum = DB->dbMeta.fileMeta[tmp_table2->fileID].pageNum;
 
+    struct BufTag buftag;
     for (int j = 0; j < table2_pagenum; j++)
     {
         int mapNo_table2 = page_requestPage(table2_pageno);
         struct PageMeta ph_table2;
-        memcpy(&ph_table2,  Buf_ReadBuffer(mapNo_table2), PAGEHEAD_SIZE);//PAGEHEAD_SIZE
+        buftag = Buf_GenerateTag(mapNo_table2);
+        memcpy(&ph_table2,  Buf_ReadBuffer(buftag), PAGEHEAD_SIZE);//PAGEHEAD_SIZE
         for (int i = 0; i < ph_table2.pageNo; i++)
         {
             char *record_table2 = (char*)malloc(tmp_table2->attrLength);
@@ -168,7 +170,7 @@ int SortJoin(int table1loyee_dictID, int department_dictID) {
 
             for (int x = 0; x < pageNum_table1; x++)
             {
-                int mapNo_table1 = page_requestPage(pageNo_table1);
+                int mapNo_table1 = page_requestPage(table1_pageno);
                 struct pageDB ph_table1;
                 memcpy(&ph_table1,  Buf_ReadBuffer(mapNo_table1), PAGEHEAD_SIZE);
                 bool flag = false;
@@ -232,7 +234,7 @@ int HashJoin(int table1loyee_dictID, int department_dictID){
     bool isFound = false;
     for (table1_pub_attr = 0; table1_pub_attr < table1.attrNum; table1_pub_attr++) {
         for (table2_pub_attr = 0; table2_pub_attr < table2.attrNum; table2_pub_attr++) {
-            if (table1.atb[table1_pub_attr] == table2.atb[table2_pub_attr]){
+            if (table1.attr[table1_pub_attr] == table2.attr[table2_pub_attr]){
                 isFound = true;
                 break;
             }
@@ -244,7 +246,7 @@ int HashJoin(int table1loyee_dictID, int department_dictID){
         printf("两表没有公共特性\n");
         return -1;
     }
-    int tmp_table_dictID = createTmpTable2(table1, , table1_pub_attr, table2_pub_attr);
+    int tmp_table_dictID = createTmpTable2(table1, table1_pub_attr, table2_pub_attr);
     if (tmp_table_dictID < 0){
         printf("创建临时表失败\n");
         return -1;
@@ -301,7 +303,7 @@ int SortJoin(int table1_dictID, int table2_dictID) {
     bool isFound = false;
     for (table1_pub_attr = 0; table1_pub_attr < table1.attributeNum; table1_pub_attr++) {
         for (table2_pub_attr = 0; table2_pub_attr < table2.attributeNum; table2_pub_attr++) {
-            if (table1.atb[table1_pub_attr] == table2.attr[table2_pub_attr]){
+            if (table1.attr[table1_pub_attr].name == table2.attr[table2_pub_attr].name){
                 isFound = true;
                 break;
             }
@@ -327,11 +329,11 @@ int SortJoin(int table1_dictID, int table2_dictID) {
     Table *tmp_table1 = &(DB->dataDict[tmp_table_table1]);
     Table *tmp_table2 = &(DB->dataDict[tmp_table_table2]);
 
-    long table1_pageno = DB->dbMeta.fileMeta[tmp_table1->fid].firstPageNo;
-    long table1_pagenum = DB->dbMeta.fileMeta[tmp_table1->fid].pageNum;
+    long table1_pageno = DB->dbMeta.fileMeta[tmp_table1->fileID].firstPageNo;
+    long table1_pagenum = DB->dbMeta.fileMeta[tmp_table1->fileID].pageNum;
 
-    long table2_pageno = DB->dbMeta.fileMeta[tmp_table2->fid].firstPageNo;
-    long table2_pagenum = DB->dbMeta.fileMeta[tmp_table2->fid].pageNum;
+    long table2_pageno = DB->dbMeta.fileMeta[tmp_table2->fileID].firstPageNo;
+    long table2_pagenum = DB->dbMeta.fileMeta[tmp_table2->fileID].pageNum;
 
     for (int j = 0; j < table2_pagenum; j++) {
         int mapNo_table2 = page_requestPage(table2_pageno);
@@ -397,7 +399,7 @@ int HashJoin(int table1loyee_dictID, int department_dictID){
     bool isFound = false;
     for (table1_pub_attr = 0; table1_pub_attr < table1.attrNum; table1_pub_attr++) {
         for (table2_pub_attr = 0; table2_pub_attr < table2.attrNum; table2_pub_attr++) {
-            if (table1.atb[table1_pub_attr] == table2.atb[table2_pub_attr]){
+            if (table1.attr[table1_pub_attr] == table2.attr[table2_pub_attr]){
                 isFound = true;
                 break;
             }
@@ -458,15 +460,14 @@ int HashJoin(int table1loyee_dictID, int department_dictID){
 }
 
 
-int nestedLoopJoinByThree(int table1_dictID, int table2_dictID, int table2_dictID){
+int nestedLoopJoinByThree(int table1_dictID, int table2_dictID, int table3_dictID){
     Table table1 = DB->dataDict[table1_dictID]; 
-    Table table2 = DB->dataDict[table2_dictID]; 
     Table table2 = DB->dataDict[table2_dictID];
 
     int table1_pub_attr = 0, table2_pub_attr = 0;
     bool isFound = false;
     for (table1_pub_attr = 0; table1_pub_attr < table1.attrNum; table1_pub_attr++) {
-        for (table2_pub_attr = 0; table2_pub_attr < table2.attrNum; ttable2_pub_attr++) {
+        for (table2_pub_attr = 0; table2_pub_attr < table2.attrNum; table2_pub_attr++) {
             if (table1.attr[table1_pub_attr] == table2.attr[table2_pub_attr]){
                 isFound = true;
                 break;
@@ -486,7 +487,6 @@ int nestedLoopJoinByThree(int table1_dictID, int table2_dictID, int table2_dictI
     int table2_fid = table2.fileID;
     long table2_pageNo = DB->dbMeta.fileMeta[table2_fid].firstPageNo;
     long table2_pageNum = DB->dbMeta.fileMeta[table2_fid].pageNum;
-
 
     int tmp_table_dictID = createTmpTable2(table1, table2, table1_pub_attr, table2_pub_attr);
     if (tmp_table_dictID < 0){
