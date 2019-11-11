@@ -7,8 +7,8 @@
 extern struct DataBase *DB; /* 全局共享 */
 
 int tableScanEqualSelector(int dictID,char* attri_name,char* value){
-	Table table1 = DB->dataDict[dictID].fileID;
-	int fileID = tablel.fileID;
+	Table table1 = DB->dataDict[dictID];
+	int fileID = table1.fileID;
 	int querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
@@ -21,8 +21,8 @@ int tableScanEqualSelector(int dictID,char* attri_name,char* value){
 		printf("该表应的文件不存在！");
 		exit(0);
 	}
-	long pageno = DB->dbMeta.fileMeta[fileID].fileFirstPageNo;
-	long pagenum = head->desc.fileMeta[fileID].filePageNum;
+	long pageno = DB->dbMeta.fileMeta[fileID].firstPageNo;
+	long pagenum = DB->dbMeta.fileMeta[fileID].pageNum;
 	int tmptable = create_tmptable(table1);
 	if(tmptable<0){
 		printf("创建临时表失败！\n");
@@ -39,7 +39,7 @@ int tableScanEqualSelector(int dictID,char* attri_name,char* value){
 	}
 	for(i=0;i<pagenum;i++){
 		struct PageMeta pagehead;
-		struct BufTag buftag = Buf_GenerateTag(CurpageNo);
+		struct BufTag buftag = Buf_GenerateTag(pageno);
 		memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);
 		for(int j=0;j<pagehead.recordNum;j++){
 			char *record = (char*)malloc(100);//暂定该表的记录长度为100
@@ -65,8 +65,8 @@ int tableScanEqualSelector(int dictID,char* attri_name,char* value){
 	return tmptable;
 }
 int tableScanRangeSelector(int dictID,char* attri_name,char* min,char* max){
-	Table table1 = DB->dataDict[dictID].fileID;
-	int fileID = tablel.fileID;
+	Table table1 = DB->dataDict[dictID];
+	int fileID = table1.fileID;
 	int querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
@@ -79,8 +79,8 @@ int tableScanRangeSelector(int dictID,char* attri_name,char* min,char* max){
 		printf("该表应的文件不存在！");
 		exit(0);
 	}
-	long pageno = DB->dbMeta.fileMeta[fileID].fileFirstPageNo;
-	long pagenum = head->desc.fileMeta[fileID].filePageNum;
+	long pageno = DB->dbMeta.fileMeta[fileID].firstPageNo;
+	long pagenum = DB->dbMeta.fileMeta[fileID].pageNum;
 	int tmptable = create_tmptable(table1);
 	if(tmptable<0){
 		printf("创建临时表失败！\n");
@@ -134,8 +134,8 @@ int tableScanRangeSelector(int dictID,char* attri_name,char* min,char* max){
 	return tmptable;
 }
 int tableScanUnEqualSelector(int dictID,char* attri_name,char* value){//非等值连接
-	Table table1 = DB->dataDict[dictID].fileID;
-	int fileID = tablel.fileID;
+	Table table1 = DB->dataDict[dictID];
+	int fileID = table1.fileID;
 	int querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
@@ -148,8 +148,8 @@ int tableScanUnEqualSelector(int dictID,char* attri_name,char* value){//非等�
 		printf("该表应的文件不存在！");
 		exit(0);
 	}
-	long pageno = DB->dbMeta.fileMeta[fileID].fileFirstPageNo;
-	long pagenum = head->desc.fileMeta[fileID].filePageNum;
+	long pageno = DB->dbMeta.fileMeta[fileID].firstPageNo;
+	long pagenum = DB->dbMeta.fileMeta[fileID].pageNum;
 	int tmptable = create_tmptable(table1);
 	if(tmptable<0){
 		printf("创建临时表失败！\n");
@@ -192,8 +192,8 @@ int tableScanUnEqualSelector(int dictID,char* attri_name,char* value){//非等�
 	return tmptable;
 }
 int tableScanMinRangeSelector(int dictID,char* attri_name,char* min){//只有最小值
-	Table table1 = DB->dataDict[dictID].fileID;
-	int fileID = tablel.fileID;
+	Table table1 = DB->dataDict[dictID];
+	int fileID = table1.fileID;
 	int querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
@@ -206,8 +206,8 @@ int tableScanMinRangeSelector(int dictID,char* attri_name,char* min){//只有最
 		printf("该表应的文件不存在！");
 		exit(0);
 	}
-	long pageno = DB->dbMeta.fileMeta[fileID].fileFirstPageNo;
-	long pagenum = head->desc.fileMeta[fileID].filePageNum;
+	long pageno = DB->dbMeta.fileMeta[fileID].firstPageNo;
+	long pagenum = DB->dbMeta.fileMeta[fileID].pageNum;
 	int tmptable = create_tmptable(table1);
 	if(tmptable<0){
 		printf("创建临时表失败！\n");
@@ -261,8 +261,8 @@ int tableScanMinRangeSelector(int dictID,char* attri_name,char* min){//只有最
 	return tmptable;
 }
 int tableScanMaxRangeSelector(int dictID,char* attri_name,char* max){//只有max值
-	Table table1 = DB->dataDict[dictID].fileID;
-	int fileID = tablel.fileID;
+	Table table1 = DB->dataDict[dictID];
+	int fileID = table1.fileID;
 	int querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
@@ -275,8 +275,8 @@ int tableScanMaxRangeSelector(int dictID,char* attri_name,char* max){//只有max
 		printf("该表应的文件不存在！");
 		exit(0);
 	}
-	long pageno = DB->dbMeta.fileMeta[fileID].fileFirstPageNo;
-	long pagenum = head->desc.fileMeta[fileID].filePageNum;
+	long pageno = DB->dbMeta.fileMeta[fileID].firstPageNo;
+	long pagenum = DB->dbMeta.fileMeta[fileID].pageNum;
 	int tmptable = create_tmptable(table1);
 	if(tmptable<0){
 		printf("创建临时表失败！\n");

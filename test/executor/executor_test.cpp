@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
 	printf("------ drop index in %s for table %s -----\n","S_SUPPKEY","Supplier");
 
 	//================ executor_test ================
-	tableScanEqualSelector(0, )
+	tableScanEqualSelector(0, "S_SUPPKEY", "Supplier#000009622");
 
 
 
