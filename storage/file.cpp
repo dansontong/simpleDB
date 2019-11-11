@@ -360,7 +360,7 @@ long getlogicID(int fileID,long pageno,int recordno ){
 	int querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
-		if(DB->dbMeta.fileMeta[i].segList[i].id==FileID){						//
+		if(DB->dbMeta.fileMeta[i].segList[i].id==fileID){						//
 			querypage=DB->dbMeta.fileMeta[i].segList[i].firstPageNo;			//
 			break;																//
 		}																		//
@@ -374,9 +374,10 @@ long getlogicID(int fileID,long pageno,int recordno ){
 	// long pagenum = DB->dbMeta.fileMeta[0].segList[i].pageNum;
 	long CurpageNo = DB->dbMeta.fileMeta[i].firstPageNo;				
 	long pagenum = DB->dbMeta.fileMeta[i].pageNum;
+	struct PageMeta pagehead;
 	for(i=0;i<pagenum;i++){
 		struct BufTag buftag = Buf_GenerateTag(CurpageNo);
-		memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);
+		memcpy(&pagehead,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
 		if(pagehead.nextPageNo=-1){
 			count = count+recordno;
 			return count;
@@ -387,12 +388,12 @@ long getlogicID(int fileID,long pageno,int recordno ){
 		}
 	}
 }
-void getrecordbylogicID(int fileID,long logicID,char* result){
+bool getrecordbylogicID(int fileID,long logicID,char* result){
 	long count = 0;
 	int querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
-		if(DB->dbMeta.fileMeta[i].segList[i].id==FileID){						//
+		if(DB->dbMeta.fileMeta[i].segList[i].id==fileID){						//
 			querypage=DB->dbMeta.fileMeta[i].segList[i].firstPageNo;			//
 			break;																//
 		}																		//
@@ -403,9 +404,10 @@ void getrecordbylogicID(int fileID,long logicID,char* result){
 	}
 	long CurpageNo = DB->dbMeta.fileMeta[i].firstPageNo;				
 	long pagenum = DB->dbMeta.fileMeta[i].pageNum;
+	struct PageMeta pagehead;
 	for(i=0;i<pagenum;i++){
 		struct BufTag buftag = Buf_GenerateTag(CurpageNo);
-		memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);
+		memcpy(&pagehead,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
 		if(pagehead.nextPageNo=-1){
 			if(count+pagehead.recordNum<logicID){
 				printf("logicID有错误！\n");
@@ -415,7 +417,6 @@ void getrecordbylogicID(int fileID,long logicID,char* result){
 				file_getrecord(CurpageNo,recordno,result);
 				return true;
 			}
-			
 		}
 		else{
 			if(count+pagehead.recordNum>=logicID){
@@ -428,6 +429,7 @@ void getrecordbylogicID(int fileID,long logicID,char* result){
 			}
 		}
 	}
+	return false;
 }
 void file_fseek(int fileID, long offset, int fromwhere)
 {
