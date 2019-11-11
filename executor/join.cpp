@@ -115,9 +115,12 @@ int SortJoin(int table1loyee_dictID, int department_dictID) {
     
     int table1_pub_attr = 0, table2_pub_attr = 0;
     bool isFound = false;
-    for (table1_pub_attr = 0; table1_pub_attr < table1.attrNum; table1_pub_attr++) {
-        for (table2_pub_attr = 0; table2_pub_attr < table2.attrNum; table2_pub_attr++) {
-            if (table1.attr[table1_pub_attr]==table2.attr[table2_pub_attr]){
+    for (table1_pub_attr = 0; table1_pub_attr < table1.attrNum; table1_pub_attr++)
+    {
+        for (table2_pub_attr = 0; table2_pub_attr < table2.attrNum; table2_pub_attr++)
+        {
+            if (table1.attr[table1_pub_attr]==table2.attr[table2_pub_attr])
+            {
                 isFound = true;
                 break;
             }
@@ -125,12 +128,14 @@ int SortJoin(int table1loyee_dictID, int department_dictID) {
         if (isFound)
             break;
     }
-    if (isFound == false) {
+    if (isFound == false)
+    {
         printf("两表没有公用属性\n");
         return -1;
     }
     int tmp_table_dictID = createTmpTable2(DB, table1, table2, table1_pub_attr, table2_pub_attr);
-    if (tmp_table_dictID < 0){
+    if (tmp_table_dictID < 0)
+    {
         printf("创建临时表失败\n");
         return -1;
     }
@@ -147,29 +152,34 @@ int SortJoin(int table1loyee_dictID, int department_dictID) {
     long table1_pagenum = DB->dbMeta.fileMeta[tmp_table1->fid].filePageNum;
 
     long table2_pageno = DB->dbMeta.fileMeta[tmp_table2->fid].fileFirstPageNo;
-    long table2_pagenum = DB->dbMeta.fileMeta[tmp_table2->fid.filePageNum;
+    long table2_pagenum = DB->dbMeta.fileMeta[tmp_table2->fid].filePageNum;
 
-    for (int j = 0; j < table2_pagenum; j++) {
+    for (int j = 0; j < table2_pagenum; j++)
+    {
         int mapNo_table2 = reqPage(DB, table2_pageno);
         struct PageMeta ph_table2;
         memcpy(&ph_table2,  Buf_ReadBuffer(mapNo_table2), SIZE_PAGEDB);//SIZE_PAGEDB
-        for (int i = 0; i < ph_table2.pageNo; i++) {
+        for (int i = 0; i < ph_table2.pageNo; i++)
+        {
             char *record_table2 = (char*)malloc(tmp_table2->attrLength);
             getNextRecord(DB, mapNo_table2, i, record_table2);
             char *val_table2 = (char*)malloc(strlen(record_table2));
             int pd = getValueByAttrID(record_table2, table2_pub_attr, val_table2);
 
-            for (int x = 0; x < pageNum_table1; x++) {
+            for (int x = 0; x < pageNum_table1; x++)
+            {
                 int mapNo_table1 = reqPage(DB, pageNo_table1);
                 struct pageDB ph_table1;
-                memcpy(&ph_table1,  Buf_ReadBuffer(mapNo_table1), SIZE_PAGEDB;
+                memcpy(&ph_table1,  Buf_ReadBuffer(mapNo_table1), SIZE_PAGEDB);
                 bool flag = false;
-                for (int y = 0; y < ph_table1.pageNo; y++){
+                for (int y = 0; y < ph_table1.pageNo; y++)
+                {
                     char *record_table1 = (char*)malloc(tmp_table1->attrLength);
                     getNextRecord(DB, mapNo_table1, y, record_table1);
                     char* val_table1 = (char*)malloc(strlen(record_table1));
                     getValueByAttrID(record_table1, table1_pub_attr, val_table1);
-                    if (strcmp(val_table1, val_table2) == 0){
+                    if (strcmp(val_table1, val_table2) == 0)
+                    {
                         char *result = (char*)malloc(tmp->attrLength);
                         memset(result, 0, tmp->attrLength);
                         strcpy(result, record_table1);
@@ -178,28 +188,38 @@ int SortJoin(int table1loyee_dictID, int department_dictID) {
                         strcat(result, record_table2 + pd + strlen(val_table2) + 1);
                         insertOneRecord(DB, tmp_table_dictID, result);
                     }
-                    else if (strcmp(val_table1, val_table2) > 0){
+                    else if (strcmp(val_table1, val_table2) > 0)
+                    {
                         flag = true;
                         break;
                     }
-                    else {
+                    else
+                    {
                         continue;
                     }
                 }
                 if (flag)
+                {
                     break;
+                }
                 if (ph_table1.nextPageNo < 0)
+                {
                     break;
+                }
                 else
+                {
                     pageNo_table1 = ph_table1.nextPageNo;
+                }
             }
-
         }
         if (ph_table2.nextPageNo < 0)
+        {
             break;
+        }
         else
+        {
             table2_pageno = ph_table2.nextPageNo;
-
+        }
     }
     return tmp_table_dictID;
 }
