@@ -128,11 +128,11 @@ void insert_onerecord(int dictID,char *record){//dictID为DB->dataDict[]的下�
 		}
 	}
 }
-void HashRelation( Table table1, int attrid, multimap<int, long> *m) {
-	int fileid = table1.fileID;
-	long pageNo = DB->dbMeta.fileMeta[i].firstPageNo;
-	long pageNum = DB->dbMeta.fileMeta[i].pageNum;
-  struct PageMeta pagehead;
+void HashRelation( Table tbl, int attrid, multimap<int, long> *m) {
+	int fileid = tbl.fileID;
+	long pageNo = DB->dbMeta.fileMeta[fileid].firstPageNo;
+	long pageNum = DB->dbMeta.fileMeta[fileid].pageNum;
+  	struct PageMeta pagehead;
 	for (int i = 0; i < pageNum; i++) {
 		struct BufTag buftag = Buf_GenerateTag(pageNo);
 		memcpy(&pagehead,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
@@ -149,6 +149,6 @@ void HashRelation( Table table1, int attrid, multimap<int, long> *m) {
 		if (pagehead.nextPageNo < 0)
 			break;
 		else
-			pageNo =pagehead.nextPageNo;
+			pageNo = pagehead.nextPageNo;
 	}
 }

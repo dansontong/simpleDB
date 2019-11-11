@@ -80,7 +80,7 @@ void page_recover_allpages();
 
 
 // record 
-void getrecordbylogicID(int fileID,long logicID,char* result);//根据逻辑号获得record存入result
+bool getrecordbylogicID(int fileID,long logicID,char* result);//根据逻辑号获得record存入result
 long getlogicID(int fileID,long pageno,int recordno );//返回该条记录的logicID
 bool file_getrecord(long pageNo,int recordID,char *record);//record 存储返回的记录
 bool file_getrecordAttribute(long pageNo,int recordID,char* Attributename,char*Attribute,char* tablename,char* posOffset);//Attribute存储返回的属性值
