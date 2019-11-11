@@ -11,8 +11,8 @@ extern struct DataBase *DB; /* 全局共享 */
 // 	DB = db;
 // }
 
-int creat_tmptable(Table table_1){
-	int fileID = file_newfile(0,type,1);//0文件类型的标识值，0表示为临时表，type为段的标识值。
+int create_tmptable(Table table_1){
+	int fileID = file_newFile(0,1);//0文件类型的标识值，0表示为临时表，type为段的标识值。
 	int dictID = -1;
 	for(int i=0;i<MAX_FILE_NUM; i++){
 		if(DB->dataDict[i].fileID<0){
@@ -35,7 +35,7 @@ void insert_onerecord(int dictID,char *record){//dictID为DB->dataDict[]的下�
 	int querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
-		if(DB->dbMeta.fileMeta[i].id==FileID){						//
+		if(DB->dbMeta.fileMeta[i].id==fileID){						//
 			querypage=DB->dbMeta.fileMeta[i].firstPageNo;			//
 			break;																//
 		}																		//
@@ -94,7 +94,7 @@ void insert_onerecord(int dictID,char *record){//dictID为DB->dataDict[]的下�
 		pagehead.freeSpace=pagehead.freeSpace-length-sizeofrecord;
 		memcpy(Buf_ReadBuffer(buftag),&pagehead,sizeofpagehead);
 		memcpy(Buf_ReadBuffer(buftag)+currecordpos,&curoffset,sizeofrecord);
-		memcpy(Buf_ReadBuffer(buftag)+curoffsetpos,str,length);
+		memcpy(Buf_ReadBuffer(buftag)+curoffsetpos,record,length);
 		break;						//找到后就break
 	}
 	if(!isfound){					//若遍历完没有页就新申请一个页。
@@ -117,7 +117,7 @@ void insert_onerecord(int dictID,char *record){//dictID为DB->dataDict[]的下�
 			buftag = Buf_GenerateTag(pagenum);
 			memcpy(Buf_ReadBuffer(buftag),&pagemeta,sizeofpagehead);
 			memcpy(Buf_ReadBuffer(buftag)+currecordpos,&curoffset,sizeofrecord);
-			memcpy(Buf_ReadBuffer(buftag)+curoffsetpos,str,length);
+			memcpy(Buf_ReadBuffer(buftag)+curoffsetpos,record,length);
 			memcpy(Buf_ReadBuffer(buftag),&pagehead,sizeofpagehead);
 
 			DB->dbMeta.fileMeta[fileno].pageNum++;
