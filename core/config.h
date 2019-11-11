@@ -18,7 +18,7 @@ using namespace std;
 #define FILE_DATA_SIZE (256*1024*1024)// 文件数据区大小256M，单位字节
 #define FILE_DATA_ADDR (BIT_MAP_ADDR + BIT_MAP_SIZE)         // 数据区起始位置
 #define BIT_MAP_SIZE (FILE_DATA_SIZE / BLOCK_SIZE / 8) // 位示图大小
-#define BIT_MAP_ADDR 1024               // 位示图起始位置 
+#define BIT_MAP_ADDR 2048               // 位示图起始位置 
 #define MAX_NAME_LENGTH 50              //表名,属性名等名字的最大长度
 #define MAX_ATTRIBUTE_NUM 20            //表中属性个数上限
 //TODO: 需测试确保dbMeta不会超出1024，否则位示图数据将会与之重叠，会出现未知错误

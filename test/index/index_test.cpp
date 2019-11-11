@@ -11,8 +11,8 @@ int main(int argc, char* argv[]) {
 	char dbFile[30] = "../data/simpleDb";
 
 	log_init("../data/DBrun.log");//初始化日志系统
-	database_initDB(&DB, dbFile);
 	Buf_Init();
+	database_initDB(&DB, dbFile);
 
 	log_Debug("DB initial done.\n");
 

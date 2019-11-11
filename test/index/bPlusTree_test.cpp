@@ -9,7 +9,7 @@ using namespace std;
 
 //#define INDEX_DAT "b_plus_tree_index.dat"
 
-#define INDEX_DAT "../../data/b_plus_tree_index.dat"
+#define INDEX_DAT "./b_plus_tree_index.dat"
 
 
 int main()
@@ -25,7 +25,7 @@ int main()
 	if (fp == NULL){
 		printf("index is null,rebuild index....\n");//索引文件不存在，重新建立索引
 		FILE *fp_create;
-		fp_create=fopen (INDEX_DAT, "wb");
+		fp_create=fopen(INDEX_DAT, "wb");
 		fclose(fp_create);
 		fp=fopen(INDEX_DAT, "rb+");
 		if (fp == NULL){
