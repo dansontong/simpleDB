@@ -2,6 +2,7 @@
 #include "database.h"
 #include "buffer.h"
 #include "log.h"
+#include "executor.h"
 
 //==================== global variable ====================
 extern struct DataBase *DB; /* 全局共享 */
@@ -131,16 +132,14 @@ void HashRelation( Table table1, int attrid, multimap<int, long> *m) {
 	int fileid = table1.fileID;
 	long pageNo = DB->dbMeta.fileMeta[i].firstPageNo;
 	long pageNum = DB->dbMeta.fileMeta[i].pageNum;
-	int sizeofpagehead = sizeof(struct PageMeta);
-	int sizeofrecord = sizeof(struct OffsetInPage);	
+  struct PageMeta pagehead;
 	for (int i = 0; i < pageNum; i++) {
-		struct PageMeta pagehead;
-		struct BufTag buftag = Buf_GenerateTag(CurpageNo);
-		memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);
+		struct BufTag buftag = Buf_GenerateTag(pageNo);
+		memcpy(&pagehead,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
 		for (int j = 0; j < pagehead.recordNum; j++) {
-			char *record = (char*)malloc(100);
+			char *record = (char*)malloc(tbl.attrLength);
 			long logicID = getlogicID(fileid,pageNo,record);
-			char *val = (char*)malloc(100);
+			char *val = (char*)malloc(tbl.attrLength);
 			getValueByAttrID(record,attid, val);
 			//暂时只考虑要进行hash的属性为int类型的情况
 			int int_val = atoi(val);

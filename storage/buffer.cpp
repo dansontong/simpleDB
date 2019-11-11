@@ -217,7 +217,7 @@ long Buf_StrategyLRU()
             }
         }
     } while (buf_id == -1);
-    printf("buf schedule buf_id:%d\n", buf_id);
+    printf("buf schedule buf_id:%ld\n", buf_id);
     assert(buf_id >= 0 && buf_id < BUFFER_NUM);
     return buf_id;
 }
