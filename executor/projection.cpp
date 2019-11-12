@@ -70,9 +70,9 @@ int projection(int dictID, char* attrName){//attributename为投影所需的所�
 			getRecord(CurpageNo, j, record);
 			memset(new_record, 0, RECORD_MAX_SIZE);
 			memset(attribute, 0, RECORD_MAX_SIZE);
-			for(int m=0;m<attrNum;m++)
+			for(int m=0; m<attrNum; m++)
 			{
-				int flag = getValueByAttrID(record,attrIndex[m], attribute);
+				int flag = getValueByAttrID(record, attrIndex[m], attribute);
 				if(flag<0)
 				{
 					printf("error:获取属性值失败\n");
@@ -93,16 +93,16 @@ int projection(int dictID, char* attrName){//attributename为投影所需的所�
 				}
 				
 			}
-			insertOneRecord(dictID,new_record);
+			insertRecord(tmpDictID, new_record);
 			printf("project on attribute %s: %s\n", attrName, new_record);
-			if(pageMeta.nextPageNo<0)
-			{
-				break;
-			}
-			else
-			{
-				CurpageNo=pageMeta.nextPageNo;
-			}
+		}
+		if(pageMeta.nextPageNo<0)
+		{
+			break;
+		}
+		else
+		{
+			CurpageNo=pageMeta.nextPageNo;
 		}
 		break; // temp: if-not, there're  too many records
 	}

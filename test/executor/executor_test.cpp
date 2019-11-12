@@ -58,9 +58,29 @@ int main(int argc, char* argv[]) {
 		//printf("%s\n", buff);
 	}
 
+	// test pageNo & recordNum
+	int fileID = DB.dataDict[nation_dictID].fileID;
+	long CurpageNo = DB.dbMeta.fileMeta[fileID].firstPageNo;				
+	long pageNum = DB.dbMeta.fileMeta[fileID].pageNum;
+	struct BufTag buftag = Buf_GenerateTag(CurpageNo);
+	struct PageMeta pageMeta;
+	memcpy(&pageMeta,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
+	printf("after insert table2: ==--==--==--==--== pageNo:%d, recordNum: %d ==--==--==--==--== \n", CurpageNo, pageMeta.recordNum);
+
 
 	create_index("Supplier","S_SUPPKEY");
 	printf("------ creat index in %s for table %s -----\n", "Supplier","S_SUPPKEY");
+	
+
+	// fileID = DB.dataDict[nation_dictID].fileID;
+	// CurpageNo = DB.dbMeta.fileMeta[fileID].firstPageNo;				
+	// pageNum = DB.dbMeta.fileMeta[fileID].pageNum;
+	// buftag = Buf_GenerateTag(CurpageNo);
+	// memcpy(&pageMeta,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
+	// printf("after create_index: ==--==--==--==--== pageNo:%d, recordNum: %d ==--==--==--==--== \n", CurpageNo, pageMeta.recordNum);
+
+
+
 	Record *recordList;
 	recordList = searchRecord("Supplier","S_SUPPKEY","Not_exist_for_test");
 	recordList = searchRecord("Supplier","S_SUPPKEY","9840");
@@ -74,9 +94,27 @@ int main(int argc, char* argv[]) {
 	drop_index("Supplier","S_SUPPKEY");
 	printf("------ drop index in %s for table %s -----\n","S_SUPPKEY","Supplier");
 
+
+	fileID = DB.dataDict[nation_dictID].fileID;
+	CurpageNo = DB.dbMeta.fileMeta[fileID].firstPageNo;				
+	pageNum = DB.dbMeta.fileMeta[fileID].pageNum;
+	buftag = Buf_GenerateTag(CurpageNo);
+	memcpy(&pageMeta,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
+	printf("after drop_index: ==--==--==--==--== pageNo:%d, recordNum: %d ==--==--==--==--== \n", CurpageNo, pageMeta.recordNum);
+
+
 	//================ executor_test -- projection ================
 	printf("------------------ begin ouput project on S_SUPPKEY: ---------------------\n");
 	projection(0, "S_SUPPKEY");
+
+
+	fileID = DB.dataDict[nation_dictID].fileID;
+	CurpageNo = DB.dbMeta.fileMeta[fileID].firstPageNo;				
+	pageNum = DB.dbMeta.fileMeta[fileID].pageNum;
+	buftag = Buf_GenerateTag(CurpageNo);
+	memcpy(&pageMeta,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
+	printf("after projection: ==--==--==--==--== pageNo:%d, recordNum: %d ==--==--==--==--== \n", CurpageNo, pageMeta.recordNum);
+
 
 	//================ executor_test -- select ================
 	printf("------------------ begin ouput record == 2: ---------------------\n");

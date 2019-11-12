@@ -109,9 +109,15 @@ int nestedLoopJoin(int employee_dictID, int department_dictID) {
                 }
 
             }
+            if(z > 2)
+            {
+                break;// temp: if-not, there're  too many records
+            }
+            
             if (table1_pm.nextPageNo < 0)  break;
             else table1_pageno = table1_pm.nextPageNo;
         }
+        
     }
 
     return tmp_table_ID;
@@ -126,7 +132,7 @@ int HashJoin(int table1_dictID, int department_dictID){
     bool isFound = false;
     for (table1_pub_attr = 0; table1_pub_attr < table1.attrNum; table1_pub_attr++) {
         for (table2_pub_attr = 0; table2_pub_attr < table2.attrNum; table2_pub_attr++) {
-            if (table1.attr[table1_pub_attr].name == table2.attr[table2_pub_attr].name){
+            if (strcmp(table1.attr[table1_pub_attr].name, table2.attr[table2_pub_attr].name) == 0){
                 isFound = true;
                 break;
             }
@@ -151,26 +157,31 @@ int HashJoin(int table1_dictID, int department_dictID){
     HashRelation(table1, table1_pub_attr, m_table1);//HashRelation
     HashRelation(table2, table2_pub_attr, m_table2);//HashRelation
 
+    char* record_table1 = (char*)malloc(table1.recordLength);
+    char* record_table2 = (char*)malloc(table2.recordLength);
+    char *res = (char*)malloc(tmp->recordLength);
+    printf("table1.recordLength: %d\n", table1.recordLength);
+    printf("table2.recordLength: %d\n", table1.recordLength);
+    printf("tmp.recordLength: %d\n", tmp->recordLength);
+
     for (int i = 0; i < BUCKET_NUM; i++) {
         map<int, long>::iterator it_table1, it_table2;
         for (it_table2 = m_table2[i].begin(); it_table2 != m_table2[i].end(); it_table2++) {
             for (it_table1 = m_table1[i].begin(); it_table1 != m_table1[i].end(); it_table1++){
                 if (it_table1->first == it_table2->first){
-                    char* record_table1 = (char*)malloc(table1.recordLength);
-                    char* record_table2 = (char*)malloc(table2.recordLength);
                     getRecordByLogicID(table1.fileID, it_table1->second, record_table1);
                     getRecordByLogicID(table2.fileID, it_table2->second, record_table2);
 
                     char* val_table2 = new char[strlen(record_table2)];
                     int pd = getValueByAttrID(record_table2, table2_pub_attr, val_table2);
 
-                    char *res = (char*)malloc(tmp->recordLength);
                     memset(res, 0, tmp->recordLength);
                     strcpy(res, record_table1);
                     strcat(res, "|");
                     strncat(res, record_table2, pd);
                     strcat(res, record_table2 + pd + strlen(val_table2) + 1);
                     insertRecord(tmp_table_dictID, res);
+                    delete(val_table2);
                 }
                 else if (it_table1->first > it_table2->first) {
                     break;

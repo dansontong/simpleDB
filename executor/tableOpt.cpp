@@ -114,7 +114,7 @@ bool getRecordByLogicID(int fileID,long logicID,char* result){  // logicID is ma
 		printf("该文件id对应的文件不存在！");
 		exit(0);
 	}
-	long CurpageNo = DB->dbMeta.fileMeta[i].firstPageNo;				
+	long CurpageNo = DB->dbMeta.fileMeta[i].firstPageNo;
 	long pagenum = DB->dbMeta.fileMeta[i].pageNum;
 	struct PageMeta pageMeta;
 	int recordNo;

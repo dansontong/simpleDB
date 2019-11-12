@@ -168,6 +168,7 @@ struct Record file_writeFile(int FileID, int length,char *str){
 	}
 	record.pageNo = CurpageNo;
 	record.recordID = curoffset.recordID;
+	printf("----------------------- pagemeta.recordNum: %d -------------------\n", pageMeta.recordNum);
 	return record;
 }
 void file_readFile(int FileID,char *str){
