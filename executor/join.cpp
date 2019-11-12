@@ -59,6 +59,8 @@ int nestedLoopJoin(int employee_dictID, int department_dictID) {
     char *table2_value = (char*)malloc(RECORD_MAX_SIZE);
     // char *res = (char*)malloc(tmp->recordLength);
     char *res = (char*)malloc(RECORD_MAX_SIZE*2);
+
+    int count = 0;
     for (int x = 0; x < outer; x++){
         for (int y = 0; y < BUFFER_NUM - 1 && y < table2_pagenum; y++) {
             struct PageMeta ph;
@@ -100,19 +102,19 @@ int nestedLoopJoin(int employee_dictID, int department_dictID) {
                             strcpy(res, table1_record);
                             strcat(res, "|");
                             strncat(res, table2_record, pd);
-                            printf("=========== table2_value: %s, table2_record: %s, pd: %d.\n", table2_value, table2_record, pd);
+                            // printf("=========== table2_value: %s, table2_record: %s, pd: %d.\n", table2_value, table2_record, pd);
                             strcat(res, table2_record + pd + strlen(table2_value) + 1);
                             insertRecord(tmp_table_ID, res);//head
-                            printf("=========== join-tmpTable on attr %s, tmpRecord: %s.\n", table1.attr[table1_pub_attr].name, res);
+                            printf("===== Nest-Join-tmpTable on attr:%s, value:%s, tmpRecord:%.60s.\n", table1.attr[table1_pub_attr].name,table2_value, res);
+
+                            if(++count>15) break;// temp: if-not, there're  too many records
                         }
                     }
+                    
                 }
-
-            }
-            if(z > 2)
-            {
                 break;// temp: if-not, there're  too many records
             }
+            if(z > 1) break;// temp: if-not, there're  too many records
             
             if (table1_pm.nextPageNo < 0)  break;
             else table1_pageno = table1_pm.nextPageNo;
@@ -164,11 +166,16 @@ int HashJoin(int table1_dictID, int department_dictID){
     printf("table2.recordLength: %d\n", table1.recordLength);
     printf("tmp.recordLength: %d\n", tmp->recordLength);
 
-    for (int i = 0; i < BUCKET_NUM; i++) {
+    int count = 0;
+    for (int i = 0; i < BUCKET_NUM; i++)
+    {
         map<int, long>::iterator it_table1, it_table2;
-        for (it_table2 = m_table2[i].begin(); it_table2 != m_table2[i].end(); it_table2++) {
-            for (it_table1 = m_table1[i].begin(); it_table1 != m_table1[i].end(); it_table1++){
-                if (it_table1->first == it_table2->first){
+        for (it_table2 = m_table2[i].begin(); it_table2 != m_table2[i].end(); it_table2++)
+        {
+            for (it_table1 = m_table1[i].begin(); it_table1 != m_table1[i].end(); it_table1++)
+            {
+                if (it_table1->first == it_table2->first)
+                {
                     getRecordByLogicID(table1.fileID, it_table1->second, record_table1);
                     getRecordByLogicID(table2.fileID, it_table2->second, record_table2);
 
@@ -181,18 +188,24 @@ int HashJoin(int table1_dictID, int department_dictID){
                     strncat(res, record_table2, pd);
                     strcat(res, record_table2 + pd + strlen(val_table2) + 1);
                     insertRecord(tmp_table_dictID, res);
+                    printf("======== hash Join on Attr:%s,=== tmp_record: %.60s.\n", table2.attr[table2_pub_attr].name, res);
                     delete(val_table2);
+
+                    if(++count>15) break;// temp: if-not, there're  too many records
                 }
-                else if (it_table1->first > it_table2->first) {
+                else if (it_table1->first > it_table2->first)
+                {
                     break;
                 }
-                else {
+                else
+                {
                     continue;
                 }
+                
             }
         }
+        break;// temp: if-not, there're  too many records
     }
-
 
     return tmp_table_dictID;
 }
