@@ -122,8 +122,6 @@ struct Record file_writeFile(int FileID, int length,char *str){
 				curoffset.isDeleted = false;
 				currecordpos = sizeofpageMeta;
 				curoffsetpos =  PAGE_SIZE - length;
-				
-				
 			}
 			else{
 				memcpy(&preoffset,Buf_ReadBuffer(buftag)+sizeofpageMeta+(pageMeta.recordNum-1)*sizeofrecord,sizeofrecord);
@@ -146,7 +144,7 @@ struct Record file_writeFile(int FileID, int length,char *str){
 		long CurpageNo = page_requestPage(1);
 		if(CurpageNo>=0){
 			DB->dbMeta.blockFree=DB->dbMeta.blockFree-1;
-			file_print_freepace();
+			// file_print_freepace();
 			struct PageMeta pagemeta; //pagehead就是未申请前最后一个页
 			pagemeta.nextPageNo=-1;
 			pagemeta.prePageNo=pageMeta.pageNo;				
@@ -165,7 +163,7 @@ struct Record file_writeFile(int FileID, int length,char *str){
 			memcpy(Buf_ReadBuffer(buftag)+curoffsetpos,str,length);
 			memcpy(Buf_ReadBuffer(buftag),&pageMeta,sizeofpageMeta);
 
-			// DB->dbMeta.fileMeta[fileno].pageNum++;// TODO:mnb-1: unComment this line, and buffer.schedule suck in.
+			DB->dbMeta.fileMeta[fileno].pageNum++;// done-TODO:mnb-1: unComment this line, and buffer.schedule suck in.
 		}
 	}
 	record.pageNo = CurpageNo;
@@ -365,7 +363,6 @@ long page_requestPage(long NeededPageNum)
 			page_setbitmap(DB->freeSpaceBitMap+p_num,position,1);
 		}
 		DB->dbMeta.blockFree-=NeededPageNum;
-		printf("1");
 		return NewPages;
 	}
 	else{

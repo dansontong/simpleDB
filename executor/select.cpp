@@ -39,10 +39,11 @@ int tableScanEqualSelector(int dictID,char* attri_name,char* value){
 	char *attrValue = (char*)malloc(RECORD_MAX_SIZE);
 	struct PageMeta pageMeta;
 	struct BufTag buftag;
-	for(i=0;i<pageNum;i++){
+	for(i=0;i<pageNum;i++)
+	{
 		buftag = Buf_GenerateTag(pageNo);
 		memcpy(&pageMeta,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
-		printf("========== pageMeta.recordNum: %d, pageNo: %d, CurpageNo:%d. \n", pageMeta.recordNum, pageMeta.pageNo, pageNo);
+		printf("======================== pageMeta.recordNum: %d, pageNo: %d, CurpageNo:%d. \n", pageMeta.recordNum, pageMeta.pageNo, pageNo);
 		for(int j=0;j<pageMeta.recordNum;j++){
 			getRecord(pageNo,j,record);
 			memset(attrValue, 0, RECORD_MAX_SIZE);
@@ -62,6 +63,7 @@ int tableScanEqualSelector(int dictID,char* attri_name,char* value){
 		else{
 			pageNo=pageMeta.nextPageNo;
 		}
+		break; // temp: if-not, there're  too many records
 	}
 	// free(record);
 	// free(attrValue);
@@ -101,11 +103,11 @@ int tableScanRangeSelector(int dictID,char* attri_name,char* min,char* max){
 	}
 	char *record = (char*)malloc(RECORD_MAX_SIZE);
 	char *attrValue = (char*)malloc(RECORD_MAX_SIZE);
-	for(i=0;i<pagenum;i++){
+	for(i=0; i<pagenum; i++){
 		struct PageMeta pageMeta;
 		struct BufTag buftag = Buf_GenerateTag(pageNo);
 		memcpy(&pageMeta,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
-		printf("========== pageMeta.recordNum: %d, pageNo: %d, CurpageNo:%d. \n", pageMeta.recordNum, pageMeta.pageNo, pageNo);
+		printf("======================== pageMeta.recordNum: %d, pageNo: %d, CurpageNo:%d. \n", pageMeta.recordNum, pageMeta.pageNo, pageNo);
 		for(int j=0;j<pageMeta.recordNum;j++){
 			getRecord(pageNo,j,record);
 			memset(attrValue, 0, RECORD_MAX_SIZE);
@@ -139,6 +141,7 @@ int tableScanRangeSelector(int dictID,char* attri_name,char* min,char* max){
 		else{
 			pageNo=pageMeta.nextPageNo;
 		}
+		break; // temp: if-not, there're  too many records
 	}
 	// free(record);
 	// free(attrValue);
@@ -201,6 +204,7 @@ int tableScanUnEqualSelector(int dictID,char* attri_name,char* value){//非等�
 		else{
 			pageno=pagehead.nextPageNo;
 		}
+		break; // temp: if-not, there're  too many records
 	}
 	return tmptable;
 }
@@ -278,6 +282,7 @@ int tableScanMinRangeSelector(int dictID,char* attri_name,char* min){//只有最
 		else{
 			pageno=pagehead.nextPageNo;
 		}
+		break; // temp: if-not, there're  too many records
 	}
 	// free(record);
 	// free(attrValue);
@@ -355,6 +360,7 @@ int tableScanMaxRangeSelector(int dictID,char* attrName,char* max){//只有max�
 		else{
 			pageno=pagehead.nextPageNo;
 		}
+		break; // temp: if-not, there're  too many records
 	}
 	// free(record);
 	// free(attrValue);

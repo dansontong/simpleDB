@@ -29,7 +29,7 @@ int createTable(char *str)
 	insertAttr(&DB->dataDict[dictID],"S_SUPPKEY",INT_TYPE,4,true);
 	insertAttr(&DB->dataDict[dictID],"S_NAME",CHAR_TYPE,25,true);
 	insertAttr(&DB->dataDict[dictID],"S_ADDRESS",VARCHAR_TYPE,40,true);
-	insertAttr(&DB->dataDict[dictID],"S_NATIONKEY",INT_TYPE,4,true);
+	insertAttr(&DB->dataDict[dictID],"NATIONKEY",INT_TYPE,4,true);
 	insertAttr(&DB->dataDict[dictID],"S_PHONE",CHAR_TYPE,15,true);
 	insertAttr(&DB->dataDict[dictID],"S_ACCTBAL",FLOAT_TYPE,8,true);
 	insertAttr(&DB->dataDict[dictID],"S_COMMENT",VARCHAR_TYPE,101,true);
@@ -58,7 +58,7 @@ int createTable2(char *str)
 	strcpy(DB->dataDict[dictID].tableName, tableName);
 
 	//插入属性
-	insertAttr(&DB->dataDict[dictID],"N_NATIONKEY",INT_TYPE,4,true);
+	insertAttr(&DB->dataDict[dictID],"NATIONKEY",INT_TYPE,4,true);
 	insertAttr(&DB->dataDict[dictID],"N_NAME",CHAR_TYPE,25,true);
 	insertAttr(&DB->dataDict[dictID],"N_REGIONKEY",INT_TYPE,4,true);
 	insertAttr(&DB->dataDict[dictID],"N_COMMENT",VARCHAR_TYPE,152,true);
@@ -151,7 +151,7 @@ int getValueByAttrID(char *recordStr, int index, char *result){
 	int length = strlen(recordStr);
 	int j = 0, k = 0;
 	int start = 0;
-	for (int i = 0; i <= length; i++) {
+	for (int i = 0; i <= length+1; i++) {
 		if (recordStr[i] == '|' || i == length){
 			if (k == index){
 				result[j] = '\0';
@@ -236,13 +236,14 @@ int getAttrIndexByName(int dictID, char *attrName)
 			return i;
 		}
 	}
+	return -1; // failure
 }
 
 bool tupleInsert(int length, int FileID, char *str){
 
 }
 
-void insertAttr(Table *table,const char *name, DATA_TYPE type, int length,bool notNull)
+void insertAttr(Table *table,const char *name, DATA_TYPE type, int length, bool notNull)
 {
 	if(table->attrNum >= MAX_ATTRIBUTE_NUM){
 		printf("reach MAX_ATTRIBUTE_NUM,error.\n");
@@ -298,31 +299,31 @@ void insertRecord(int dictID, char *str)
 
 void insertOneRecord(int dictID,char *record){//dictID为DB->dataDict[]的下标
 	int length = strlen(record);
-	int fileID = DB->dataDict[dictID].fileID;  
+	int fileID = DB->dataDict[dictID].fileID;
 	int querypage=-1;
 	int i;
-	for( i=0;i<MAX_FILE_NUM;i++){                                   //这一块是查找文件是否存在
+	for( i=0;i<MAX_FILE_NUM;i++){									//这一块是查找文件是否存在
 		if(DB->dbMeta.fileMeta[i].id==fileID){						//
 			querypage=DB->dbMeta.fileMeta[i].firstPageNo;			//
-			break;																//
-		}																		//
+			break;													//
+		}															//
 	}
 	if(querypage<0){
 		printf("该表对应的文件号不存在！\n");
 		exit(0);
 	}
 	
-	long CurpageNo = DB->dbMeta.fileMeta[i].firstPageNo;				
+	long CurpageNo = DB->dbMeta.fileMeta[i].firstPageNo;
 	long pagenum = DB->dbMeta.fileMeta[i].pageNum;
 	int fileno = i;
 	int sizeofpagehead = sizeof(struct PageMeta);
-	int sizeofrecord = sizeof(struct OffsetInPage);									//读取该文件的信息
-	rewind(DB->dbFile);					
+	int sizeofrecord = sizeof(struct OffsetInPage);				//读取该文件的信息
+	//rewind(DB->dbFile);					
 	bool isfound = false;
 	struct PageMeta pagehead;
-	struct BufTag buftag = Buf_GenerateTag(CurpageNo);
-	memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);						//读取第一页的内容并存放在pagehead里
-	OffsetInPage preoffset,curoffset;							//页里的记录索引的结构体，定义在file.h里
+	struct BufTag buftag2 = Buf_GenerateTag(CurpageNo);
+	memcpy(&pagehead,Buf_ReadBuffer(buftag2),sizeofpagehead);	//读取第一页的内容并存放在pagehead里
+	OffsetInPage preoffset, curoffset;							//页里的记录索引的结构体，定义在file.h里
 	long currecordpos,curoffsetpos;								//前一个是指当前记录索引的位置，第二个是指当前记录的位置
 	for(int i=0;i<pagenum;i++){									//该循环是为了遍历所有的页找出能存放该记录的页
 		// printf("page:%d,空闲空间：%ld\n",i,pagehead.freeSpace);
@@ -331,12 +332,12 @@ void insertOneRecord(int dictID,char *record){//dictID为DB->dataDict[]的下标
 				break;
 			}
 			CurpageNo = pagehead.nextPageNo;
-			buftag = Buf_GenerateTag(CurpageNo);
-			memcpy(&pagehead,Buf_ReadBuffer(buftag),sizeofpagehead);
+			buftag2 = Buf_GenerateTag(CurpageNo);
+			memcpy(&pagehead,Buf_ReadBuffer(buftag2),sizeofpagehead);
 			continue;	
 		}
 		else{
-			memcpy(&preoffset,Buf_ReadBuffer(buftag)+sizeofpagehead,sizeofrecord);
+			memcpy(&preoffset,Buf_ReadBuffer(buftag2)+sizeofpagehead,sizeofrecord);
 			isfound = true;
 			if(pagehead.recordNum==0){
 				curoffset.recordID = 0;
@@ -344,11 +345,9 @@ void insertOneRecord(int dictID,char *record){//dictID为DB->dataDict[]的下标
 				curoffset.isDeleted = false;
 				currecordpos = sizeofpagehead;
 				curoffsetpos =  PAGE_SIZE - length;
-				
-				
 			}
 			else{
-				memcpy(&preoffset,Buf_ReadBuffer(buftag)+sizeofpagehead+(pagehead.recordNum-1)*sizeofrecord,sizeofrecord);
+				memcpy(&preoffset,Buf_ReadBuffer(buftag2)+sizeofpagehead+(pagehead.recordNum-1)*sizeofrecord,sizeofrecord);
 				curoffset.recordID = pagehead.recordNum;
 				curoffset.offset = preoffset.offset+length;
 				curoffset.isDeleted = false;
@@ -359,16 +358,16 @@ void insertOneRecord(int dictID,char *record){//dictID为DB->dataDict[]的下标
 		}
 		pagehead.recordNum++;
 		pagehead.freeSpace=pagehead.freeSpace-length-sizeofrecord;
-		memcpy(Buf_ReadBuffer(buftag),&pagehead,sizeofpagehead);
-		memcpy(Buf_ReadBuffer(buftag)+currecordpos,&curoffset,sizeofrecord);
-		memcpy(Buf_ReadBuffer(buftag)+curoffsetpos,record,length);
+		memcpy(Buf_ReadBuffer(buftag2),&pagehead,sizeofpagehead);
+		memcpy(Buf_ReadBuffer(buftag2)+currecordpos,&curoffset,sizeofrecord);
+		memcpy(Buf_ReadBuffer(buftag2)+curoffsetpos,record,length);
 		break;						//找到后就break
 	}
 	if(!isfound){					//若遍历完没有页就新申请一个页。
 		long CurpageNo = page_requestPage(1);
 		if(CurpageNo>=0){
 			DB->dbMeta.blockFree=DB->dbMeta.blockFree-1;
-			file_print_freepace();
+			// file_print_freepace();
 			struct PageMeta pagemeta; //pagehead就是未申请前最后一个页
 			pagemeta.nextPageNo=-1;
 			pagemeta.prePageNo=pagehead.pageNo;				
@@ -381,11 +380,11 @@ void insertOneRecord(int dictID,char *record){//dictID为DB->dataDict[]的下标
 			curoffset.recordID = 0;
 			curoffset.offset = length;
 			curoffset.isDeleted = false;
-			buftag = Buf_GenerateTag(pagenum);
-			memcpy(Buf_ReadBuffer(buftag),&pagemeta,sizeofpagehead);
-			memcpy(Buf_ReadBuffer(buftag)+currecordpos,&curoffset,sizeofrecord);
-			memcpy(Buf_ReadBuffer(buftag)+curoffsetpos,record,length);
-			memcpy(Buf_ReadBuffer(buftag),&pagehead,sizeofpagehead);
+			buftag2 = Buf_GenerateTag(pagenum);
+			memcpy(Buf_ReadBuffer(buftag2),&pagemeta,sizeofpagehead);
+			memcpy(Buf_ReadBuffer(buftag2)+currecordpos,&curoffset,sizeofrecord);
+			memcpy(Buf_ReadBuffer(buftag2)+curoffsetpos,record,length);
+			memcpy(Buf_ReadBuffer(buftag2),&pagehead,sizeofpagehead);
 
 			DB->dbMeta.fileMeta[fileno].pageNum++;
 		}

@@ -11,7 +11,7 @@ int main(int argc, char* argv[]) {
 	DataBase DB;
 	char dbFile[30] = "../data/simpleDb";
 
-	log_init("../data/DBrun.log");//初始化日志系统
+	log_init("./DBrun.log");//初始化日志系统
 	Buf_Init();
 	database_initDB(&DB, dbFile);
 
@@ -74,6 +74,10 @@ int main(int argc, char* argv[]) {
 	drop_index("Supplier","S_SUPPKEY");
 	printf("------ drop index in %s for table %s -----\n","S_SUPPKEY","Supplier");
 
+	//================ executor_test -- projection ================
+	printf("------------------ begin ouput project on S_SUPPKEY: ---------------------\n");
+	projection(0, "S_SUPPKEY");
+
 	//================ executor_test -- select ================
 	printf("------------------ begin ouput record == 2: ---------------------\n");
 	tableScanEqualSelector(0, "S_SUPPKEY", "2");
@@ -86,9 +90,6 @@ int main(int argc, char* argv[]) {
 	printf("------------------ begin ouput record != 2: ---------------------\n");
 	tableScanUnEqualSelector(0,"S_SUPPKEY","2");//非等值连接
 
-	//================ executor_test -- projection ================
-	printf("------------------ begin ouput project on S_SUPPKEY: ---------------------\n");
-	projection(0, "S_SUPPKEY");
 
 	//================ executor_test -- joint ================
 	printf("------------------ begin nestedLoopJoin: ---------------------\n");
