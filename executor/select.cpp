@@ -53,7 +53,7 @@ int tableScanEqualSelector(int dictID,char* attri_name,char* value){
 				return -1;
 			}
 			if (strcmp(attrValue, value) == 0){
-				insertOneRecord(tmptable,record);
+				insertRecord(tmptable,record);
 				printf(" tmpTable ===== attrValue: %s\n", record);
 			}
 		}
@@ -123,14 +123,14 @@ int tableScanRangeSelector(int dictID,char* attri_name,char* min,char* max){
 				int val_ = atoi(attrValue);
 				if (val_ >= min_ && val_ <= max_)
 				{
-					insertOneRecord(tmptable,record);
+					insertRecord(tmptable,record);
 					printf(" tmpTable ===== attrValue: %s\n", record);
 				}
 			}
 			//char类型
 			else if (table1.attr[attrIndex].type == CHAR_TYPE) {
 				if (strcmp(min, attrValue) <= 0 && strcmp(max, attrValue) >= 0){
-					insertOneRecord(tmptable,record);
+					insertRecord(tmptable,record);
 					printf(" tmpTable ===== attrValue: %s\n", record);
 				}
 			}
@@ -194,7 +194,7 @@ int tableScanUnEqualSelector(int dictID,char* attri_name,char* value){//非等�
 				return -1;
 			}
 			if (strcmp(attrValue, value) != 0){
-				insertOneRecord(tmptable,record);
+				insertRecord(tmptable,record);
 				printf(" tmpTable ===== attrValue: %s\n", record);
 			}
 		}
@@ -262,7 +262,7 @@ int tableScanMinRangeSelector(int dictID,char* attri_name,char* min){//只有最
 				int val_ = atoi(attrValue);
 				if (val_ >= min_ )
 				{
-					insertOneRecord(tmptable,record);
+					insertRecord(tmptable,record);
 					printf(" tmpTable ===== attrValue: %s\n", record);					
 				}
 			}
@@ -271,7 +271,7 @@ int tableScanMinRangeSelector(int dictID,char* attri_name,char* min){//只有最
 			{
 				if (strcmp(min, attrValue) <= 0 )
 				{
-					insertOneRecord(tmptable,record);
+					insertRecord(tmptable,record);
 					printf(" tmpTable ===== attrValue: %s\n", record);
 				}
 			}
@@ -342,14 +342,14 @@ int tableScanMaxRangeSelector(int dictID,char* attrName,char* max){//只有max�
 				int val_ = atoi(attrValue);
 				if (val_ <= max_)
 				{
-					insertOneRecord(tmptable,record);
+					insertRecord(tmptable,record);
 					printf(" tmpTable ===== attrValue: %s\n", record);
 				}
 			}
 			//char类型
 			else if(table1.attr[attrIndex].type == CHAR_TYPE) {
 				if( strcmp(max, attrValue) >= 0){
-					insertOneRecord(tmptable,record);
+					insertRecord(tmptable,record);
 					printf(" tmpTable ===== attrValue: %s\n", record);
 				}
 			}

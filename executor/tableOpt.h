@@ -22,7 +22,7 @@ bool getrecordAttribute(long pageNo,int recordID,char* Attributename,char*Attrib
 
 // 记录相关  --from database.h
 void insertRecord(int dictID, char *record);
-void insertOneRecord(int dictID,char *record);//往表里插入一条数据 ----from tmpTable.h
+// void insertOneRecord(int dictID,char *record);//往表里插入一条数据 ----from tmpTable.h
 void deleteRecord(char *tableName, char *attributeName, Record *record);
 Record* searchRecord(char* tableName,char* attrName, char* attribute);
 
