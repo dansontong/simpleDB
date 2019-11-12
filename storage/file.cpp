@@ -145,22 +145,26 @@ struct Record file_writeFile(int FileID, int length,char *str){
 		if(CurpageNo>=0){
 			DB->dbMeta.blockFree=DB->dbMeta.blockFree-1;
 			// file_print_freepace();
-			struct PageMeta pagemeta; //pagehead就是未申请前最后一个页
-			pagemeta.nextPageNo=-1;
-			pagemeta.prePageNo=pageMeta.pageNo;				
-			pagemeta.pageNo=CurpageNo;
-			pageMeta.nextPageNo = CurpageNo;		//将这页加在这个文件中		
-			pagemeta.recordNum = 1;
-			pagemeta.freeSpace = PAGE_SIZE - length - sizeofpageMeta - sizeofrecord;
+			pageMeta.nextPageNo = CurpageNo;		//将这页加在这个文件中
+
+			struct PageMeta newPageMeta; //pageMeta就是未申请前最后一个页
+			newPageMeta.nextPageNo=-1;
+			newPageMeta.prePageNo=pageMeta.pageNo;				
+			newPageMeta.pageNo=CurpageNo;
+			newPageMeta.recordNum = 1;
+			newPageMeta.freeSpace = PAGE_SIZE - length - sizeofpageMeta - sizeofrecord;
+
 			curoffsetpos = PAGE_SIZE-length;
 			currecordpos = sizeofpageMeta;
 			curoffset.recordID = 0;
 			curoffset.offset = length;
 			curoffset.isDeleted = false;
-			buftag = Buf_GenerateTag(pagenum+1);
-			memcpy(Buf_ReadBuffer(buftag),&pagemeta,sizeofpageMeta);
-			memcpy(Buf_ReadBuffer(buftag)+currecordpos,&curoffset,sizeofrecord);
-			memcpy(Buf_ReadBuffer(buftag)+curoffsetpos,str,length);
+			// struct BufTag newBuftag = Buf_GenerateTag(pagenum+1);
+			struct BufTag newBuftag = Buf_GenerateTag(CurpageNo);
+
+			memcpy(Buf_ReadBuffer(newBuftag),&newPageMeta,sizeofpageMeta);
+			memcpy(Buf_ReadBuffer(newBuftag)+currecordpos,&curoffset,sizeofrecord);
+			memcpy(Buf_ReadBuffer(newBuftag)+curoffsetpos,str,length);
 			memcpy(Buf_ReadBuffer(buftag),&pageMeta,sizeofpageMeta);
 
 			DB->dbMeta.fileMeta[fileno].pageNum++;// done-TODO:mnb-1: unComment this line, and buffer.schedule suck in.
@@ -168,7 +172,7 @@ struct Record file_writeFile(int FileID, int length,char *str){
 	}
 	record.pageNo = CurpageNo;
 	record.recordID = curoffset.recordID;
-	printf("----------------------- pagemeta.recordNum: %d -------------------\n", pageMeta.recordNum);
+	printf("----------------------- pageMeta.recordNum: %d -------------------\n", pageMeta.recordNum);
 	return record;
 }
 void file_readFile(int FileID,char *str){

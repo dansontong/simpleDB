@@ -297,6 +297,7 @@ void insertRecord(int dictID, char *str)
 	}
 }
 
+// another version of insertRecord, no use now.
 void insertOneRecord(int dictID,char *record){//dictID为DB->dataDict[]的下标
 	int length = strlen(record);
 	int fileID = DB->dataDict[dictID].fileID;
@@ -372,7 +373,7 @@ void insertOneRecord(int dictID,char *record){//dictID为DB->dataDict[]的下标
 			pagemeta.nextPageNo=-1;
 			pagemeta.prePageNo=pagehead.pageNo;				
 			pagemeta.pageNo=CurpageNo;
-			pagehead.nextPageNo = CurpageNo;		//将这页加在这个文件中				
+			// pagehead.nextPageNo = CurpageNo;		//将这页加在这个文件中				
 			pagemeta.recordNum = 1;
 			pagemeta.freeSpace = PAGE_SIZE - length - sizeofpagehead - sizeofrecord;
 			curoffsetpos = PAGE_SIZE-length;
@@ -533,7 +534,7 @@ int createTmpTableAfterSort(Table table, int shareAttr){
 		char* des = (char*)malloc(table.recordLength);
 
 		getRecordByLogicID(table_fid, it->second, des);
-		insertOneRecord(dictID, des);
+		insertRecord(dictID, des);
 		//        if(count == -1 || isExisted(buffNo, mapNo, DB->dbMeta.fileMeta[queryFileIndex(DB, table.fileID)].filePageNum) == false){
 		//            buffNo[count] =mapNo;
 		//            count++;
