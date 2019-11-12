@@ -43,7 +43,7 @@ using namespace std;
 #define BUCKET_NUM 101
 
 // file 配置参数
-#define RECORD_MAX_SIZE 300 //记录最长长度
+#define RECORD_MAX_SIZE 400 //记录最长长度
 
 typedef enum{
 	INT_TYPE = 0,
