@@ -17,7 +17,7 @@ fseek(FILE *stream, long offset, int fromwhere);//文件流 偏移量(用正负�
 4, DB在database.h 和 file.cpp中作为全局变量，后续需要多个数据库，需要改成c++类实现   
 5, b+树模块测试如果之前文件存在会有问题，待解决。  
 6，目前索引模块测试index_test.cpp中查找9840的记录，查找失败，待解决。  
-7, buffer模块，201行的TODO,运行曾出现过215行Buf_StrategyLRU函数的assert(buf_id>=0)失败，待解决  
+~~7, buffer模块，201行的TODO,运行曾出现过215行Buf_StrategyLRU函数的assert(buf_id>=0)失败 done~~
 8, 查到的元组从磁盘解析出来。  
   
   
@@ -31,9 +31,7 @@ fseek(FILE *stream, long offset, int fromwhere);//文件流 偏移量(用正负�
 7，索引-接口：     ly，包括/index/index.h-cpp  
 
 # TODO:mnb  
-1, projection.cpp和select.cpp里面，同样用pageNo=1构造buftag后，为什么projection.cpp取到的pageMeta里pageNo=9979,select.cpp取到pageNo=1才是对的。为什么会有同样buftag返回不同的地址？？？  
-2, file.cpp168行放开注释后，buffer会在start schedule输出后卡住，原因？
-
-
+~~1, projection.cpp和select.cpp里面，同样用pageNo=1构造buftag后，为什么projection.cpp取到的pageMeta里pageNo=9979,select.cpp取到pageNo=1才是对的。为什么会有同样buftag返回不同的地址？？？  done，部分load忘记更新buftag~~
+~~2, file.cpp168行放开注释后，buffer会在start schedule输出后卡住，原因跑的太快了，大家时间戳都一样……~~
   
   https://github.com/dansontong/simpleDB/invitations 邀请链接
