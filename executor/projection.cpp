@@ -64,7 +64,7 @@ int projection(int dictID, char* attrName){//attributename为投影所需的所�
 		buftag = Buf_GenerateTag(CurpageNo);
 		memcpy(&pageMeta, Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
 		int num=0;
-		printf("========== pageMeta.recordNum: %d, pageNo: %d, CurpageNo:%d. \n", pageMeta.recordNum, pageMeta.pageNo, CurpageNo);
+		// printf("========== pageMeta.recordNum: %d, pageNo: %d, CurpageNo:%d. \n", pageMeta.recordNum, pageMeta.pageNo, CurpageNo);
 		for(int j = 0; j<pageMeta.recordNum; j++)
 		{
 			getRecord(CurpageNo, j, record);
@@ -94,7 +94,7 @@ int projection(int dictID, char* attrName){//attributename为投影所需的所�
 				
 			}
 			insertRecord(tmpDictID, new_record);
-			printf("project on attribute %s: %s\n", attrName, new_record);
+			printf("===== project on attribute:%s, new_record:%.60s.\n", attrName, new_record);
 		}
 		if(pageMeta.nextPageNo<0)
 		{

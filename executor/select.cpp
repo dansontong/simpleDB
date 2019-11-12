@@ -43,7 +43,7 @@ int tableScanEqualSelector(int dictID,char* attri_name,char* value){
 	{
 		buftag = Buf_GenerateTag(pageNo);
 		memcpy(&pageMeta,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
-		printf("======================== pageMeta.recordNum: %d, pageNo: %d, CurpageNo:%d. \n", pageMeta.recordNum, pageMeta.pageNo, pageNo);
+		// printf("======================== pageMeta.recordNum: %d, pageNo: %d, CurpageNo:%d. \n", pageMeta.recordNum, pageMeta.pageNo, pageNo);
 		for(int j=0;j<pageMeta.recordNum;j++){
 			getRecord(pageNo,j,record);
 			memset(attrValue, 0, RECORD_MAX_SIZE);
@@ -54,7 +54,7 @@ int tableScanEqualSelector(int dictID,char* attri_name,char* value){
 			}
 			if (strcmp(attrValue, value) == 0){
 				insertRecord(tmptable,record);
-				printf(" tmpTable ===== attrValue: %s\n", record);
+				printf("==== tmp-record: %.60s\n", record);
 			}
 		}
 		if(pageMeta.nextPageNo<0){
@@ -107,7 +107,7 @@ int tableScanRangeSelector(int dictID,char* attri_name,char* min,char* max){
 		struct PageMeta pageMeta;
 		struct BufTag buftag = Buf_GenerateTag(pageNo);
 		memcpy(&pageMeta,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
-		printf("======================== pageMeta.recordNum: %d, pageNo: %d, CurpageNo:%d. \n", pageMeta.recordNum, pageMeta.pageNo, pageNo);
+		// printf("======================== pageMeta.recordNum: %d, pageNo: %d, CurpageNo:%d. \n", pageMeta.recordNum, pageMeta.pageNo, pageNo);
 		for(int j=0;j<pageMeta.recordNum;j++){
 			getRecord(pageNo,j,record);
 			memset(attrValue, 0, RECORD_MAX_SIZE);
@@ -124,14 +124,14 @@ int tableScanRangeSelector(int dictID,char* attri_name,char* min,char* max){
 				if (val_ >= min_ && val_ <= max_)
 				{
 					insertRecord(tmptable,record);
-					printf(" tmpTable ===== attrValue: %s\n", record);
+					printf("==== tmp-record: %.60s\n", record);
 				}
 			}
 			//char类型
 			else if (table1.attr[attrIndex].type == CHAR_TYPE) {
 				if (strcmp(min, attrValue) <= 0 && strcmp(max, attrValue) >= 0){
 					insertRecord(tmptable,record);
-					printf(" tmpTable ===== attrValue: %s\n", record);
+					printf("==== tmp-record: %.60s\n", record);
 				}
 			}
 		}
@@ -195,7 +195,7 @@ int tableScanUnEqualSelector(int dictID,char* attri_name,char* value){//非等�
 			}
 			if (strcmp(attrValue, value) != 0){
 				insertRecord(tmptable,record);
-				printf(" tmpTable ===== attrValue: %s\n", record);
+				printf("==== tmp-record: %.60s\n", record);
 			}
 		}
 		if(pagehead.nextPageNo<0){
@@ -263,7 +263,7 @@ int tableScanMinRangeSelector(int dictID,char* attri_name,char* min){//只有最
 				if (val_ >= min_ )
 				{
 					insertRecord(tmptable,record);
-					printf(" tmpTable ===== attrValue: %s\n", record);					
+					printf("==== tmp-record: %.60s\n", record);
 				}
 			}
 			//char类型
@@ -272,7 +272,7 @@ int tableScanMinRangeSelector(int dictID,char* attri_name,char* min){//只有最
 				if (strcmp(min, attrValue) <= 0 )
 				{
 					insertRecord(tmptable,record);
-					printf(" tmpTable ===== attrValue: %s\n", record);
+					printf("==== tmp-record: %.60s\n", record);
 				}
 			}
 		}
@@ -343,14 +343,14 @@ int tableScanMaxRangeSelector(int dictID,char* attrName,char* max){//只有max�
 				if (val_ <= max_)
 				{
 					insertRecord(tmptable,record);
-					printf(" tmpTable ===== attrValue: %s\n", record);
+					printf("==== tmp-record: %.60s\n", record);
 				}
 			}
 			//char类型
 			else if(table1.attr[attrIndex].type == CHAR_TYPE) {
 				if( strcmp(max, attrValue) >= 0){
 					insertRecord(tmptable,record);
-					printf(" tmpTable ===== attrValue: %s\n", record);
+					printf("==== tmp-record: %.60s\n", record);
 				}
 			}
 		}

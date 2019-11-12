@@ -172,7 +172,7 @@ struct Record file_writeFile(int FileID, int length,char *str){
 	}
 	record.pageNo = CurpageNo;
 	record.recordID = curoffset.recordID;
-	printf("----------------------- pageMeta.recordNum: %d -------------------\n", pageMeta.recordNum);
+	// printf("----------------------- pageMeta.recordNum: %d -------------------\n", pageMeta.recordNum);
 	return record;
 }
 void file_readFile(int FileID,char *str){
