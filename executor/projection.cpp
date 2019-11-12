@@ -32,10 +32,11 @@ int projection(int dictID, char* attrName){//attributename为投影所需的所�
 	memset(one_attribute,0,MAX_NAME_LENGTH);
 	int* attrIndex = (int* )malloc(sizeof(int)*DB->dataDict[dictID].attrNum);
 	memset(attrIndex, -1, DB->dataDict[dictID].attrNum);
-	int charnum=0,attrNum=0;
-	for(int j=0;j<=strlen(attrName);j++){
+	int charnum=0, attrNum=0;
+	for(int j=0; j<=strlen(attrName)+1; j++){
 		if(attrName[j]=='|' || j==strlen(attrName)){
 			attrIndex[attrNum++] = getAttrIndexByName(dictID, one_attribute);
+			// printf("j:%d ++++++++++++++++++++ attrName: %s, attrIndex[0]: %d\n", j, one_attribute, attrIndex[0]);
 			// for(int m=0;m<DB->dataDict[dictID].attrNum;m++){
 			// 	if(strcmp(one_attribute,DB->dataDict[dictID].attr[m].name)==0){
 			// 		attrIndex[attrNum]=m;
@@ -58,42 +59,52 @@ int projection(int dictID, char* attrName){//attributename为投影所需的所�
 	char* attribute = (char*)malloc(RECORD_MAX_SIZE);
 	struct BufTag buftag;
 	struct PageMeta pageMeta;
-	for(i=0; i<pageNum; i++){
+	for(i=0; i<pageNum; i++)
+	{
 		buftag = Buf_GenerateTag(CurpageNo);
 		memcpy(&pageMeta, Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
 		int num=0;
 		printf("========== pageMeta.recordNum: %d, pageNo: %d, CurpageNo:%d. \n", pageMeta.recordNum, pageMeta.pageNo, CurpageNo);
-		for(int j = 0; j<pageMeta.recordNum; j++){
+		for(int j = 0; j<pageMeta.recordNum; j++)
+		{
 			getRecord(CurpageNo, j, record);
 			memset(new_record, 0, RECORD_MAX_SIZE);
 			memset(attribute, 0, RECORD_MAX_SIZE);
-			for(int m=0;m<attrNum;m++){
-				int flag = getValueByAttrID(record,attrIndex[m],attribute);
-				if(flag<0){
+			for(int m=0;m<attrNum;m++)
+			{
+				int flag = getValueByAttrID(record,attrIndex[m], attribute);
+				if(flag<0)
+				{
 					printf("error:获取属性值失败\n");
 					return -1;
 				}
-				if(m==0){
+				if(m==0)
+				{
 					strcpy(new_record,attribute);
 					strcat(new_record,"|");
 				}
-				else{
+				else
+				{
 					strcat(new_record,attribute);
-					if(m<attrNum-1){
+					if(m<attrNum-1)
+					{
 						strcat(new_record,"|");
 					}
 				}
 				
 			}
 			insertOneRecord(dictID,new_record);
-			printf("project on attribute: %s\n", new_record);
-			if(pageMeta.nextPageNo<0){
+			printf("project on attribute %s: %s\n", attrName, new_record);
+			if(pageMeta.nextPageNo<0)
+			{
 				break;
 			}
-			else{
+			else
+			{
 				CurpageNo=pageMeta.nextPageNo;
 			}
 		}
+		break; // temp: if-not, there're  too many records
 	}
 	return tmpDictID;
 }

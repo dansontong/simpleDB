@@ -15,7 +15,7 @@ int nestedLoopJoin(int employee_dictID, int department_dictID) {
     {
         for (table2_pub_attr = 0; table2_pub_attr < table2.attrNum; table2_pub_attr++)
         {
-            if (table1.attr[table1_pub_attr].name==table1.attr[table2_pub_attr].name)
+            if (strcmp(table1.attr[table1_pub_attr].name, table2.attr[table2_pub_attr].name) == 0)
             {
                 isFound = true;
                 break;
@@ -25,7 +25,7 @@ int nestedLoopJoin(int employee_dictID, int department_dictID) {
     }
     //标志位如果为空的话代表两个表没有公共属性
     if (isFound == false) {
-        printf("两表没有公共属性");
+        printf("两表没有公共属性\n");
         return -1;
     }
 
@@ -39,57 +39,71 @@ int nestedLoopJoin(int employee_dictID, int department_dictID) {
     //p1
     int tmp_table_ID = createTmpTable2(table1,table2,table1_pub_attr,table2_pub_attr);
     if (tmp_table_ID < 0){
-        printf("创建临时表失败");
+        printf("创建临时表失败\n");
         return -1;
     }
 
     Table *tmp = &(DB->dataDict[tmp_table_ID]);
     //两表循环连接
-    int outer = table2_pagenum / BUFFER_NUM;
+    int outer = table2_pagenum / (BUFFER_NUM-1) + 1;
     struct BufTag buftag;
     int *buffID = (int*)malloc(table2_pagenum);
+
+    // char *table1_record = (char*)malloc(table1.recordLength);
+    // char *table1_value = (char*)malloc(table1.recordLength);
+    // char *table2_record = (char*)malloc(table2.recordLength);
+    // char *table2_value = (char*)malloc(table2.recordLength);
+    char *table1_record = (char*)malloc(RECORD_MAX_SIZE);
+    char *table1_value = (char*)malloc(RECORD_MAX_SIZE);
+    char *table2_record = (char*)malloc(RECORD_MAX_SIZE);
+    char *table2_value = (char*)malloc(RECORD_MAX_SIZE);
+    // char *res = (char*)malloc(tmp->recordLength);
+    char *res = (char*)malloc(RECORD_MAX_SIZE*2);
     for (int x = 0; x < outer; x++){
         for (int y = 0; y < BUFFER_NUM - 1 && y < table2_pagenum; y++) {
             struct PageMeta ph;
-            buftag = Buf_GenerateTag(table1_pageno);
+            buftag = Buf_GenerateTag(table2_pageno);
             memcpy(&ph, Buf_ReadBuffer(buftag), PAGEMETA_SIZE);
             // DB->buff.map[mapNo].isPin = true; //PIN住
-            buffID[y] = table1_pageno;
+            buffID[y] = table2_pageno;
             if (ph.nextPageNo < 0)
                 break;
             else
-                table1_pageno = ph.nextPageNo;
+                table2_pageno = ph.nextPageNo;
         }
 
-        for (int z = 0; z < table1_pagenum; z++) {
+        for (int z = 0; z < table1_pagenum; z++)
+        {
             struct PageMeta table1_pm;
             buftag = Buf_GenerateTag(table1_pageno);
             memcpy(&table1_pm, Buf_ReadBuffer(buftag), PAGEMETA_SIZE);//head
-            for (int k = 0; k < table1_pm.recordNum; k++) {
-                char *table1_record = (char*)malloc(table1.recordLength);
-                char *table1_value = (char*)malloc(table1.recordLength);
+            for (int k = 0; k < table1_pm.recordNum; k++)
+            {
                 getRecord(table1_pageno, k, table1_record);//读取下一条记录
                 int pe = getValueByAttrID(table1_record, table1_pub_attr, table1_value);
-                if (pe < 0)  exit(0);
-                for (int y = 0; y < BUFFER_NUM - 1 && y < table2_pagenum; y++){
+                if (pe < 0)
+                {
+                    exit(0);
+                }
+                for (int y = 0; y < BUFFER_NUM - 1 && y < table2_pagenum; y++)
+                {
                     struct PageMeta table2_pm;
                     buftag = Buf_GenerateTag(buffID[y]);
                     memcpy(&table2_pm, Buf_ReadBuffer(buftag), PAGEMETA_SIZE);
                     for (int i = 0; i < table2_pm.recordNum; i++) {//curRecordNUm
-                        char *table2_record = (char*)malloc(table2.recordLength);
                         getRecord(buffID[y], i, table2_record);//head
-                        char *table2_value = (char*)malloc(table2.recordLength);
                         int pd = getValueByAttrID(table2_record, table2_pub_attr, table2_value);
                         if (pd < 0) exit(0);
 
                         if (strcmp(table1_value, table2_value) == 0){
-                            char *res = (char*)malloc(tmp->recordLength);
-                            memset(res, 0, tmp->recordLength);
+                            memset(res, 0, RECORD_MAX_SIZE*2);
+                            strcpy(res, table1_record);
+                            strcat(res, "|");
                             strncat(res, table2_record, pd);
-                            strcpy(res, table2_record);
+                            printf("=========== table2_value: %s, table2_record: %s, pd: %d.\n", table2_value, table2_record, pd);
                             strcat(res, table2_record + pd + strlen(table2_value) + 1);
-                            strcat(res, "\\ |");
                             insertRecord(tmp_table_ID, res);//head
+                            printf("=========== join-tmpTable on attr %s, tmpRecord: %s.\n", table1.attr[table1_pub_attr].name, res);
                         }
                     }
                 }
