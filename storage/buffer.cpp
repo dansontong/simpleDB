@@ -38,16 +38,15 @@ void Buf_Init()
     bufMetas = newbufmeta;
 
     int i;
-    for (i = 0; i < BUFFER_NUM - 1; i++)
+    for (i = 0; i < BUFFER_NUM; i++)
     {
         BufMeta *bp_p = &(bufMetas[i]);
         bp_p->bTag.pageNo = -1;
         bp_p->bufId = i;
         bp_p->visitTime = UTCNowTimestamp();
-        bp_p->fNext = i + 1;
+        bp_p->fNext = (i == BUFFER_NUM - 1) ? BUF_FREE_END : i + 1;
         bp_p->bufMode = BM_free;
     }
-    log_Info("buffer ready for work.");
 }
 
 void Buf_Free()
@@ -175,6 +174,7 @@ long Buf_LoadPage(BufTag btag)
     // 从外存读取一个块
     file_read_sd(btag.pageNo, blockStart);
     newbmeta->bufMode = BM_isValid;
+    newbmeta->bTag.pageNo = btag.pageNo;
     return newBufId;
 }
 
@@ -192,7 +192,7 @@ long Buf_StrategyLRU()
 {
     long buf_id = -1;
     long minVisit = UTCNowTimestamp();
-    int i;    
+    int i;
     printf("start schedule\n");
 
     // TODO bug ：可能选不出合适的块
@@ -202,22 +202,23 @@ long Buf_StrategyLRU()
         {
             BufMeta bmeta = bufMetas[i];
             // TODO 没有想好这部分的处理，什么状态的缓存块参与淘汰
-            if (bmeta.bufMode == BM_free){
+            if (bmeta.bufMode == BM_free)
+            {
                 // 出现空闲块直接返回
+                buf_id = i;
                 break;
             }
             if (bmeta.bufMode == BM_ioProgress)
             {
                 continue;
             }
-            if (bmeta.visitTime < minVisit)
+            if (bmeta.visitTime <= minVisit)
             {
                 buf_id = i;
                 minVisit = bmeta.visitTime;
             }
         }
     } while (buf_id == -1);
-    printf("buf schedule buf_id:%ld\n", buf_id);
     assert(buf_id >= 0 && buf_id < BUFFER_NUM);
     return buf_id;
 }
@@ -235,7 +236,8 @@ bool Buf_Remove(long bufId)
 
     // 检查缓存块能否删除
     // BufMode不为空、不在io_progress等状态
-    if (bmeta->bufMode ==  BM_free){
+    if (bmeta->bufMode == BM_free)
+    {
         // buf为free不用删除，直接返回
         return true;
     }
@@ -357,11 +359,6 @@ bool CMPBufTag(const BufTag tag1, const BufTag tag2)
     return tag1.pageNo == tag2.pageNo;
 }
 
-void TestLoad(char *dest)
-{
-    char data[] = {"this is a test for load page."};
-    memcpy(dest, data, BLOCK_SIZE);
-}
 // ==================== mem func ====================
 void *MemAllocNoThrow(std::size_t alloc_size)
 {
