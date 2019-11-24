@@ -1,8 +1,8 @@
 ### 文件说明
-trivialtree.* 简单实现的一个多叉树，树结构：孩子兄弟结构表示
-sqllexical.lex  词法解析文件
-sqlparser.y     语法规则
-sqlparser.h/.c  最终文件
+trivialtree.* 简单实现的一个多叉树，树结构：孩子兄弟结构表示  
+sqllexical.lex  词法解析文件  
+sqlparser.y     语法规则  
+sqlparser.h/.c  最终文件  
 
 ### 测试说明
 1. 依赖编译  
