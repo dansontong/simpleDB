@@ -77,7 +77,7 @@ void trivialtree::insertBrother(trivialtree *bro)
 
 void trivialtree::print(int dept)
 {
-    string prefix;
+    string prefix="       |";
     for (int i = 0; i < dept; i++)
     {
         prefix.append("\t");
@@ -85,11 +85,18 @@ void trivialtree::print(int dept)
     cout << prefix << datas << "\n";
     if (children)
     {
-        cout << prefix << "child:" << endl;
         this->children->print(dept + 1);
     }
     if (brothers != NULL)
     {
         this->brothers->print(dept);
     }
+}
+
+trivialtree* trivialtree::getChild(){
+    return this->childrear;
+}
+
+void trivialtree::setdata(char *data){
+    this->datas = string(data);
 }
