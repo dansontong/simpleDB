@@ -1,12 +1,19 @@
-// 正确输入
-create table user (uid int,amount float);
+drop table a;
 
-insert into user (uid, amount) values (132,43);
-insert into user values (132,43);
+delete from fad 
+where fad<fa or adsf>fa;
 
-select uid,amount from user, banks where user<banks;
+select * from fa;
+select * from a,b where fad<fa or adsf>fa;
 
-delete from user;
-delete from user where uid<fd;
+select * from a,b where b<d order by f desc;
 
-drop table user;
+insert into a values (43, 34);
+insert into a (id,age) values (43, 34);
+
+create table user (
+    id int,
+    amount float
+);
+
+

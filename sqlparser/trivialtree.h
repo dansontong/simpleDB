@@ -20,9 +20,10 @@ public:
     trivialtree(std::string d);
 
     std::string data();
-
+    void setdata(char *data);
     void setParent(trivialtree *p);
     trivialtree* getParent();
+    trivialtree* getChild();            // 返回小儿子
     void insertChild(trivialtree *child);
 
     void insertBrother(trivialtree *bro);
