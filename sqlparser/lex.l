@@ -25,16 +25,15 @@
  * flex definitions
  * 
  *------------------------------------------------------------------*/
-char [A-Za-z]
-num [0-9]
+digit [0-9]
 keyword create|table|drop|select|from|where|insert\ into|values|delete|order\ by|desc|asc
 datatype int|float|double|char|date
 logic and|or
 separator \;|\,|\(|\)
-oprator \>|\<
-name {char}*
-data {num}*
-
+oprator \>|\<|=
+data {digit}*
+name [A-Za-z][A-Za-z0-9]*
+date {digit}+\-{digit}+(\-{digit}+)?
 %%
 [ \t\r\n]+  {
     /* eat up whitespace */
@@ -85,7 +84,8 @@ data {num}*
     }
 }
 {name} {
-    BeginToken(yytext); yylval.string = strdup(yytext);return VALNAME;}
+    BeginToken(yytext); yylval.string = strdup(yytext);return VALNAME;
+}
 {separator} {
     BeginToken(yytext); 
     if(strcmp(yytext,";")==0){
@@ -98,6 +98,9 @@ data {num}*
         return RIGHT_BRACKET;
     }
 }
+
+{date} {BeginToken(yytext); yylval.string = strdup(yytext); return DATA;}
+"\".*\"" {BeginToken(yytext); yylval.string = strdup(yytext); return DATA;}
 {data} {BeginToken(yytext); yylval.string = strdup(yytext); return DATA;}
 
 "*" { 

@@ -1,3 +1,4 @@
+  
 %{
 /*--------------------------------------------------------------------
  * 
@@ -201,8 +202,7 @@ condition_list: condition LOGICOP condition_list {
     ONLYINSERT($$, $1);
     BUILDANDINSERT($$, $2);
     ONLYINSERT($$, $3);
-}
-| condition {
+}| condition {
     $$ = (void *) new trivialtree("<CONDITION_LIST>");
     ONLYINSERT($$, $1);
 };
@@ -213,14 +213,23 @@ condition: VALNAME OPERATOR VALNAME {
     BUILDANDINSERT($$,$1);
     BUILDANDINSERT($$,$2);
     BUILDANDINSERT($$,$3);
+}|VALNAME OPERATOR DATA {    
+    $$ = (void *) new trivialtree("<CONDITION>");
+    BUILDANDINSERT($$,$1);
+    BUILDANDINSERT($$,$2);
+    BUILDANDINSERT($$,$3);
+}|DATA OPERATOR VALNAME {    
+    $$ = (void *) new trivialtree("<CONDITION>");
+    BUILDANDINSERT($$,$1);
+    BUILDANDINSERT($$,$2);
+    BUILDANDINSERT($$,$3);
 }; 
 
 tuple_list: column SEP_COMMA tuple_list{
     $$ = (void *) new trivialtree("<TUPLE_LIST>");
     ONLYINSERT($$, $1);
     ONLYINSERT($$, $3);
-};
-| column{
+}| column{
     $$ = (void *) new trivialtree("<TUPLE_LIST>");
     ONLYINSERT($$, $1);
 };

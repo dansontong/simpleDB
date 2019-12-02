@@ -76,7 +76,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 42 "parse.y" /* yacc.c:1909  */
+#line 43 "parse.y" /* yacc.c:1909  */
 
   double      value;
   char        *string;
