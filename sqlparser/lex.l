@@ -28,7 +28,7 @@
 char [A-Za-z]
 num [0-9]
 keyword create|table|drop|select|from|where|insert\ into|values|delete|order\ by|desc|asc
-datatype int|float|double
+datatype int|float|double|char|date
 logic and|or
 separator \;|\,|\(|\)
 oprator \>|\<
