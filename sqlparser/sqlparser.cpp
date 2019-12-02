@@ -276,7 +276,7 @@ extern int main(int argc, char *argv[])
     }
 
     if (infile == NULL)
-        infile = "defs.txt";
+        infile = "testcase.sql";
 
     /*================================================================*/
     /* opening input -------------------------------------------------*/
