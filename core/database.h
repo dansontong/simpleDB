@@ -75,4 +75,8 @@ int database_memToDisk();
 //字典相关
 int readDataDictionary();
 
+
+//交互相关interact
+void dosInteract();
+
 #endif
