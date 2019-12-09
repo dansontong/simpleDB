@@ -29,12 +29,12 @@ fseek(FILE *stream, long offset, int fromwhere);//文件流 偏移量(用正负�
 5, 查询编译器:    mnb，包括sqlparser文件夹
 6, 索引-B+树:     lh ，包括/index/BPlusTree/b_plus_tree.h-cpp  
 7，索引-接口：     ly，包括/index/index.h-cpp   
------ 第五次 -----
+----- 第五次 -----   
 8, 可视化窗口： ly,window文件夹  
 9, 物理优化：  lh,executor文件夹  
 10,逻辑优化：  hrc,executor文件夹  
 11,查询执行：  mnb,executor文件夹.对接parser结果，调用物理优化和逻辑优化，执行 查询计划  
-12,完善功能： txg.  
+12,完善功能： txg  
   
   
 TODO:mnb  
