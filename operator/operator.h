@@ -1,5 +1,5 @@
-#ifndef EXECUTOR_H_INCLUDE
-#define EXECUTOR_H_INCLUDE
+#ifndef OPERATOR_H_INCLUDE
+#define OPERATOR_H_INCLUDE
 
 #include "config.h"
 #include "database.h"
@@ -15,6 +15,7 @@ int tableScanRangeSelector(int dictID,char* attri_name,char* min,char* max);//�
 int tableScanMaxRangeSelector(int dictID,char* attri_name,char* max);//只有max值
 int tableScanMinRangeSelector(int dictID,char* attri_name,char* min);//只有最小值
 int tableScanUnEqualSelector(int dictID,char* attri_name,char* value);//非等值连接
+int tableScanSelector(int dictID,char* attri_name,char* value);//select*
 
 
 // ==================== projection.cpp ==================

@@ -53,6 +53,7 @@ void database_initDB(struct DataBase *db, char *fileName)
 void database_closeDB()
 {
 	fclose(DB->dbFile);
+	DB->dbFile = NULL;
 	free(DB->freeSpaceBitMap);
 }
 

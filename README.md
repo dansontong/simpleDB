@@ -28,8 +28,15 @@ fseek(FILE *stream, long offset, int fromwhere);//文件流 偏移量(用正负�
 4, 简易日志系统:  txg，包括log文件夹  
 5, 查询编译器:    mnb，包括sqlparser文件夹
 6, 索引-B+树:     lh ，包括/index/BPlusTree/b_plus_tree.h-cpp  
-7，索引-接口：     ly，包括/index/index.h-cpp  
-
+7，索引-接口：     ly，包括/index/index.h-cpp   
+----- 第五次 -----
+8, 可视化窗口： ly,window文件夹  
+9, 物理优化：  lh,executor文件夹  
+10,逻辑优化：  hrc,executor文件夹  
+11,查询执行：  mnb,executor文件夹.对接parser结果，调用物理优化和逻辑优化，执行 查询计划  
+12,完善功能： txg.  
+  
+  
 TODO:mnb  
 ~~1, projection.cpp和select.cpp里面，同样用pageNo=1构造buftag后，为什么projection.cpp取到的pageMeta里pageNo=9979,select.cpp取到pageNo=1才是对的。为什么会有同样buftag返回不同的地址？？？  done，部分load忘记更新buftag~~  
 ~~2, file.cpp168行放开注释后，buffer会在start schedule输出后卡住，原因跑的太快了，大家时间戳都一样……~~  
