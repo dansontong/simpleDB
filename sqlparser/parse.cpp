@@ -82,7 +82,6 @@
  * global variables
  * 
  *------------------------------------------------------------------*/
-trivialtree *curGT;
 
 #define BUILDANDINSERT(root, data)  do{\
         trivialtree *tmp=new trivialtree(std::string(data));\
@@ -94,7 +93,7 @@ trivialtree *curGT;
         }\
     }while(0)
 
-#line 98 "parse.c" /* yacc.c:339  */
+#line 97 "parse.cpp" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -113,9 +112,9 @@ trivialtree *curGT;
 #endif
 
 /* In a future release of Bison, this section will be replaced
-   by #include "parse.h".  */
-#ifndef YY_YY_PARSE_H_INCLUDED
-# define YY_YY_PARSE_H_INCLUDED
+   by #include "parse.hpp".  */
+#ifndef YY_YY_PARSE_HPP_INCLUDED
+# define YY_YY_PARSE_HPP_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -160,13 +159,13 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 43 "parse.y" /* yacc.c:355  */
+#line 42 "parse.y" /* yacc.c:355  */
 
   double      value;
   char        *string;
   void        *tnode;
 
-#line 170 "parse.c" /* yacc.c:355  */
+#line 169 "parse.cpp" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -193,11 +192,11 @@ extern YYSTYPE yylval;
 extern YYLTYPE yylloc;
 int yyparse (void);
 
-#endif /* !YY_YY_PARSE_H_INCLUDED  */
+#endif /* !YY_YY_PARSE_HPP_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 
-#line 201 "parse.c" /* yacc.c:358  */
+#line 200 "parse.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -499,10 +498,10 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    78,    78,    78,    80,    81,    82,    83,    84,    86,
-      97,   109,   124,   134,   147,   159,   162,   167,   172,   177,
-     182,   184,   189,   194,   198,   200,   205,   211,   216,   221,
-     228,   232,   237,   243,   247
+       0,    77,    77,    77,    79,    80,    81,    82,    83,    85,
+      96,   108,   123,   133,   146,   158,   161,   166,   171,   176,
+     181,   183,   188,   193,   197,   199,   204,   210,   215,   220,
+     227,   231,   236,   242,   246
 };
 #endif
 
@@ -1410,68 +1409,68 @@ yyreduce:
   switch (yyn)
     {
         case 4:
-#line 80 "parse.y" /* yacc.c:1646  */
-    {PrintGrammar((yyvsp[-1].tnode));}
-#line 1416 "parse.c" /* yacc.c:1646  */
+#line 79 "parse.y" /* yacc.c:1646  */
+    {groot = (trivialtree *)(yyvsp[-1].tnode);}
+#line 1415 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 81 "parse.y" /* yacc.c:1646  */
-    {PrintGrammar((yyvsp[-1].tnode));}
-#line 1422 "parse.c" /* yacc.c:1646  */
+#line 80 "parse.y" /* yacc.c:1646  */
+    {groot = (trivialtree *)(yyvsp[-1].tnode);}
+#line 1421 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 82 "parse.y" /* yacc.c:1646  */
-    {PrintGrammar((yyvsp[-1].tnode));}
-#line 1428 "parse.c" /* yacc.c:1646  */
+#line 81 "parse.y" /* yacc.c:1646  */
+    {groot = (trivialtree *)(yyvsp[-1].tnode);}
+#line 1427 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 83 "parse.y" /* yacc.c:1646  */
-    {PrintGrammar((yyvsp[-1].tnode));}
-#line 1434 "parse.c" /* yacc.c:1646  */
+#line 82 "parse.y" /* yacc.c:1646  */
+    {groot = (trivialtree *)(yyvsp[-1].tnode);}
+#line 1433 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 84 "parse.y" /* yacc.c:1646  */
-    {PrintGrammar((yyvsp[-1].tnode));}
-#line 1440 "parse.c" /* yacc.c:1646  */
+#line 83 "parse.y" /* yacc.c:1646  */
+    {groot = (trivialtree *)(yyvsp[-1].tnode);}
+#line 1439 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 86 "parse.y" /* yacc.c:1646  */
+#line 85 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (void *) new trivialtree("<DROP>");
     BUILDANDINSERT((yyval.tnode), (yyvsp[-2].string));
     BUILDANDINSERT((yyval.tnode), (yyvsp[-1].string));
     BUILDANDINSERT((yyval.tnode), (yyvsp[0].string));
-    if ( debug ){
+    if ( parser_debug ){
         // printf("[reduce]: DROP TABLE %s => drop_sql\n", ((trivialtree *)$3)->data().c_str());
         printf("debug: %p\n", &(yylsp[0]));
     }
 }
-#line 1455 "parse.c" /* yacc.c:1646  */
+#line 1454 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 97 "parse.y" /* yacc.c:1646  */
+#line 96 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (void *) new trivialtree("<DELETE>");
     BUILDANDINSERT((yyval.tnode), (yyvsp[-3].string));
     BUILDANDINSERT((yyval.tnode), (yyvsp[-2].string));
     BUILDANDINSERT((yyval.tnode), (yyvsp[-1].string));
     ONLYINSERT((yyval.tnode),(yyvsp[0].tnode));
-    if ( debug ){
+    if ( parser_debug ){
         // printf("[reduce]: DELETE FROM %s WHERE => drop_sql\n", ((trivialtree *)$3)->data().c_str());
         ;
     }
 }
-#line 1471 "parse.c" /* yacc.c:1646  */
+#line 1470 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 109 "parse.y" /* yacc.c:1646  */
+#line 108 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (void *) new trivialtree("<SELECT>");
     BUILDANDINSERT((yyval.tnode),(yyvsp[-5].string));
@@ -1481,32 +1480,32 @@ yyreduce:
     ONLYINSERT((yyval.tnode),(yyvsp[-1].tnode));
     ONLYINSERT((yyval.tnode),(yyvsp[0].tnode));
 
-    if ( debug ){
+    if ( parser_debug ){
         // printf("[reduce]: SELECT FROM %s WHERE => select_sql\n", ((trivialtree *)$3)->data().c_str());
         ;
     }
 }
-#line 1490 "parse.c" /* yacc.c:1646  */
+#line 1489 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 124 "parse.y" /* yacc.c:1646  */
+#line 123 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (void *) new trivialtree("<INSERT>");
     BUILDANDINSERT((yyval.tnode),(yyvsp[-5].string));
     BUILDANDINSERT((yyval.tnode),(yyvsp[-4].string));
     BUILDANDINSERT((yyval.tnode),(yyvsp[-3].string));
     ONLYINSERT((yyval.tnode),(yyvsp[-1].tnode));
-    if ( debug ){
+    if ( parser_debug ){
         // printf("[reduce]: insert into values => insert_sql\n", ((trivialtree *)$3)->data().c_str());
         ;
     }
 }
-#line 1506 "parse.c" /* yacc.c:1646  */
+#line 1505 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 134 "parse.y" /* yacc.c:1646  */
+#line 133 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (void *) new trivialtree("<INSERT>");
     BUILDANDINSERT((yyval.tnode),(yyvsp[-8].string)); // INSERT 
@@ -1514,224 +1513,224 @@ yyreduce:
     ONLYINSERT((yyval.tnode),(yyvsp[-5].tnode)); // val_list
     BUILDANDINSERT((yyval.tnode),(yyvsp[-3].string)); // VALUES
     ONLYINSERT((yyval.tnode),(yyvsp[-1].tnode)); // data_list
-    if ( debug ){
+    if ( parser_debug ){
         // printf("[reduce]: insert into values => insert_sql\n", ((trivialtree *)$3)->data().c_str());
         ;
     }
 }
-#line 1523 "parse.c" /* yacc.c:1646  */
+#line 1522 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 147 "parse.y" /* yacc.c:1646  */
+#line 146 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (void *) new trivialtree("<CREATE>");
     BUILDANDINSERT((yyval.tnode),(yyvsp[-5].string)); // CREATE
     BUILDANDINSERT((yyval.tnode),(yyvsp[-4].string)); // TABLE
     BUILDANDINSERT((yyval.tnode),(yyvsp[-3].string)); // VALNAME
     ONLYINSERT((yyval.tnode), (yyvsp[-1].tnode));
-    if ( debug ){
+    if ( parser_debug ){
         // printf("[reduce]: CREATE TABLE  => create_sql\n", ((trivialtree *)$3)->data().c_str());
         ;
     }
 }
-#line 1539 "parse.c" /* yacc.c:1646  */
+#line 1538 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 159 "parse.y" /* yacc.c:1646  */
+#line 158 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (yyvsp[0].tnode);
     ((trivialtree *)(yyval.tnode))->setdata("<SEL_LIST>");
 }
-#line 1548 "parse.c" /* yacc.c:1646  */
+#line 1547 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 162 "parse.y" /* yacc.c:1646  */
+#line 161 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (void *) new trivialtree("<SEL_LIST>");
     BUILDANDINSERT((yyval.tnode),(yyvsp[0].string));
 }
-#line 1557 "parse.c" /* yacc.c:1646  */
+#line 1556 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 167 "parse.y" /* yacc.c:1646  */
+#line 166 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (void *) new trivialtree("<VAL_LIST>");
     BUILDANDINSERT((yyval.tnode),(yyvsp[-2].string));
     ONLYINSERT((yyval.tnode),(yyvsp[0].tnode));
 }
-#line 1567 "parse.c" /* yacc.c:1646  */
+#line 1566 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 172 "parse.y" /* yacc.c:1646  */
+#line 171 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (void *) new trivialtree("<VAL_LIST>");
     BUILDANDINSERT((yyval.tnode),(yyvsp[0].string));
 }
-#line 1576 "parse.c" /* yacc.c:1646  */
+#line 1575 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 177 "parse.y" /* yacc.c:1646  */
+#line 176 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (void *) new trivialtree("<WHERE>");
     BUILDANDINSERT((yyval.tnode), (yyvsp[-1].string));
     ONLYINSERT((yyval.tnode), (yyvsp[0].tnode));
 }
-#line 1586 "parse.c" /* yacc.c:1646  */
+#line 1585 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 182 "parse.y" /* yacc.c:1646  */
+#line 181 "parse.y" /* yacc.c:1646  */
     {(yyval.tnode) = NULL;}
-#line 1592 "parse.c" /* yacc.c:1646  */
+#line 1591 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 184 "parse.y" /* yacc.c:1646  */
+#line 183 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (void *) new trivialtree("<ORDERBY>");
     BUILDANDINSERT((yyval.tnode), (yyvsp[-2].string));
     ONLYINSERT((yyval.tnode), (yyvsp[-1].tnode));
     BUILDANDINSERT((yyval.tnode), (yyvsp[0].string));
 }
-#line 1603 "parse.c" /* yacc.c:1646  */
+#line 1602 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 189 "parse.y" /* yacc.c:1646  */
+#line 188 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (void *) new trivialtree("<ORDERBY>");
     BUILDANDINSERT((yyval.tnode), (yyvsp[-2].string));
     ONLYINSERT((yyval.tnode), (yyvsp[-1].tnode));
     BUILDANDINSERT((yyval.tnode), (yyvsp[0].string));
 }
-#line 1614 "parse.c" /* yacc.c:1646  */
+#line 1613 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 194 "parse.y" /* yacc.c:1646  */
+#line 193 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (void *) new trivialtree("<ORDERBY>");
     BUILDANDINSERT((yyval.tnode), (yyvsp[-1].string));
     ONLYINSERT((yyval.tnode), (yyvsp[0].tnode));
 }
-#line 1624 "parse.c" /* yacc.c:1646  */
+#line 1623 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 198 "parse.y" /* yacc.c:1646  */
+#line 197 "parse.y" /* yacc.c:1646  */
     {(yyval.tnode)=NULL;}
-#line 1630 "parse.c" /* yacc.c:1646  */
+#line 1629 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 200 "parse.y" /* yacc.c:1646  */
+#line 199 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (void *) new trivialtree("<CONDITION_LIST>");
     ONLYINSERT((yyval.tnode), (yyvsp[-2].tnode));
     BUILDANDINSERT((yyval.tnode), (yyvsp[-1].string));
     ONLYINSERT((yyval.tnode), (yyvsp[0].tnode));
 }
-#line 1641 "parse.c" /* yacc.c:1646  */
+#line 1640 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 205 "parse.y" /* yacc.c:1646  */
+#line 204 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (void *) new trivialtree("<CONDITION_LIST>");
     ONLYINSERT((yyval.tnode), (yyvsp[0].tnode));
 }
-#line 1650 "parse.c" /* yacc.c:1646  */
+#line 1649 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 211 "parse.y" /* yacc.c:1646  */
+#line 210 "parse.y" /* yacc.c:1646  */
     {    
     (yyval.tnode) = (void *) new trivialtree("<CONDITION>");
     BUILDANDINSERT((yyval.tnode),(yyvsp[-2].string));
     BUILDANDINSERT((yyval.tnode),(yyvsp[-1].string));
     BUILDANDINSERT((yyval.tnode),(yyvsp[0].string));
 }
-#line 1661 "parse.c" /* yacc.c:1646  */
+#line 1660 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 216 "parse.y" /* yacc.c:1646  */
+#line 215 "parse.y" /* yacc.c:1646  */
     {    
     (yyval.tnode) = (void *) new trivialtree("<CONDITION>");
     BUILDANDINSERT((yyval.tnode),(yyvsp[-2].string));
     BUILDANDINSERT((yyval.tnode),(yyvsp[-1].string));
     BUILDANDINSERT((yyval.tnode),(yyvsp[0].string));
 }
-#line 1672 "parse.c" /* yacc.c:1646  */
+#line 1671 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 221 "parse.y" /* yacc.c:1646  */
+#line 220 "parse.y" /* yacc.c:1646  */
     {    
     (yyval.tnode) = (void *) new trivialtree("<CONDITION>");
     BUILDANDINSERT((yyval.tnode),(yyvsp[-2].string));
     BUILDANDINSERT((yyval.tnode),(yyvsp[-1].string));
     BUILDANDINSERT((yyval.tnode),(yyvsp[0].string));
 }
-#line 1683 "parse.c" /* yacc.c:1646  */
+#line 1682 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 228 "parse.y" /* yacc.c:1646  */
+#line 227 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (void *) new trivialtree("<TUPLE_LIST>");
     ONLYINSERT((yyval.tnode), (yyvsp[-2].tnode));
     ONLYINSERT((yyval.tnode), (yyvsp[0].tnode));
 }
-#line 1693 "parse.c" /* yacc.c:1646  */
+#line 1692 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 232 "parse.y" /* yacc.c:1646  */
+#line 231 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (void *) new trivialtree("<TUPLE_LIST>");
     ONLYINSERT((yyval.tnode), (yyvsp[0].tnode));
 }
-#line 1702 "parse.c" /* yacc.c:1646  */
+#line 1701 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 237 "parse.y" /* yacc.c:1646  */
+#line 236 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (void *) new trivialtree("<TUPLE>");
     BUILDANDINSERT((yyval.tnode), (yyvsp[-1].string));
     BUILDANDINSERT((yyval.tnode), (yyvsp[0].string));
 }
-#line 1712 "parse.c" /* yacc.c:1646  */
+#line 1711 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 243 "parse.y" /* yacc.c:1646  */
+#line 242 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (void *) new trivialtree("<DATA_LIST>");
     BUILDANDINSERT((yyval.tnode), (yyvsp[-2].string));
     ONLYINSERT((yyval.tnode), (yyvsp[0].tnode));
 }
-#line 1722 "parse.c" /* yacc.c:1646  */
+#line 1721 "parse.cpp" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 247 "parse.y" /* yacc.c:1646  */
+#line 246 "parse.y" /* yacc.c:1646  */
     {
     (yyval.tnode) = (void *) new trivialtree("<DATA_LIST>");
     BUILDANDINSERT((yyval.tnode), (yyvsp[0].string));
 }
-#line 1731 "parse.c" /* yacc.c:1646  */
+#line 1730 "parse.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 1735 "parse.c" /* yacc.c:1646  */
+#line 1734 "parse.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1966,7 +1965,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 252 "parse.y" /* yacc.c:1906  */
+#line 251 "parse.y" /* yacc.c:1906  */
 
 /*------------------------------------------------------------------------------
  * 

@@ -16,7 +16,8 @@
 /*
  * global variable
  */
-extern int debug;
+extern int parser_debug;
+extern trivialtree *groot;
 
 /*
  * lex & parse
@@ -34,4 +35,6 @@ extern void BeginToken(char*);
 extern void PrintError(char *s, ...);
 
 extern void PrintGrammar(trivialtree *root);
+extern trivialtree * sql_parser_single(char *sql, int sqllen);
+
 #endif /*SQL_PARSER*/
