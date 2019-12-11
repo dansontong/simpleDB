@@ -1,15 +1,15 @@
 #
 # makefile for sqlparser
 #
-OBJS += lex.c parse.c parse.h trivialtree.h trivialtree.cpp sqlparser.h sqlparser.cpp
+OBJS += lex.c parse.c parse.h trivialtree.h trivialtree.cpp sqlparser.h sqlparser.cpp ../log/log.cpp ../log/log.h
 
 sqlparser: sqlparser.h sqlparser.cpp parse.c parse.h lex.c
 	g++ -g -w -fpermissive -osqlparser $(OBJS)
 
 # dependencies
 depends:
-	flex -olex.c -i lex.l
-	bison -o parse.c parse.y -d
+	flex -olex.cpp -i lex.l
+	bison -o parse.cpp parse.y -d
 
 clean:
 	rm -rf *.o

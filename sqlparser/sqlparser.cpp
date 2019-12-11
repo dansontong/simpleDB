@@ -14,11 +14,14 @@
 #include "sqlparser.h"
 
 #include <iostream>
+#include "log.h"
+
 /*
  * global variable
  */
 
-int debug = 0;
+int parser_debug = 0;
+trivialtree *groot = NULL;
 
 /*
  * local variable
@@ -126,7 +129,6 @@ extern void PrintError(char *errorstring, ...)
             fprintf(stdout, ".");
         fprintf(stdout, "   token%d:%d\n", start, end);
     }
-    /* */
 
     /*================================================================*/
     /* print it using variable arguments -----------------------------*/
@@ -169,8 +171,6 @@ static int getNextLine(void)
     lBuffer = strlen(buffer);
     DumpRow();
 
-    /*================================================================*/
-    /* that's it -----------------------------------------------------*/
     return 0;
 }
 
@@ -202,7 +202,7 @@ extern int GetNextChar(char *b, int maxBuffer)
     b[0] = buffer[nBuffer];
     nBuffer += 1;
 
-    if (debug)
+    if (parser_debug)
         printf("GetNextChar() => '%c'0x%02x at %d\n",
                dumpChar(b[0]), b[0], nBuffer);
     return b[0] == 0 ? 0 : 1;
@@ -220,20 +220,6 @@ extern void BeginToken(char *t)
     nTokenStart = nTokenNextStart;
     nTokenLength = strlen(t);
     nTokenNextStart = nBuffer; // + 1;
-
-    /*================================================================*/
-    /* location for bison --------------------------------------------*/
-    yylloc.first_line = nRow;
-    yylloc.first_column = nTokenStart;
-    yylloc.last_line = nRow;
-    yylloc.last_column = nTokenStart + nTokenLength - 1;
-
-    if (debug)
-    {
-        printf("Token '%s' at %d:%d next at %d\n", dumpString(t),
-               yylloc.first_column,
-               yylloc.last_column, nTokenNextStart);
-    }
 }
 
 /*--------------------------------------------------------------------
@@ -243,7 +229,7 @@ extern void BeginToken(char *t)
  *------------------------------------------------------------------*/
 void PrintGrammar(trivialtree *root)
 {
-    if (root)
+    if (root && parser_debug)
     {
         fprintf(stdout, "       |  *** grammar tree ***  \n");
         root->print(0);
@@ -255,38 +241,85 @@ void PrintGrammar(trivialtree *root)
  * 
  * the master
  *------------------------------------------------------------------*/
-extern int main(int argc, char *argv[])
+// extern int main(int argc, char *argv[])
+// {
+//     int i;
+//     char *infile = NULL;
+
+//     /*================================================================*/
+//     /*----------------------------------------------------------------*/
+//     debug = 0;
+
+//     for (i = 1; i < argc; i++)
+//     {
+//         if (strcmp(argv[i], "-debug") == 0)
+//         {
+//             printf("debugging activated\n");
+//             debug = 1;
+//         }
+//         else
+//             infile = argv[i];
+//     }
+
+//     if (infile == NULL)
+//         infile = "testcase.sql";
+
+//     /*================================================================*/
+//     /* opening input -------------------------------------------------*/
+//     printf("reading file '%s'\n", infile);
+//     file = fopen(infile, "r");
+//     if (file == NULL)
+//     {
+//         printf("cannot open input\n");
+//         return 12;
+//     }
+
+//     /*================================================================*/
+//     /*----------------------------------------------------------------*/
+//     buffer = (char *)malloc(lMaxBuffer);
+//     if (buffer == NULL)
+//     {
+//         printf("cannot allocate %d bytes of memory\n", lMaxBuffer);
+//         fclose(file);
+//         return 12;
+//     }
+
+//     /*================================================================*/
+//     /* parse it ------------------------------------------------------*/
+//     DumpRow();
+//     if (getNextLine() == 0)
+//         yyparse();
+
+//     /*================================================================*/
+//     /* ending... -----------------------------------------------------*/
+//     free(buffer);
+//     fclose(file);
+
+//     return 0;
+// }
+
+
+// 调用语法分析接口（单个语句的）
+// 传入sql语句的起始地址&语句长度
+// 返回语法树的树根指针，如果出错则返回NULL
+// 如果当前语句中有多个语句，则只返回最后一句的语法树
+// 非线程安全！
+trivialtree * sql_parser_single(char *sql, int sqllen)
 {
-    int i;
-    char *infile = NULL;
+    // 创建临时文件
+    char tmp_filename[] = "./sqptmp.tmp";
+    FILE *f1 = fopen(tmp_filename, "wb");
 
-    /*================================================================*/
-    /*----------------------------------------------------------------*/
-    debug = 0;
-
-    for (i = 1; i < argc; i++)
-    {
-        if (strcmp(argv[i], "-debug") == 0)
-        {
-            printf("debugging activated\n");
-            debug = 1;
-        }
-        else
-            infile = argv[i];
+    // 将sql写入临时文件
+    int r1 = fwrite(sql, sizeof(char), sqllen, f1);
+    if (r1<sqllen){
+        log_Error("write sql to temp file error.\n");
+        return NULL;
     }
+    fclose(f1);
 
-    if (infile == NULL)
-        infile = "testcase.sql";
 
-    /*================================================================*/
-    /* opening input -------------------------------------------------*/
-    printf("reading file '%s'\n", infile);
-    file = fopen(infile, "r");
-    if (file == NULL)
-    {
-        printf("cannot open input\n");
-        return 12;
-    }
+    file = fopen(tmp_filename, "r");
 
     /*================================================================*/
     /*----------------------------------------------------------------*/
@@ -295,11 +328,11 @@ extern int main(int argc, char *argv[])
     {
         printf("cannot allocate %d bytes of memory\n", lMaxBuffer);
         fclose(file);
-        return 12;
+        return NULL;
     }
 
-    /*================================================================*/
-    /* parse it ------------------------------------------------------*/
+    // 调用语法解析器
+    groot = NULL;
     DumpRow();
     if (getNextLine() == 0)
         yyparse();
@@ -309,8 +342,10 @@ extern int main(int argc, char *argv[])
     free(buffer);
     fclose(file);
 
-    return 0;
+    // 删除临时文件
+    int res = remove(tmp_filename);
+    if (res != 0){
+        log_Error("remove sql temp file error.\n");
+    }
+    return groot;
 }
-/*--------------------------------------------------------------------
- * main.c
- *------------------------------------------------------------------*/

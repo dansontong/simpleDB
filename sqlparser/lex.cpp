@@ -1,6 +1,6 @@
-#line 2 "lex.c"
+#line 2 "lex.cpp"
 
-#line 4 "lex.c"
+#line 4 "lex.cpp"
 
 #define  YY_INT_ALIGNED short int
 
@@ -571,7 +571,7 @@ char *yytext;
  * flex definitions
  * 
  *------------------------------------------------------------------*/
-#line 575 "lex.c"
+#line 575 "lex.cpp"
 
 #define INITIAL 0
 
@@ -755,7 +755,7 @@ YY_DECL
     
 #line 37 "lex.l"
 
-#line 759 "lex.c"
+#line 759 "lex.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -959,7 +959,7 @@ YY_RULE_SETUP
 #line 112 "lex.l"
 ECHO;
 	YY_BREAK
-#line 963 "lex.c"
+#line 963 "lex.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 

@@ -18,7 +18,6 @@
  * global variables
  * 
  *------------------------------------------------------------------*/
-trivialtree *curGT;
 
 #define BUILDANDINSERT(root, data)  do{\
         trivialtree *tmp=new trivialtree(std::string(data));\
@@ -77,18 +76,18 @@ trivialtree *curGT;
  *----------------------------------------------------------------------------*/
 sql: scripts sql| scripts; 
 
-scripts: drop_sql SEP_SEMICOLON {PrintGrammar($1);}
-| delete_sql SEP_SEMICOLON {PrintGrammar($1);}
-| select_sql SEP_SEMICOLON {PrintGrammar($1);}
-| create_sql SEP_SEMICOLON {PrintGrammar($1);}
-| insert_sql SEP_SEMICOLON {PrintGrammar($1);};
+scripts: drop_sql SEP_SEMICOLON {groot = (trivialtree *)$1;}
+| delete_sql SEP_SEMICOLON {groot = (trivialtree *)$1;}
+| select_sql SEP_SEMICOLON {groot = (trivialtree *)$1;}
+| create_sql SEP_SEMICOLON {groot = (trivialtree *)$1;}
+| insert_sql SEP_SEMICOLON {groot = (trivialtree *)$1;};
 
 drop_sql:  DROP TABLE VALNAME {
     $$ = (void *) new trivialtree("<DROP>");
     BUILDANDINSERT($$, $1);
     BUILDANDINSERT($$, $2);
     BUILDANDINSERT($$, $3);
-    if ( debug ){
+    if ( parser_debug ){
         // printf("[reduce]: DROP TABLE %s => drop_sql\n", ((trivialtree *)$3)->data().c_str());
         printf("debug: %p\n", &@3);
     }
@@ -100,7 +99,7 @@ delete_sql: DELETE FROM VALNAME where_clause {
     BUILDANDINSERT($$, $2);
     BUILDANDINSERT($$, $3);
     ONLYINSERT($$,$4);
-    if ( debug ){
+    if ( parser_debug ){
         // printf("[reduce]: DELETE FROM %s WHERE => drop_sql\n", ((trivialtree *)$3)->data().c_str());
         ;
     }
@@ -115,7 +114,7 @@ select_sql: SELECT sel_list FROM val_list where_clause order_clause{
     ONLYINSERT($$,$5);
     ONLYINSERT($$,$6);
 
-    if ( debug ){
+    if ( parser_debug ){
         // printf("[reduce]: SELECT FROM %s WHERE => select_sql\n", ((trivialtree *)$3)->data().c_str());
         ;
     }
@@ -127,7 +126,7 @@ insert_sql: INSERT VALNAME VALUES LEFT_BRACKET data_list RIGHT_BRACKET{
     BUILDANDINSERT($$,$2);
     BUILDANDINSERT($$,$3);
     ONLYINSERT($$,$5);
-    if ( debug ){
+    if ( parser_debug ){
         // printf("[reduce]: insert into values => insert_sql\n", ((trivialtree *)$3)->data().c_str());
         ;
     }
@@ -138,7 +137,7 @@ insert_sql: INSERT VALNAME VALUES LEFT_BRACKET data_list RIGHT_BRACKET{
     ONLYINSERT($$,$4); // val_list
     BUILDANDINSERT($$,$6); // VALUES
     ONLYINSERT($$,$8); // data_list
-    if ( debug ){
+    if ( parser_debug ){
         // printf("[reduce]: insert into values => insert_sql\n", ((trivialtree *)$3)->data().c_str());
         ;
     }
@@ -150,7 +149,7 @@ create_sql: CREATE TABLE VALNAME LEFT_BRACKET tuple_list RIGHT_BRACKET{
     BUILDANDINSERT($$,$2); // TABLE
     BUILDANDINSERT($$,$3); // VALNAME
     ONLYINSERT($$, $5);
-    if ( debug ){
+    if ( parser_debug ){
         // printf("[reduce]: CREATE TABLE  => create_sql\n", ((trivialtree *)$3)->data().c_str());
         ;
     }
