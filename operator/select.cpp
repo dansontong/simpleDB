@@ -1,4 +1,4 @@
-#include "executor.h"
+#include "operator.h"
 
 //==================== global variable ====================
 extern struct DataBase *DB; /* 全局共享 */
@@ -70,9 +70,10 @@ int tableScanEqualSelector(int dictID,char* attri_name,char* value){
 	return tmptable;
 }
 
-int tableScanSelector(int dictID,char* attri_name,char* value){
+int tableScanSelector(int dictID,char* attri_name){
 	Table table1 = DB->dataDict[dictID];
 	int fileID = table1.fileID;
+	printf("%d\n", fileID);
 	long querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
@@ -119,10 +120,8 @@ int tableScanSelector(int dictID,char* attri_name,char* value){
 				printf("获取表中属性值失败！\n");
 				return -1;
 			}
-			if (strcmp(attrValue, value) == 0){
-				insertRecord(tmptable,record);
-				printf("==== tmp-record: %.60s\n", record);
-			}
+			insertRecord(tmptable,record);
+			printf("=== tmp-record: %.60s\n", record);
 		}
 		if(pageMeta.nextPageNo<0){
 			break;
@@ -130,7 +129,7 @@ int tableScanSelector(int dictID,char* attri_name,char* value){
 		else{
 			pageNo=pageMeta.nextPageNo;
 		}
-		break; // temp: if-not, there're  too many records
+		// break; // temp: if-not, there're  too many records
 	}
 	// free(record);
 	// free(attrValue);

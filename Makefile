@@ -1,7 +1,7 @@
 #不生成.o文件，一步到位得到可执行文件
 cc = g++
 target = database
-INCLUDE = -I ./log -I ./core -I ./index -I ./index/BPlusTree -I ./storage
+INCLUDE = -I ./log -I ./core -I ./index -I ./index/BPlusTree -I ./storage -I ./operator
 # debug mode default
 ver = debug
 ifeq ($(ver), debug)
@@ -15,10 +15,10 @@ CXXFLAGS = -pthread -O3
 endif
 
 head = $(shell find ./log ./core ./storage -name "*.h")
-src = $(shell find ./log ./core ./storage -name "*.cpp")
+src = $(shell find ./log ./core ./storage ./operator ./index -name "*.cpp")  ./main.cpp
 
 $(target): $(src)
-	$(cc) $(CXXFLAGS) $(INCLUDE) $^ main.cpp -o $(target)
+	$(cc) $(CXXFLAGS) $(INCLUDE) $^ -o $(target)
 	# ./$(target)
 	# rm $(target)
 

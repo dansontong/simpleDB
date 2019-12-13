@@ -6,9 +6,9 @@ int main(int argc, char* argv[])
 {
 	//初始化数据库
 	DataBase DB;
-	char dbFile[30] = "../data/simpleDb";
+	// char dbFile[30] = "./data/simpleDb";//see config.h
 
-	log_init("./DBrun.log");//初始化日志系统
+	// log_init("./DBrun.log");//初始化日志系统,contain by Buf_init()
 	Buf_Init();
 	database_initDB(&DB, dbFile);
 
@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 	database_showDbInfo();
 
 	//进入交互,dos或window界面
-	// dosInteract();
+	dosInteract();
 
 	if(DB.dbFile  != NULL)
 	{

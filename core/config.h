@@ -14,7 +14,7 @@ using namespace std;
 
 // configuration配置参数
 
-// 磁盘中的数据库文件 配置参数
+// 磁盘中的数据库文件,大小配置参数
 #define BLOCK_SIZE (4*1024)            // 磁盘中数据块的大小，也等于buffer中的PAGE_SIZE
 #define FILE_DATA_SIZE (256*1024*1024)// 文件数据区大小256M，单位字节
 #define FILE_DATA_ADDR (BIT_MAP_ADDR + BIT_MAP_SIZE)         // 数据区起始位置
@@ -63,6 +63,9 @@ typedef enum{
 	TMP_TABLE_FILE = 4,  // tmpTable_file
 }FILE_TYPE;
 
+
+// 字符常量
+static char dbFile[50] = "./data/simpleDb";
 const static char dataTypeName[7][10]={"INT","LONG","FLOAT","DOUBLE","CHAR","VARCHAR","DATE"};
 
 #endif

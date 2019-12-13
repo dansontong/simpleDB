@@ -39,11 +39,11 @@ void database_initDB(struct DataBase *db, char *fileName)
 		DB->dbMeta.dataDictFid = fid;
 	}
 	int count = readDataDictionary();
-	//一律重置数据字典，后续需要更改
-	for (int i = count; i < MAX_FILE_NUM; i++) {
-		memset(&DB->dataDict[i], 0, sizeof(Table));
-		DB->dataDict[i].fileID = -1;
-	}
+	// for (int i = count; i < MAX_FILE_NUM; i++) {//一律重置数据字典，后续需要更改
+	// 	memset(&DB->dataDict[i], 0, sizeof(Table));
+	// 	DB->dataDict[i].fileID = -1;
+	// }
+	
 	printf("initDB done.\n");
 	//建立表
 	//插入数据
