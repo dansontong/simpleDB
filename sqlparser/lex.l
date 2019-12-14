@@ -34,6 +34,7 @@ oprator \>|\<|=
 data {digit}*
 name [A-Za-z][A-Za-z0-9]*
 date {digit}+\-{digit}+(\-{digit}+)?
+str \".*\"
 %%
 [ \t\r\n]+  {
     /* eat up whitespace */
@@ -99,8 +100,10 @@ date {digit}+\-{digit}+(\-{digit}+)?
     }
 }
 
+"." {BeginToken(yytext); yylval.string = strdup(yytext); return SEP_PERIOD;}
+
 {date} {BeginToken(yytext); yylval.string = strdup(yytext); return DATA;}
-"\".*\"" {BeginToken(yytext); yylval.string = strdup(yytext); return DATA;}
+{str} {BeginToken(yytext); yylval.string = strdup(yytext); return DATA;}
 {data} {BeginToken(yytext); yylval.string = strdup(yytext); return DATA;}
 
 "*" { 

@@ -10,7 +10,7 @@
 int main() {
     printf("======================= parser_test begin ===========\n");
 
-    char sql[] = "select * from user;";
+    char sql[] = "select * from tmp, user where v=10 and g<10;";
     printf("sql: %s\n", sql);
 
     trivialtree *root = sql_parser_single(sql, strlen(sql));

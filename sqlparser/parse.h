@@ -59,15 +59,16 @@ extern int yydebug;
     SEP_SEMICOLON = 269,
     SEP_COMMA = 270,
     ASTERISK = 271,
-    LOGICOP = 272,
-    OPERATOR = 273,
-    LEFT_BRACKET = 274,
-    RIGHT_BRACKET = 275,
-    VALNAME = 276,
-    DATATYPE = 277,
-    DATA = 278,
-    ASC = 279,
-    DESC = 280
+    SEP_PERIOD = 272,
+    LOGICOP = 273,
+    OPERATOR = 274,
+    LEFT_BRACKET = 275,
+    RIGHT_BRACKET = 276,
+    VALNAME = 277,
+    DATATYPE = 278,
+    DATA = 279,
+    ASC = 280,
+    DESC = 281
   };
 #endif
 
@@ -82,7 +83,7 @@ union YYSTYPE
   char        *string;
   void        *tnode;
 
-#line 86 "parse.h" /* yacc.c:1909  */
+#line 87 "parse.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

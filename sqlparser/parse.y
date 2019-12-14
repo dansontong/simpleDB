@@ -53,13 +53,14 @@
  *------------------------------------------------------------------*/
 %token<string> DROP CREATE SELECT INSERT DELETE
 %token<string> TABLE FROM WHERE ORDERBY INTO VALUES
-%token<string> SEP_SEMICOLON SEP_COMMA ASTERISK
+%token<string> SEP_SEMICOLON SEP_COMMA ASTERISK SEP_PERIOD
 %token<string> LOGICOP OPERATOR LEFT_BRACKET RIGHT_BRACKET
 %token<string> VALNAME DATATYPE DATA ASC DESC
 
 %type<tnode>    drop_sql delete_sql select_sql create_sql insert_sql
 %type<tnode>    where_clause sel_list condition_list val_list data_list tuple_list order_clause
 %type<tnode>    condition column
+%type<string>   val_tuple
 /*------------------------------------------------------------------------------
  *
  * start of grammar
@@ -207,22 +208,32 @@ condition_list: condition LOGICOP condition_list {
 };
 
 // TODO too simple
-condition: VALNAME OPERATOR VALNAME {    
+condition: val_tuple OPERATOR val_tuple {    
     $$ = (void *) new trivialtree("<CONDITION>");
     BUILDANDINSERT($$,$1);
     BUILDANDINSERT($$,$2);
     BUILDANDINSERT($$,$3);
-}|VALNAME OPERATOR DATA {    
+}|val_tuple OPERATOR DATA {
+    char data[100] = "DATA:";
     $$ = (void *) new trivialtree("<CONDITION>");
     BUILDANDINSERT($$,$1);
     BUILDANDINSERT($$,$2);
-    BUILDANDINSERT($$,$3);
-}|DATA OPERATOR VALNAME {    
+    BUILDANDINSERT($$,strcat(data, $3));
+}|DATA OPERATOR val_tuple {    
+    char data[100] = "DATA:";
     $$ = (void *) new trivialtree("<CONDITION>");
-    BUILDANDINSERT($$,$1);
+    BUILDANDINSERT($$,strcat(data, $1));
     BUILDANDINSERT($$,$2);
     BUILDANDINSERT($$,$3);
 }; 
+
+val_tuple: VALNAME SEP_PERIOD VALNAME{
+    char attr[100] = "ATTR:";
+    $$ = strdup( strcat(strcat(strcat(attr, $1), "."), $3) );
+}|VALNAME{
+    char attr[100] = "ATTR:";
+    $$ = strdup(strcat(attr, $1));
+};
 
 tuple_list: column SEP_COMMA tuple_list{
     $$ = (void *) new trivialtree("<TUPLE_LIST>");
