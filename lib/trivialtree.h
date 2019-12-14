@@ -19,6 +19,9 @@ public:
 
     trivialtree(std::string d);
 
+    trivialtree* Brother(){return this->brothers;}
+    trivialtree* Child(){return this->children;}
+
     std::string data();
     void setdata(char *data);
     void setParent(trivialtree *p);

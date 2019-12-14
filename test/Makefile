@@ -1,15 +1,17 @@
 cc = g++
 
 CXXFLAGS = -pthread -g -Ddebug -fpermissive
-INCLUDE = -I ../core -I ../storage -I ../log -I ../index/BPlusTree -I ../index -I ../executor -I ../sqlparser
+INCLUDE = -I ../core -I ../storage -I ../log -I ../index/BPlusTree -I ../index -I ../executor -I ../sqlparser -I ../lib
 CFLAGS_parser = -std=c++1z -lstdc++ -Wall -Werror -I../parser -L../parser -lsqlparser
 LIB_SRC =  -L../storage/*.cpp -L../core/*.cpp
 src = ../core ../storage ../index
 src_buf = $(shell find ../log ../core ../storage -name "*.cpp")
 src_bPtree = $(shell find ../log ../index/BPlusTree  -name "*.cpp")
 src_index = $(shell find ../log ../core ../storage ../index ../executor ../sqlparser -name "*.cpp")
-src_executor = $(shell find ../log ../core ../storage ../index ../executor  -name "*.cpp")
-src_parser = $(shell find ../log ../sqlparser -name "*.cpp")
+# src_executor = $(shell find ../log ../core ../storage ../index ../executor  -name "*.cpp")
+src_parser = $(shell find ../log ../sqlparser ../lib  -name "*.cpp")
+
+src_executor = $(shell find ../log ../sqlparser ../lib -name "*.cpp")
 
 buffer: 
 	# $(cc) $(CXXFLAGS) $(INCLUDE) storage/buffer_test.cpp $(src_buf) -o buffer_test.o
@@ -21,13 +23,14 @@ buffer:
 	# $(cc) $(CXXFLAGS) $(INCLUDE) index/bPlusTree_test.cpp $(src_bPtree) -o bPlusTree_test.o
 	# $(cc) $(CXXFLAGS) $(INCLUDE) executor/executor_test.cpp $(src_executor) -o executor_test.o
 	$(cc) $(CXXFLAGS) $(INCLUDE) parser/sqlparser_test.cpp $(src_parser) -o parser_test.o
+	$(cc) $(CXXFLAGS) $(INCLUDE) executor/executor_test.cpp $(src_executor) ../executor/executor.cpp -o executor_test.o
 	# ./buffer_test.o
 	# ./log_test.o
 	# ./pageBitMap_test.o
 	# ./parser_test.o
 	# ./index_test.o
 	# ./bPlusTree_test.o
-	# ./executor_test.o
+	./executor_test.o
 	# rm -rf *_test.o *.log
 
 # make clear: clear runnable file 
