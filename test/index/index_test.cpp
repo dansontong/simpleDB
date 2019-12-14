@@ -13,13 +13,13 @@ int main(int argc, char* argv[]) {
 
 	log_init("../data/DBrun.log");//初始化日志系统
 	Buf_Init();
-	database_initDB(&DB, dbFile);
+	initDB(&DB, dbFile);
 
 	log_Debug("DB initial done.\n");
 
 	//展示数据库
-	database_showDbInfo();
-	database_memToDisk();
+	showDbInfo();
+	memToDisk();
 	
 	//创建表
 	char tableFile[30] = "../data/table_list";
@@ -57,9 +57,9 @@ int main(int argc, char* argv[]) {
 
 
 
-	database_showDbInfo();
+	showDbInfo();
 
-	database_closeDB();
+	closeDB();
 
 
 

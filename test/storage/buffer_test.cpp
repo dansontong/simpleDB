@@ -35,7 +35,7 @@ int main()
     // //初始化数据库
     // DataBase DB;
     // char dbFile[30] = "../data/simpleDb";
-    // database_initDB(&DB, dbFile);
+    // initDB(&DB, dbFile);
     // // file_Init(&DB);
     // Buf_Init();
     // cout << "Buffer init success." << endl;

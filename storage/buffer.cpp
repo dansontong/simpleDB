@@ -375,3 +375,23 @@ void MemFree(void *addr)
     }
     free(addr);
 }
+
+void bufToDisk()
+{
+    long bufId;
+    for (int i = 0; i < BUFFER_NUM; i++)
+    {
+        bufId = i;
+        BufMeta *bmeta = &(bufMetas[bufId]);
+        if (bmeta->bufMode == BM_isDirty)
+        {
+            // 缓存块为脏数据，丢弃前先写回
+            char *bufstart = Buf_GetBlock(bufId);
+            file_write_sd(bmeta->bTag.pageNo, bufstart);
+
+            char logs[255];
+            sprintf(logs, "%ld buffer is dirty, write to disk first.", bufId);
+            log_Info(logs);
+        }
+    }
+}

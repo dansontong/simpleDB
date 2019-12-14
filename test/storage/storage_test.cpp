@@ -9,14 +9,14 @@ int main(int argc, char* argv[])
 	char dbFile[30] = "./data/simpleDb";
 
 	log_init();//初始化日志系统
-	database_initDB(&DB, dbFile);
+	initDB(&DB, dbFile);
 	Buf_Init(&DB);
 
 	log_Debug("DB initial done.\n");
 
 	//展示数据库
-	database_showDbInfo(&DB);
-	database_memToDisk(&DB);
+	showDbInfo(&DB);
+	memToDisk(&DB);
 	
 	//创建表
 	char tableFile[30] = "./data/table_list";
@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 		printf("insert line No.%d\n", count++);
 		//printf("%s\n", buff);
 	}
-		database_showDbInfo(&DB);
+		showDbInfo(&DB);
 
 	// int fileID = file_createFile(&dbMeta, TABLE_FILE, 1);
 	// printf("创建文件%d成功！\n", fileID);
@@ -57,5 +57,5 @@ int main(int argc, char* argv[])
 	// 	file_writeFile(&dbMeta, fileID, strlen(str), str);
 	// }
 
-	database_closeDB(&DB);
+	closeDB(&DB);
 }

@@ -8,15 +8,16 @@ int tableScanEqualSelector(int dictID,char* attri_name,char* value){
 	int fileID = table1.fileID;
 	long querypage=-1;
 	int i;
-	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
+	for( i=0;i<MAX_FILE_NUM;i++){                                   //这一块是查找文件是否存在
 		if(DB->dbMeta.fileMeta[i].id==fileID){						//
 			querypage=DB->dbMeta.fileMeta[i].firstPageNo;			//
-			break;																//
-		}																		//
+			break;													//
+		}															//
 	}
 	if(querypage==-1){
-		printf("该表应的文件不存在！");
-		exit(0);
+		printf("该表应的文件不存在！\n");
+		return -1;
+		// exit(0);
 	}
 	long pageNo = DB->dbMeta.fileMeta[i].firstPageNo;
 	long pageNum = DB->dbMeta.fileMeta[i].pageNum;
@@ -83,8 +84,9 @@ int tableScanSelector(int dictID,char* attri_name){
 		}																		//
 	}
 	if(querypage==-1){
-		printf("该表应的文件不存在！");
-		exit(0);
+		printf("该表应的文件不存在！\n");
+		return -1;
+		// exit(0);
 	}
 	long pageNo = DB->dbMeta.fileMeta[i].firstPageNo;
 	long pageNum = DB->dbMeta.fileMeta[i].pageNum;
@@ -147,8 +149,9 @@ int tableScanRangeSelector(int dictID,char* attri_name,char* min,char* max){
 		}																		//
 	}
 	if(querypage==-1){
-		printf("该表应的文件不存在！");
-		exit(0);
+		printf("该表应的文件不存在！\n");
+		return -1;
+		// exit(0);
 	}
 	long pageNo = DB->dbMeta.fileMeta[i].firstPageNo;
 	long pagenum = DB->dbMeta.fileMeta[i].pageNum;
@@ -225,8 +228,9 @@ int tableScanUnEqualSelector(int dictID,char* attri_name,char* value){//非等�
 		}																		//
 	}
 	if(querypage==-1){
-		printf("该表应的文件不存在！");
-		exit(0);
+		printf("该表应的文件不存在！\n");
+		return -1;
+		// exit(0);
 	}
 	long pageno = DB->dbMeta.fileMeta[i].firstPageNo;
 	long pagenum = DB->dbMeta.fileMeta[i].pageNum;
@@ -286,8 +290,9 @@ int tableScanMinRangeSelector(int dictID,char* attri_name,char* min){//只有最
 		}																		//
 	}
 	if(querypage==-1){
-		printf("该表应的文件不存在！");
-		exit(0);
+		printf("该表应的文件不存在！\n");
+		return -1;
+		// exit(0);
 	}
 	long pageno = DB->dbMeta.fileMeta[i].firstPageNo;
 	long pagenum = DB->dbMeta.fileMeta[i].pageNum;
@@ -366,8 +371,9 @@ int tableScanMaxRangeSelector(int dictID,char* attrName,char* max){//只有max�
 		}																		//
 	}
 	if(querypage==-1){
-		printf("该表应的文件不存在！");
-		exit(0);
+		printf("该表应的文件不存在！\n");
+		return -1;
+		// exit(0);
 	}
 	long pageno = DB->dbMeta.fileMeta[i].firstPageNo;
 	long pagenum = DB->dbMeta.fileMeta[i].pageNum;

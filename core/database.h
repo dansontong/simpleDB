@@ -60,15 +60,17 @@ struct DataBase{
 // ==================== manager function ====================
 // 存储管理
 
-void database_createDbFile(char *fileName); 
-void database_initDB(struct DataBase *DB, char *fileName);
-void database_closeDB();
-void database_showDbInfo();
+void initDB(struct DataBase *DB, char *fileName);
+void closeDB();
+void deleteDB();
+void showDbInfo();
+void createDbFile(char *fileName); 
 void database_showSegList(int fileID); 
 
 
 //定时把内存中缓冲区的所有数据写到磁盘
-int database_memToDisk();
+int memToDisk();
+int saveDbHead();
 
 
 
@@ -77,6 +79,7 @@ int readDataDictionary();
 
 
 //交互相关interact
-void dosInteract();
+void dosMain();
+void winMain();
 
 #endif

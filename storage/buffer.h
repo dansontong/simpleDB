@@ -76,6 +76,8 @@ void Buf_PrintInfo();			// 打印buffer的信息
 void *MemAllocNoThrow(std::size_t alloc_size);
 void MemFree(void *start);
 
+void bufToDisk();
+
 // ==================== utils function ====================
 long UTCNowTimestamp();
 bool CMPBufTag(BufTag tag1, BufTag tag2);

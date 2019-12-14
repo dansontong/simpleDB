@@ -9,14 +9,14 @@
 struct DataBase *DB = NULL; /* 模块内共享 */
 
 //====================    function     ====================
-void database_initDB(struct DataBase *db, char *fileName)
+void initDB(struct DataBase *db, char *fileName)
 {
 	DB = db;
 	DB->dbFile = fopen(fileName, "rb");
 	if(DB->dbFile == NULL)
 	{
 		printf("DataBase isn't exist, creating new dataBase.\n");
-		database_createDbFile(fileName);
+		createDbFile(fileName);
 		DB->dbFile = fopen(fileName, "rb");
 	}
 	
@@ -34,9 +34,13 @@ void database_initDB(struct DataBase *db, char *fileName)
 	int fid = DB->dbMeta.dataDictFid;
 	if(fid < 0)
 	{
-		//printf("dataDictionary file doesn't exist.\n");
+		printf("dataDictionary file doesn't exist.\n");
 		fid = file_newFile(DATA_DICT_FILE, 1);
 		DB->dbMeta.dataDictFid = fid;
+		for (int i = 0; i < MAX_FILE_NUM; i++) {//一律重置数据字典，后续需要更改
+			memset(&DB->dataDict[i], 0, sizeof(Table));
+			DB->dataDict[i].fileID = -1;
+		}
 	}
 	int count = readDataDictionary();
 	// for (int i = count; i < MAX_FILE_NUM; i++) {//一律重置数据字典，后续需要更改
@@ -50,16 +54,31 @@ void database_initDB(struct DataBase *db, char *fileName)
 }
 
 // 关闭数据库
-void database_closeDB()
+void closeDB()
 {
 	fclose(DB->dbFile);
 	DB->dbFile = NULL;
 	free(DB->freeSpaceBitMap);
+	memToDisk();
+}
+
+// 删除数据库
+void deleteDB()
+{
+	if(remove(dbFile)==0)
+	{
+		cout<<"delete database success."<<endl;
+	}
+	else
+	{
+		cout<<"delete database failed."<<endl;
+	}
 }
 
 int readDataDictionary()
 {
 	int fid = DB->dbMeta.dataDictFid;
+	printf("DB->dbMeta.dataDictFid:%d\n", fid);
 	if (fid < 0) {
 		printf("Data dictionary file does not exist.");
 		return 0;
@@ -85,7 +104,7 @@ int readDataDictionary()
 	return count;
 }
 
-void database_createDbFile(char *fileName)
+void createDbFile(char *fileName)
 {
 	DataBase db;
 	db.dbMeta.blockSize = BLOCK_SIZE;
@@ -123,12 +142,18 @@ void database_createDbFile(char *fileName)
 	printf("create dataBase done.\n");
 }
 
-void database_showDbInfo(){
+void showDbInfo(){
 	Buf_PrintInfo();
 }
 
-int database_memToDisk(){
+int memToDisk(){
+	saveDbHead();
+	bufToDisk();
+	return 0;
+}
 
+int saveDbHead(){
+	
 	return 0;
 }
 
