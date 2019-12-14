@@ -4,7 +4,15 @@
 #include <stdio.h>
 #include <string.h>
 
-void dosInteract()
+extern DataBase* DB;
+
+void winMain()
+{
+	// windowApp();
+	printf("not implement yet.TODO.\n");
+}
+
+void dosMain()
 {
 	while(1)
 	{
@@ -17,17 +25,51 @@ void dosInteract()
 		if(strcmp(strIn, "help\n")==0)
 		{
 			printf("usage:\n");
-			printf("- help, get help.\n");
-			printf("- \n");
+			printf("- %-15s, get help.\n","help");
+			printf("- %-15s, delete database.\n","delete db");
+			printf("- %-15s, create database.\n","create db");
+			printf("- %-15s, show data dictionary.\n","data dict");
+			printf("- %-15s, insert tuple of supplier.tbl.\n","insert");
+			printf("- %-15s, select all from table supplier.\n","select all");
+			printf("- %-15s, Memory to disk.\n","memtodisk");
+			printf("- %-15s, exit DBMS.\n","exit");
 		}
-		else if(strcmp(strIn, "drop database\n")==0)
+		else if(strcmp(strIn, "del db\n")==0 || strcmp(strIn, "delete db\n")==0)
 		{
 			printf("are you sure to \"drop database\"? yes/no: \n");
 			fgets(strIn, 10, stdin);
-			if(strcmp(strIn, "yes")==0){
-				printf("drop database and begin recreate ...\n");
-				database_createDbFile(dbFile);
+			if(strcmp(strIn, "yes\n")==0){
+				printf("close database and delete DB file. ...\n");
+				closeDB();
+				deleteDB();
 			}
+		}
+		else if(strcmp(strIn, "data dict\n")==0)
+		{
+			printf("dataDictFid: %d\n", DB->dbMeta.dataDictFid);
+			for (int i = 0; i < MAX_FILE_NUM; i++) {//一律重置数据字典，后续需要更改
+				printf("dataDictFid[%d]: %d\n", i, DB->dataDict[i].fileID);
+			}
+		}
+		else if(strcmp(strIn, "exit\n")==0)
+		{			
+			closeDB();
+			exit(0);
+		}
+		else if(strcmp(strIn, "memtodisk\n")==0)
+		{			
+			memToDisk();
+		}
+		else if(strcmp(strIn, "reset db\n")==0)
+		{			
+			closeDB();
+			deleteDB();
+			initDB(DB, dbFile);
+		}
+		else if(strcmp(strIn, "create db\n")==0)
+		{
+              
+			createDbFile(dbFile);
 		}
 		else if(strcmp(strIn, "insert\n")==0)
 		{
@@ -87,7 +129,7 @@ void dosInteract()
 	return;
 
 
-	// database_memToDisk();
+	// memToDisk();
 	
 	// //创建表
 	// char tableFile[30] = "../data/table_list";
@@ -180,6 +222,6 @@ void dosInteract()
 
 	// printf("------------------ end executor_test ---------------------\n");
 
-	// database_showDbInfo();
+	// showDbInfo();
 
 }

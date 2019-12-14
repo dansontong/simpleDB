@@ -414,6 +414,7 @@ int create_tmptable(Table table_1){
 	int fileID = file_newFile(TMP_TABLE_FILE,1);//文件类型的标识值，3表示为临时表，type为段的标识值。
 	int dictID = -1;
 	for(int i=0;i<MAX_FILE_NUM; i++){
+		printf("%d\n", DB->dataDict[i].fileID);
 		if(DB->dataDict[i].fileID<0){
 			DB->dataDict[i]= table_1;
 			DB->dataDict[i].fileID = fileID;

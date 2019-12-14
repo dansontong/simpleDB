@@ -1,5 +1,6 @@
 #include "database.h"
 #include "log.h"
+#include <string.h>
 
 
 int main(int argc, char* argv[])
@@ -10,18 +11,25 @@ int main(int argc, char* argv[])
 
 	// log_init("./DBrun.log");//初始化日志系统,contain by Buf_init()
 	Buf_Init();
-	database_initDB(&DB, dbFile);
+	initDB(&DB, dbFile);
 
 	log_Debug("DB initial done.\n");
 
 	//展示数据库
-	database_showDbInfo();
+	showDbInfo();
 
-	//进入交互,dos或window界面
-	dosInteract();
+	//进入交互,dos或window界面	
+	if(argc > 1 && strcmp(argv[1], "win") == 0)
+	{
+		winMain();
+	}else
+	{
+		dosMain();
+	}
+	
 
 	if(DB.dbFile  != NULL)
 	{
-		database_closeDB();
+		closeDB();
 	}
 }
