@@ -5,13 +5,14 @@ extern struct DataBase *DB; /* 全局共享 */
 
 
 //创建表，并返回数据字典下标
-int createTable(char *str)
+int createTable(char *tableName, Attribute *attr_list, int attr_num)
 {
-	//解析字符串 CREATE TABLE NATION ( N_NATIONKEY INTEGER NOT NULL,N_NAMECHAR(25) NOT NULL,N_REGIONKEY INTEGER NOT NULL,N_COMMENTVARCHAR(152));
+	//解析字符串 CREATE TABLE NATION ( N_NATIONKEY INTEGER NOT NULL,N_NAME CHAR(25) NOT NULL,N_REGIONKEY INTEGER NOT NULL,N_COMMENTVARCHAR(152));
 	// parse a given query
 	// hsql::SQLParserResult result;
 	// hsql::SQLParser::parse(query, &result);//后期再使用
-	char tableName[MAX_NAME_LENGTH] = "Supplier";
+	// char tableName[MAX_NAME_LENGTH] = "Supplier";
+
 
 	int fileID = file_newFile(TABLE_FILE, 1);
 	//插入数据字典
@@ -31,13 +32,17 @@ int createTable(char *str)
 	memset(DB->dataDict[dictID].attr, 0, MAX_ATTRIBUTE_NUM * sizeof(Attribute));
 
 	//插入属性
-	insertAttr(&DB->dataDict[dictID],"S_SUPPKEY",INT_TYPE,4,true);
-	insertAttr(&DB->dataDict[dictID],"S_NAME",CHAR_TYPE,25,true);
-	insertAttr(&DB->dataDict[dictID],"S_ADDRESS",VARCHAR_TYPE,40,true);
-	insertAttr(&DB->dataDict[dictID],"NATIONKEY",INT_TYPE,4,true);
-	insertAttr(&DB->dataDict[dictID],"S_PHONE",CHAR_TYPE,15,true);
-	insertAttr(&DB->dataDict[dictID],"S_ACCTBAL",FLOAT_TYPE,8,true);
-	insertAttr(&DB->dataDict[dictID],"S_COMMENT",VARCHAR_TYPE,101,true);
+	for(int i=0; i<attr_num; i++)
+	{
+		insertAttr(&DB->dataDict[dictID],attr_list[i].name,attr_list[i].type,attr_list[i].length,attr_list[i].notNull);
+	}
+	// insertAttr(&DB->dataDict[dictID],"S_SUPPKEY",INT_TYPE,4,true);
+	// insertAttr(&DB->dataDict[dictID],"S_NAME",CHAR_TYPE,25,true);
+	// insertAttr(&DB->dataDict[dictID],"S_ADDRESS",VARCHAR_TYPE,40,true);
+	// insertAttr(&DB->dataDict[dictID],"NATIONKEY",INT_TYPE,4,true);
+	// insertAttr(&DB->dataDict[dictID],"S_PHONE",CHAR_TYPE,15,true);
+	// insertAttr(&DB->dataDict[dictID],"S_ACCTBAL",FLOAT_TYPE,8,true);
+	// insertAttr(&DB->dataDict[dictID],"S_COMMENT",VARCHAR_TYPE,101,true);
 
 	// write to file
 	
@@ -284,26 +289,22 @@ bool tupleInsert(int length, int FileID, char *str){
 
 }
 
-void insertAttr(Table *table,const char *name, DATA_TYPE type, int length, bool notNull)
+void insertAttr(Table *table, char *name, DATA_TYPE type, int length, bool notNull)
 {
 	if(table->attrNum >= MAX_ATTRIBUTE_NUM){
 		printf("reach MAX_ATTRIBUTE_NUM,error.\n");
 	}
 	//第一个属性的偏移为0
 	if (table->attrNum == 0){
-		strcpy(table->attr[table->attrNum].name, name);
-		table->attr[table->attrNum].type = type;
-		table->attr[table->attrNum].length = length;
 		table->attr[table->attrNum].offset = 0;
-	}
-	else {
-		int offset = table->attr[table->attrNum-1].length + table->attr[table->attrNum-1].offset;
-		strcpy(table->attr[table->attrNum].name, name);
-		table->attr[table->attrNum].type = type;
-		table->attr[table->attrNum].length = length;
-		table->attr[table->attrNum].notNull = notNull;
+	}else{
+		int offset = table->attr[table->attrNum-1].length + table->attr[table->attrNum-1].offset;		
 		table->attr[table->attrNum].offset = offset;
 	}
+	strcpy(table->attr[table->attrNum].name, name);
+	table->attr[table->attrNum].type = type;
+	table->attr[table->attrNum].length = length;
+	table->attr[table->attrNum].notNull = notNull;
 	table->attrNum += 1;
 	table->recordLength += length;
 }
