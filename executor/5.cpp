@@ -797,7 +797,7 @@ int main(){
 	//printf("%s->",cur->left->left->right->left->left->kind);
 	//ergodic(cur);
 	Down_filterandproject(headplan);
-	bool flag=false;
+	//bool flag=false;
 	aaa(cur);
 	DisplayTree(headplan.left);
 	//printf("%s",headplan.left->kind);
