@@ -10,24 +10,25 @@
 // ==================== data structure ====================
 // 数据库文件的描述信息
 struct DbMeta{
-	long blockSize;//数据块大小，默认4k
+	// long blockSize;//数据块大小，默认4k
 	long blockNum; //总块数
 	long blockFree;//空闲块数
-	long bitMapSize; //位示图大小
-	long bitMapAddr; //位示图的起始位置
-	long dataSize; //数据区大小,默认1G
-	long dataAddr; //数据区的起始位置
+	// long bitMapSize; //位示图大小
+	// long bitMapAddr; //位示图的起始位置
+	// long dataSize; //数据区大小,默认1G
+	// long dataAddr; //数据区的起始位置
 	int currFileNum; //当前的文件数，currFileNum < MAX_FILE_NUM
-	int dataDictFid; // 数据字典文件号
+	// int dataDictFid; // 数据字典文件号
 
 	struct FileMeta fileMeta[MAX_FILE_NUM];
 };
 
-struct Index{
-	int fileID;   //索引文件的文件号
-	char tableName[MAX_NAME_LENGTH];//表名
-	char attrName[MAX_NAME_LENGTH]; //属性名
-};
+// 取消这个结构体，因为只有indexFileID有用，已经加到Attrbute结构体中
+// struct Index{ 
+// 	int fileID;   //索引文件的文件号
+// 	char tableName[MAX_NAME_LENGTH];//表名
+// 	char attrName[MAX_NAME_LENGTH]; //属性名
+// };
 
 struct Attribute{
 	char name[MAX_NAME_LENGTH]; //属性名
@@ -35,7 +36,7 @@ struct Attribute{
 	DATA_TYPE type;//数据类型
 	int offset; //偏移位置
 	bool notNull;
-	Index indexFile;
+	int indexFileID;
 };
 
 struct Table{
@@ -73,9 +74,9 @@ int memToDisk();
 int saveDbHead();
 
 
-
 //字典相关
 int readDataDictionary();
+int getDictIDbyTableName(char *tableName);
 
 
 //交互相关interact

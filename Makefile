@@ -17,8 +17,8 @@ endif
 head = $(shell find ./log ./core ./storage -name "*.h")
 src = $(shell find ./log ./core ./storage ./operator ./index -name "*.cpp")  ./main.cpp
 
-$(target): $(src)
-	$(cc) $(CXXFLAGS) $(INCLUDE) $^ -o $(target)
+$(target): $(src) $(head)
+	$(cc) $(CXXFLAGS) $(INCLUDE) $(src) -o $(target)
 	# ./$(target)
 	# rm $(target)
 

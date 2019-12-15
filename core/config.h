@@ -16,14 +16,15 @@ using namespace std;
 
 // 磁盘中的数据库文件,大小配置参数
 #define BLOCK_SIZE (4*1024)            // 磁盘中数据块的大小，也等于buffer中的PAGE_SIZE
-#define FILE_DATA_SIZE (256*1024*1024)// 文件数据区大小256M，单位字节
+#define FILE_DATA_SIZE (1024*1024*1024)// 文件数据区大小256M，单位字节
 #define FILE_DATA_ADDR (BIT_MAP_ADDR + BIT_MAP_SIZE)         // 数据区起始位置
 #define BIT_MAP_SIZE (FILE_DATA_SIZE / BLOCK_SIZE / 8) // 位示图大小
-#define BIT_MAP_ADDR 2048               // 位示图起始位置 
+#define BIT_MAP_ADDR 172424              // 位示图起始位置 //=========== careful ===========
+#define PAGEMETA_SIZE sizeof(struct PageMeta)
+// dbMeta+DataDict不会超出BIT_MAP_ADDR，否则位示图数据将会与之重叠，会出现未知错误
+
 #define MAX_NAME_LENGTH 50              //表名,属性名等名字的最大长度
 #define MAX_ATTRIBUTE_NUM 20            //表中属性个数上限
-#define PAGEMETA_SIZE sizeof(struct PageMeta)
-//TODO: 需测试确保dbMeta不会超出1024，否则位示图数据将会与之重叠，会出现未知错误
 
 // file 配置参数
 #define MAX_FILE_NUM     100  //最大文件数量
@@ -65,7 +66,7 @@ typedef enum{
 
 
 // 字符常量
-static char dbFile[50] = "./data/simpleDb";
-const static char dataTypeName[7][10]={"INT","LONG","FLOAT","DOUBLE","CHAR","VARCHAR","DATE"};
+static char DB_FILE[50] = "./data/simpleDb";
+const static char DATA_TYPE_NAME[7][10]={"INT","LONG","FLOAT","DOUBLE","CHAR","VARCHAR","DATE"};
 
 #endif

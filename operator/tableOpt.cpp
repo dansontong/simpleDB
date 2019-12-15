@@ -25,6 +25,10 @@ int createTable(char *str)
 	DB->dataDict[dictID].fileID = fileID;
 	strcpy(DB->dataDict[dictID].tableName, tableName);
 
+	DB->dataDict[dictID].attrNum = 0;  //属性个数
+	DB->dataDict[dictID].recordLength = 0;//记录总长度
+	DB->dataDict[dictID].recordNum = 0;  //属性个数
+
 	//插入属性
 	insertAttr(&DB->dataDict[dictID],"S_SUPPKEY",INT_TYPE,4,true);
 	insertAttr(&DB->dataDict[dictID],"S_NAME",CHAR_TYPE,25,true);
@@ -34,8 +38,44 @@ int createTable(char *str)
 	insertAttr(&DB->dataDict[dictID],"S_ACCTBAL",FLOAT_TYPE,8,true);
 	insertAttr(&DB->dataDict[dictID],"S_COMMENT",VARCHAR_TYPE,101,true);
 
+	// write to file
+	
+	
 	return dictID;
 }
+
+// delete table by name
+int deleteTable(char *tableName)
+{
+	// delete from bitmap, mark page be free in bitMap
+	int dictID = getDictIDbyTableName(tableName);
+	int fileID = DB->dataDict[dictID].fileID;
+	long pageNo = DB->dbMeta.fileMeta[fileID].firstPageNo;
+	struct PageMeta ph;
+	struct BufTag buftag = Buf_GenerateTag(pageNo);
+	memcpy(&ph, Buf_ReadBuffer(buftag), PAGEMETA_SIZE);
+	while(pageNo != -1)
+	{
+		page_recover_onepage(pageNo);
+		pageNo = ph.nextPageNo;
+		buftag = Buf_GenerateTag(pageNo);
+		memcpy(&ph, Buf_ReadBuffer(buftag), PAGEMETA_SIZE);
+	}
+	
+	// delete related index file	
+	for(int i=0; i<DB->dataDict[dictID].attrNum; i++)
+	{
+		if( DB->dataDict[dictID].attr[i].indexFileID != -1 )
+		{
+			DB->dataDict[dictID].attr[i].indexFileID = -1;
+			// TODO:  
+		}
+	}
+	
+	// delete from dictionary
+	DB->dataDict[dictID].fileID = -1;
+}
+
 //创建表，并返回数据字典下标
 int createTable2(char *str)
 {
@@ -70,11 +110,11 @@ long getLogicID(int fileID, long pageNo,int recordNo){
 	long count = 0;
 	int i;
 	int querypage=-1;
-	for( i=0;i<MAX_FILE_NUM;i++){                                            //这一块是查找文件是否存在
-		if(DB->dbMeta.fileMeta[i].segList[i].id==fileID){						//
-			querypage=DB->dbMeta.fileMeta[i].segList[i].firstPageNo;			//
-			break;																//
-		}																		//
+	for( i=0;i<MAX_FILE_NUM;i++){                                           //这一块是查找文件是否存在
+		if(DB->dbMeta.fileMeta[i].segList[i].id==fileID){					//
+			querypage=DB->dbMeta.fileMeta[i].segList[i].firstPageNo;		//
+			break;															//
+		}																	//
 	}
 	if(querypage==-1){
 		printf("该文件id对应的文件不存在！");
@@ -280,7 +320,7 @@ void insertRecord(int dictID, char *str)
 	// char *offset;
 	for(i=0; i<DB->dataDict[dictID].attrNum; i++)
 	{
-		if( DB->dataDict[dictID].attr[i].indexFile.fileID != 0 )
+		if( DB->dataDict[dictID].attr[i].indexFileID != 0 )
 		{		
 			// offset = recordStr+DB->dataDict[dictID].attr[i].offset; //TODO：是否需要加上record?
 			// if(i<DB->dataDict[dictID].attrNum-1)

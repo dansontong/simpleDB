@@ -22,15 +22,15 @@ void create_index(char *tableName,char *Attributename){
 	}
 	for(j=0;j<DB->dataDict[i].attrNum;j++){									//查找属性列
 		if(strcmp(DB->dataDict[i].attr[j].name,Attributename)==0){
-			if(DB->dataDict[i].attr[j].indexFile.fileID==0){
+			if(DB->dataDict[i].attr[j].indexFileID==0){
 				indexID=DB->dataDict[i].fileID*100+j;							//新建索引文件
 				index=fopen("../data/indexID","wb+");
-				DB->dataDict[i].attr[j].indexFile.fileID=indexID;	
-				strcpy(DB->dataDict[i].attr[j].indexFile.tableName, tableName);
-				strcpy(DB->dataDict[i].attr[j].indexFile.attrName, Attributename);
+				DB->dataDict[i].attr[j].indexFileID=indexID;	
+				// strcpy(DB->dataDict[i].attr[j].indexFile.tableName, tableName);
+				// strcpy(DB->dataDict[i].attr[j].indexFile.attrName, Attributename);
 			}
 			else{
-				indexID=DB->dataDict[i].attr[j].indexFile.fileID;				//获取索引文件
+				indexID=DB->dataDict[i].attr[j].indexFileID;				//获取索引文件
 			}
 		}
 	}
@@ -77,11 +77,11 @@ for(int i=0;i<MAX_FILE_NUM;i++){
 		if(strcmp(DB->dataDict[i].tableName,tableName)==0){
 			for(int j=0;j<DB->dataDict[i].attrNum;j++){
 				if(strcmp(DB->dataDict[i].attr[j].name,Attributename)==0){
-					if(DB->dataDict[i].attr[j].indexFile.fileID==0){
+					if(DB->dataDict[i].attr[j].indexFileID==0){
 						printf("error:the indexfile is not exist!\n");	
 					}
 					else{
-						DB->dataDict[i].attr[j].indexFile.fileID=0;
+						DB->dataDict[i].attr[j].indexFileID=0;
 						const char *savePath = "../data/indexID";
 						int value=remove(savePath);
 						if(value==EOF)
@@ -99,11 +99,11 @@ int find_indexfile(char *tableName,char *Attributename){					//查找索引文�
 		if(strcmp(DB->dataDict[i].tableName,tableName)==0){
 			for(int j=0;j<DB->dataDict[i].attrNum;j++){
 				if(strcmp(DB->dataDict[i].attr[j].name,Attributename)==0){
-					if(DB->dataDict[i].attr[j].indexFile.fileID==0){
+					if(DB->dataDict[i].attr[j].indexFileID==0){
 						return -1;
 					}
 					else{
-						return DB->dataDict[i].attr[j].indexFile.fileID;
+						return DB->dataDict[i].attr[j].indexFileID;
 					}
 				}
 			}

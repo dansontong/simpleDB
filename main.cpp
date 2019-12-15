@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
 
 	// log_init("./DBrun.log");//初始化日志系统,contain by Buf_init()
 	Buf_Init();
-	initDB(&DB, dbFile);
+	initDB(&DB, DB_FILE);
 
 	log_Debug("DB initial done.\n");
 

@@ -25,14 +25,14 @@ void dosMain()
 		if(strcmp(strIn, "help\n")==0)
 		{
 			printf("usage:\n");
-			printf("- %-15s, get help.\n","help");
-			printf("- %-15s, delete database.\n","delete db");
-			printf("- %-15s, create database.\n","create db");
-			printf("- %-15s, show data dictionary.\n","data dict");
-			printf("- %-15s, insert tuple of supplier.tbl.\n","insert");
-			printf("- %-15s, select all from table supplier.\n","select all");
-			printf("- %-15s, Memory to disk.\n","memtodisk");
-			printf("- %-15s, exit DBMS.\n","exit");
+			printf("- %-15s get help.\n","help");
+			printf("- %-15s delete database.\n","delete db");
+			printf("- %-15s create database.\n","create db");
+			printf("- %-15s show data dictionary.\n","data dict");
+			printf("- %-15s insert tuple of supplier.tbl.\n","insert");
+			printf("- %-15s select all from table supplier.\n","select all");
+			printf("- %-15s Memory to disk.\n","memtodisk");
+			printf("- %-15s exit DBMS.\n","exit");
 		}
 		else if(strcmp(strIn, "del db\n")==0 || strcmp(strIn, "delete db\n")==0)
 		{
@@ -46,9 +46,8 @@ void dosMain()
 		}
 		else if(strcmp(strIn, "data dict\n")==0)
 		{
-			printf("dataDictFid: %d\n", DB->dbMeta.dataDictFid);
-			for (int i = 0; i < MAX_FILE_NUM; i++) {//一律重置数据字典，后续需要更改
-				printf("dataDictFid[%d]: %d\n", i, DB->dataDict[i].fileID);
+			for (int i = 0; i < MAX_FILE_NUM; i++) {//数据字典
+				printf("dataDict[%d].fileID: %d\n", i, DB->dataDict[i].fileID);
 			}
 		}
 		else if(strcmp(strIn, "exit\n")==0)
@@ -64,12 +63,11 @@ void dosMain()
 		{			
 			closeDB();
 			deleteDB();
-			initDB(DB, dbFile);
+			initDB(DB, DB_FILE);
 		}
 		else if(strcmp(strIn, "create db\n")==0)
 		{
-              
-			createDbFile(dbFile);
+            initDB(DB, DB_FILE);
 		}
 		else if(strcmp(strIn, "insert\n")==0)
 		{

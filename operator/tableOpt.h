@@ -27,6 +27,7 @@ void deleteRecord(char *tableName, char *attributeName, Record *record);
 Record* searchRecord(char* tableName,char* attrName, char* attribute);
 
 // ±Ìœ‡πÿ  --from database.h
+int deleteTable(char *tableName);
 int createTable(char *tableName);
 int createTable2(char *tableName);
 void insertAttr(Table *table, const char *name, DATA_TYPE type, int length,bool notNull);
