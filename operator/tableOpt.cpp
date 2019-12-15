@@ -50,6 +50,56 @@ int createTable(char *tableName, Attribute *attr_list, int attr_num)
 	return dictID;
 }
 
+void insertAttr(Table *table, char *name, DATA_TYPE type, int length, bool notNull)
+{
+	if(table->attrNum >= MAX_ATTRIBUTE_NUM){
+		printf("reach MAX_ATTRIBUTE_NUM,error.\n");
+	}
+	//第一个属性的偏移为0
+	if (table->attrNum == 0){
+		table->attr[table->attrNum].offset = 0;
+	}else{
+		int offset = table->attr[table->attrNum-1].length + table->attr[table->attrNum-1].offset;		
+		table->attr[table->attrNum].offset = offset;
+	}
+	strcpy(table->attr[table->attrNum].name, name);
+	table->attr[table->attrNum].type = type;
+	table->attr[table->attrNum].length = length;
+	table->attr[table->attrNum].notNull = notNull;
+	table->attrNum += 1;
+	table->recordLength += length;
+}
+
+//创建表，并返回数据字典下标
+// int createTable2(char *str)
+// {
+// 	//解析字符串 CREATE TABLE NATION ( N_NATIONKEY INTEGER NOT NULL,N_NAMECHAR(25) NOT NULL,N_REGIONKEY INTEGER NOT NULL,N_COMMENTVARCHAR(152));
+// 	// parse a given query
+// 	// hsql::SQLParserResult result;
+// 	// hsql::SQLParser::parse(query, &result);//后期再使用
+// 	char tableName[MAX_NAME_LENGTH] = "nation";
+
+// 	int fileID = file_newFile(TABLE_FILE, 1);
+// 	//插入数据字典
+// 	int dictID = -1;
+// 	for(int i=0; i<MAX_FILE_NUM; i++){
+// 		if(DB->dataDict[i].fileID < 0){
+// 			dictID = i;
+// 			break;
+// 		}
+// 	}
+// 	DB->dataDict[dictID].fileID = fileID;
+// 	strcpy(DB->dataDict[dictID].tableName, tableName);
+
+// 	//插入属性
+// 	insertAttr(&DB->dataDict[dictID],"NATIONKEY",INT_TYPE,4,true);
+// 	insertAttr(&DB->dataDict[dictID],"N_NAME",CHAR_TYPE,25,true);
+// 	insertAttr(&DB->dataDict[dictID],"N_REGIONKEY",INT_TYPE,4,true);
+// 	insertAttr(&DB->dataDict[dictID],"N_COMMENT",VARCHAR_TYPE,152,true);
+
+// 	return dictID;
+// }
+
 // delete table by name
 int deleteTable(char *tableName)
 {
@@ -80,36 +130,6 @@ int deleteTable(char *tableName)
 	
 	// delete from dictionary
 	DB->dataDict[dictID].fileID = -1;
-}
-
-//创建表，并返回数据字典下标
-int createTable2(char *str)
-{
-	//解析字符串 CREATE TABLE NATION ( N_NATIONKEY INTEGER NOT NULL,N_NAMECHAR(25) NOT NULL,N_REGIONKEY INTEGER NOT NULL,N_COMMENTVARCHAR(152));
-	// parse a given query
-	// hsql::SQLParserResult result;
-	// hsql::SQLParser::parse(query, &result);//后期再使用
-	char tableName[MAX_NAME_LENGTH] = "nation";
-
-	int fileID = file_newFile(TABLE_FILE, 1);
-	//插入数据字典
-	int dictID = -1;
-	for(int i=0; i<MAX_FILE_NUM; i++){
-		if(DB->dataDict[i].fileID < 0){
-			dictID = i;
-			break;
-		}
-	}
-	DB->dataDict[dictID].fileID = fileID;
-	strcpy(DB->dataDict[dictID].tableName, tableName);
-
-	//插入属性
-	insertAttr(&DB->dataDict[dictID],"NATIONKEY",INT_TYPE,4,true);
-	insertAttr(&DB->dataDict[dictID],"N_NAME",CHAR_TYPE,25,true);
-	insertAttr(&DB->dataDict[dictID],"N_REGIONKEY",INT_TYPE,4,true);
-	insertAttr(&DB->dataDict[dictID],"N_COMMENT",VARCHAR_TYPE,152,true);
-
-	return dictID;
 }
 
 long getLogicID(int fileID, long pageNo,int recordNo){
@@ -289,31 +309,14 @@ bool tupleInsert(int length, int FileID, char *str){
 
 }
 
-void insertAttr(Table *table, char *name, DATA_TYPE type, int length, bool notNull)
-{
-	if(table->attrNum >= MAX_ATTRIBUTE_NUM){
-		printf("reach MAX_ATTRIBUTE_NUM,error.\n");
-	}
-	//第一个属性的偏移为0
-	if (table->attrNum == 0){
-		table->attr[table->attrNum].offset = 0;
-	}else{
-		int offset = table->attr[table->attrNum-1].length + table->attr[table->attrNum-1].offset;		
-		table->attr[table->attrNum].offset = offset;
-	}
-	strcpy(table->attr[table->attrNum].name, name);
-	table->attr[table->attrNum].type = type;
-	table->attr[table->attrNum].length = length;
-	table->attr[table->attrNum].notNull = notNull;
-	table->attrNum += 1;
-	table->recordLength += length;
-}
-
 void insertRecord(int dictID, char *str)
 {
 	int fileID = DB->dataDict[dictID].fileID;
 	int length = strlen(str);
+	// write file
 	Record record = file_writeFile(fileID, length, str);
+	// write data_dictionary
+	DB->dataDict[dictID].recordNum += 1;
 	
 	char recordStr[1000]; //假设记录最长1000个字节
 	// char *attribute;

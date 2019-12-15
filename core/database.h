@@ -45,7 +45,7 @@ struct Table{
 	Attribute attr[MAX_ATTRIBUTE_NUM]; //属性列表
 	int attrNum;  //属性个数
 	int recordLength;//记录总长度
-	int recordNum;  //属性个数
+	int recordNum;  //记录个数
 };
 
 // 数据存储信息
