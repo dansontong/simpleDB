@@ -4,69 +4,74 @@
 #include "config.h"
 #include "buffer.h"
 
-/*       æ®µé¡µå¼æ–‡ä»¶ç®¡ç†æ¨¡å—-å¤´æ–‡ä»¶
- * è¯¥æ¨¡å—å†…éƒ¨å¯åˆ†ä¸ºsetment,page,fileä¸‰ä¸ªå­æ¨¡å—ã€‚
- * å­æ¨¡å—åˆ†åˆ«åœ¨ä¸åŒçš„cppæ–‡ä»¶ä¸­å®ç°å¯¹åº”çš„å‡½æ•°ã€‚
+/*       ¶ÎÒ³Ê½ÎÄ¼ş¹ÜÀíÄ£¿é-Í·ÎÄ¼ş
+ * ¸ÃÄ£¿éÄÚ²¿¿É·ÖÎªsetment,page,fileÈı¸ö×ÓÄ£¿é¡£
+ * ×ÓÄ£¿é·Ö±ğÔÚ²»Í¬µÄcppÎÄ¼şÖĞÊµÏÖ¶ÔÓ¦µÄº¯Êı¡£
  *
 **/
 
 // ==================== data structure ====================
-// é¡µæè¿°ä¿¡æ¯
+// Ò³ÃèÊöĞÅÏ¢
 struct PageMeta{
-	long pageNo;      // é¡µå·
-	long prePageNo;	  // å‰ç»§é¡µå·
-	long nextPageNo;  // åç»§é¡µå·
-	int recordNum;    // è¯¥é¡µå­˜å‚¨çš„è®°å½•ä¸ªæ•°
-	long freeSpace;   // è¯¥é¡µçš„ç©ºé—²ç©ºé—´å¤§å°
+	long pageNo;      // Ò³ºÅ
+	long prePageNo;	  // Ç°¼ÌÒ³ºÅ
+	long nextPageNo;  // ºó¼ÌÒ³ºÅ
+	long freeSpace;   // ¸ÃÒ³µÄ¿ÕÏĞ¿Õ¼ä´óĞ¡
+	int recordNum;    // ¸ÃÒ³´æ´¢µÄ¼ÇÂ¼¸öÊı
 };
 struct OffsetInPage{
 	int recordID;
-	int offset;         //è¯¥è®°å½•ç›¸å¯¹äºå—å°¾åœ°å€çš„åç§»é‡
+	int offset;         //¸Ã¼ÇÂ¼Ïà¶ÔÓÚ¿éÎ²µØÖ·µÄÆ«ÒÆÁ¿
 	bool isDeleted;
 };
 
-//æ®µæè¿°ä¿¡æ¯
+//¶ÎÃèÊöĞÅÏ¢
 struct Segment{
-	int state;  // æ®µçŠ¶æ€ 
-	int id;     // æ®µå·
-	int type;   // -----å¯ç”¨äºæ ‡è®°å…±äº«ï¼Œå°šæœªä½¿ç”¨
-	long firstPageNo; // è¯¥æ®µçš„èµ·å§‹é¡µå·
-	long pageNum;     // è¯¥æ®µçš„é¡µæ•°
+	int state;  // ¶Î×´Ì¬ 
+	int id;     // ¶ÎºÅ
+	int type;   // -----¿ÉÓÃÓÚ±ê¼Ç¹²Ïí£¬ÉĞÎ´Ê¹ÓÃ
+	long firstPageNo; // ¸Ã¶ÎµÄÆğÊ¼Ò³ºÅ
+	long pageNum;     // ¸Ã¶ÎµÄÒ³Êı
 };
 
-//æ–‡ä»¶æè¿°ä¿¡æ¯
+//ÎÄ¼şÃèÊöĞÅÏ¢
 struct FileMeta{
-	int id;       // æ–‡ä»¶å·
-	long pageNum;   // æ–‡ä»¶é¡µæ•°	
-	long firstPageNo;   // æ–‡ä»¶æ®µæ•°
-	char name[20];// æ–‡ä»¶å,æœ€é•¿20ä¸ªå­—ç¬¦
-	int state;    // æ–‡ä»¶çŠ¶æ€
-	int segNum;   // æ–‡ä»¶æ®µæ•°
+	int id;       // ÎÄ¼şºÅ
+	long pageNum; // ÎÄ¼şÒ³Êı	
+	long firstPageNo;// ÎÄ¼ş¶ÎÊı
+	char name[20];// ÎÄ¼şÃû,×î³¤20¸ö×Ö·û
+	int state;    // ÎÄ¼ş×´Ì¬
+	int segNum;   // ÎÄ¼ş¶ÎÊı
 	int fileType;
-	struct Segment segList[SEGMENT_NUM];// æ®µè¡¨
+	struct Segment segList[SEGMENT_NUM];// ¶Î±í
 };
 
 struct Record{
-	long pageNo;   //é¡µå·
-	int recordID;  //é¡µå†…ç¬¬å‡ ä¸ªè®°å½•
-	char* posOffset;//åœ°å€
+	long pageNo;   //Ò³ºÅ
+	int recordID;  //Ò³ÄÚµÚ¼¸¸ö¼ÇÂ¼
+	char* posOffset;//µØÖ·
 };
 
 // ==================== manager function ====================
 // void file_Init(struct DataBase *DB);
 
-// æ–‡ä»¶ç®¡ç†-å®ç°åœ¨fileéƒ¨åˆ†
+// ÎÄ¼ş¹ÜÀí-ÊµÏÖÔÚfile²¿·Ö
 struct Record file_writeFile(int fileID, int length, char *str);
 int file_newFile(FILE_TYPE fileType, long NeededPageNum);
 void file_readFile(int FileID,char *str);
 void file_deleteFile(int FileID);
-void file_read_sd(long pageNo, char *bufferpath); //æä¾›ç»™bufferæ¨¡å—ï¼Œè¯»å–ç£ç›˜
-void file_write_sd(long pageNo, char *bufferpath);//æä¾›ç»™bufferæ¨¡å—ï¼Œå†™å…¥ç£ç›˜
 void file_print_freepace();
-void file_fseek(int fileID, long offset, int fromwhere);//æ–‡ä»¶æµ åç§»é‡(ç”¨æ­£è´Ÿè¡¨ç¤ºæ–¹å‘) åç§»ä½ç½®(åˆ˜æ¬¢-B+æ ‘-éœ€æ±‚)
+
+void file_read_sd(long pageNo, char *bufferpath); //Ìá¹©¸øbufferÄ£¿é£¬¶ÁÈ¡´ÅÅÌ
+void file_write_sd(long pageNo, char *bufferpath);//Ìá¹©¸øbufferÄ£¿é£¬Ğ´Èë´ÅÅÌ
+
+// ¶ÔÍâÌá¹©ÆÕÍ¨ÎÄ¼ş²Ù×÷
+void file_fseek(int fileID, long offset, int fromwhere);//ÎÄ¼şÁ÷ Æ«ÒÆÁ¿(ÓÃÕı¸º±íÊ¾·½Ïò) Æ«ÒÆÎ»ÖÃ(Áõ»¶-B+Ê÷-ĞèÇó)
 
 
-// é¡µç®¡ç†-å®ç°åœ¨pageéƒ¨åˆ†
+// Ò³¹ÜÀí-ÊµÏÖÔÚpage²¿·Ö
+void writePage(long pageNo);//ÀûÓÃbuffer,Ğ´Ö¸¶¨µÄÒ³
+void readPage(long pageNo); //ÀûÓÃbuffer,¶ÁÖ¸¶¨µÄÒ³
 int page_isEmpty(unsigned long bit_map,int position);
 void page_setbitmap(unsigned long *bit_map,int position,int value);
 
@@ -76,7 +81,7 @@ void page_recover_onepage(int PageNo);
 void page_recover_allpages();
 
 
-// æ®µç®¡ç†-å®ç°åœ¨segmentéƒ¨åˆ†
+// ¶Î¹ÜÀí-ÊµÏÖÔÚsegment²¿·Ö
 
 
 

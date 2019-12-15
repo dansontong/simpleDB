@@ -44,7 +44,7 @@ int file_newFile(FILE_TYPE fileType, long NeededPageNum){
 			}
 			pagemeta.freeSpace = PAGE_SIZE - sizeof(pagemeta);
 			rewind(DB->dbFile);
-			fseek(DB->dbFile,DB->dbMeta.dataAddr+pagemeta.pageNo*PAGE_SIZE,SEEK_SET);
+			fseek(DB->dbFile, FILE_DATA_ADDR + pagemeta.pageNo * PAGE_SIZE, SEEK_SET);
 			fwrite(&pagemeta,sizeof(pagemeta),1,DB->dbFile);
 		}
 		for( i = 0;i<MAX_FILE_NUM;i++){
@@ -238,7 +238,7 @@ void file_deleteFile(int FileID){
 	}
 	long pagenum = DB->dbMeta.fileMeta[0].segList[i].pageNum;			//读取第一页的信息
 	long CurpageNo = DB->dbMeta.fileMeta[0].segList[i].firstPageNo;
-	long pageAddr = DB->dbMeta.dataAddr +CurpageNo * PAGE_SIZE;
+	long pageAddr = FILE_DATA_ADDR + CurpageNo * PAGE_SIZE;
 	int sizeofpageMeta = sizeof(struct PageMeta);
 	int sizeofrecord = sizeof(struct OffsetInPage);
 	long nextPage = -1;
@@ -250,7 +250,7 @@ void file_deleteFile(int FileID){
 		nextPage = pageMeta.nextPageNo;
 		page_recover_onepage(pageMeta.pageNo);				//删除这一页
 		if(nextPage>0){
-			pageAddr = DB->dbMeta.dataAddr +nextPage * PAGE_SIZE;	//获取新的一页的地址
+			pageAddr = FILE_DATA_ADDR +nextPage * PAGE_SIZE;	//获取新的一页的地址
 		}
 		else{
 			break;
@@ -266,12 +266,12 @@ void file_deleteFile(int FileID){
 }
 void file_read_sd(long pageno,char *bufferpath){
 	rewind(DB->dbFile);
-	fseek(DB->dbFile,DB->dbMeta.dataAddr+pageno*PAGE_SIZE,SEEK_SET);
+	fseek(DB->dbFile,FILE_DATA_ADDR+pageno*PAGE_SIZE,SEEK_SET);
 	size_t sizeRead = fread(bufferpath,PAGE_SIZE,1,DB->dbFile);
 }
 void file_write_sd(long pageno,char *bufferpath){
 	rewind(DB->dbFile);
-	fseek(DB->dbFile,DB->dbMeta.dataAddr+pageno*PAGE_SIZE,SEEK_SET);
+	fseek(DB->dbFile,FILE_DATA_ADDR+pageno*PAGE_SIZE,SEEK_SET);
 	fwrite(bufferpath,PAGE_SIZE,1,DB->dbFile);
 }
 void file_print_freepace(){
