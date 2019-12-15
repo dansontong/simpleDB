@@ -75,8 +75,8 @@ int saveDbHead();
 
 
 //字典相关
-int readDataDictionary();
-int getDictIDbyTableName(char *tableName);
+// int readDataDictionary();
+// int getDictIDbyTableName(char *tableName);
 
 
 //交互相关interact

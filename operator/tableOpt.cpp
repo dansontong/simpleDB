@@ -27,7 +27,8 @@ int createTable(char *str)
 
 	DB->dataDict[dictID].attrNum = 0;  //属性个数
 	DB->dataDict[dictID].recordLength = 0;//记录总长度
-	DB->dataDict[dictID].recordNum = 0;  //属性个数
+	DB->dataDict[dictID].recordNum = 0;  //记录个数
+	memset(DB->dataDict[dictID].attr, 0, MAX_ATTRIBUTE_NUM * sizeof(Attribute));
 
 	//插入属性
 	insertAttr(&DB->dataDict[dictID],"S_SUPPKEY",INT_TYPE,4,true);
@@ -585,3 +586,17 @@ int createTmpTableAfterSort(Table table, int shareAttr){
 	}
 	return dictID;
 }
+
+// get DictID by tableName, -1 means fail
+int getDictIDbyName(char *tableName)
+{
+	for(int i=0; i<MAX_FILE_NUM; i++)
+	{
+		if(strcmp(DB->dataDict[i].tableName, tableName) == 0)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
