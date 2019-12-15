@@ -36,7 +36,7 @@ void dosMain()
 			printf("- %-15s create index on S_SUPPKEY of Supplier.\n","create index");
 			printf("- %-15s exit DBMS.\n","exit");
 		}
-		else if(strcmp(strIn, "del db\n")==0 || strcmp(strIn, "delete db\n")==0)
+		else if(strcmp(strIn, "del-db\n")==0 || strcmp(strIn, "delete-db\n")==0)
 		{
 			printf("are you sure to \"drop database\"? yes/no: \n");
 			fgets(strIn, 10, stdin);
@@ -46,7 +46,7 @@ void dosMain()
 				deleteDB();
 			}
 		}
-		else if(strcmp(strIn, "data dict\n")==0)
+		else if(strcmp(strIn, "data-dict\n")==0)
 		{
 			for (int i = 0; i < MAX_FILE_NUM; i++) {//数据字典
 				printf("dataDict[%d].fileID: %d\n", i, DB->dataDict[i].fileID);
@@ -61,13 +61,13 @@ void dosMain()
 		{			
 			memToDisk();
 		}
-		else if(strcmp(strIn, "reset db\n")==0)
+		else if(strcmp(strIn, "reset-db\n")==0)
 		{			
 			closeDB();
 			deleteDB();
 			initDB(DB, DB_FILE);
 		}
-		else if(strcmp(strIn, "create db\n")==0)
+		else if(strcmp(strIn, "create-db\n")==0)
 		{
             initDB(DB, DB_FILE);
 		}
@@ -75,7 +75,36 @@ void dosMain()
 		{
 			//创建表
 			char tableFile[30] = "./data/table_list";
-			int sup_dictID = createTable(tableFile);//后续需要改，要能根据parser解析结果自动创建表,目前只创建supplier,nation.tbl
+			Attribute attr_list[5];
+			strcpy(attr_list[0].name, "S_SUPPKEY");
+			attr_list[0].type = INT_TYPE;
+			attr_list[0].length = 4;
+			attr_list[0].notNull = true;
+			strcpy(attr_list[0].name, "S_NAME");
+			attr_list[0].type = CHAR_TYPE;
+			attr_list[0].length = 25;
+			attr_list[0].notNull = true;
+			strcpy(attr_list[0].name, "S_ADDRESS");
+			attr_list[0].type = VARCHAR_TYPE;
+			attr_list[0].length = 40;
+			attr_list[0].notNull = true;
+			strcpy(attr_list[0].name, "NATIONKEY");
+			attr_list[0].type = INT_TYPE;
+			attr_list[0].length = 4;
+			attr_list[0].notNull = true;
+			strcpy(attr_list[0].name, "S_PHONE");
+			attr_list[0].type = CHAR_TYPE;
+			attr_list[0].length = 15;
+			attr_list[0].notNull = true;
+			strcpy(attr_list[0].name, "S_ACCTBAL");
+			attr_list[0].type = FLOAT_TYPE;
+			attr_list[0].length = 8;
+			attr_list[0].notNull = true;
+			strcpy(attr_list[0].name, "S_COMMENT");
+			attr_list[0].type = VARCHAR_TYPE;
+			attr_list[0].length = 101;
+			attr_list[0].notNull = true;
+			int sup_dictID = createTable("Supplier", attr_list, 7);//
 			//读入数据，插入记录
 			char tupleFile[30] = "./data/supplier.tbl";
 			char buff[1000];
@@ -93,7 +122,23 @@ void dosMain()
 				//printf("%s\n", buff);
 			}
 
-			int nation_dictID = createTable2(tableFile);//后续需要改，要能根据parser解析结果自动创建表,目前只创建supplier,nation.tbl
+			strcpy(attr_list[0].name, "NATIONKEY");
+			attr_list[0].type = INT_TYPE;
+			attr_list[0].length = 4;
+			attr_list[0].notNull = true;
+			strcpy(attr_list[0].name, "N_NAME");
+			attr_list[0].type = CHAR_TYPE;
+			attr_list[0].length = 25;
+			attr_list[0].notNull = true;
+			strcpy(attr_list[0].name, "N_REGIONKEY");
+			attr_list[0].type = INT_TYPE;
+			attr_list[0].length = 4;
+			attr_list[0].notNull = true;
+			strcpy(attr_list[0].name, "N_COMMENT");
+			attr_list[0].type = VARCHAR_TYPE;
+			attr_list[0].length = 101;
+			attr_list[0].notNull = true;
+			int nation_dictID = createTable("nation", attr_list, 4);//
 			//读入数据，插入记录
 			char tupleFile2[30] = "./data/nation.tbl";
 			fp = fopen(tupleFile2, "rb");
@@ -110,9 +155,13 @@ void dosMain()
 				//printf("%s\n", buff);
 			}
 		}
-		else if(strcmp(strIn, "create index\n")==0)
+		else if(strcmp(strIn, "create-index\n")==0)
 		{
 			create_index("Supplier","S_SUPPKEY");
+		}
+		else if(strcmp(strIn, "drop-index\n")==0)
+		{
+			drop_index("Supplier","S_SUPPKEY");
 		}
 		else if(strcmp(strIn, "find\n")==0)
 		{
@@ -120,7 +169,7 @@ void dosMain()
 			recordList = searchRecord("Supplier","S_SUPPKEY","Not_exist_for_test");
 			recordList = searchRecord("Supplier","S_SUPPKEY","9840");
 		}
-		else if(strcmp(strIn, "select all\n")==0)
+		else if(strcmp(strIn, "select-all\n")==0)
 		{
 			tableScanSelector(0, "S_SUPPKEY");
 		}

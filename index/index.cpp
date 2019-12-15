@@ -4,15 +4,18 @@
 #include "log.h"
 #include "index.h"
 #include "tableOpt.h"
-#include<stdio.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 //==================== file global variable ====================
 extern struct DataBase *DB; /* 全局共享 */
 
 
 //========================  function   =========================
-void create_index(char *tableName,char *Attributename){
+void create_index(char *tableName,char *attributeName){
 	FILE *index;
+	char indexFilePath[50] = "./data/index/";
+	char tmpStr[16] = {0};
 	int indexID,FileID,i,j;
 	for(i=0;i<MAX_FILE_NUM;i++){												//查找表文件的文件号
 		if(strcmp(DB->dataDict[i].tableName,tableName)==0){
@@ -21,13 +24,18 @@ void create_index(char *tableName,char *Attributename){
 		}
 	}
 	for(j=0;j<DB->dataDict[i].attrNum;j++){									//查找属性列
-		if(strcmp(DB->dataDict[i].attr[j].name,Attributename)==0){
+		if(strcmp(DB->dataDict[i].attr[j].name,attributeName)==0){
 			if(DB->dataDict[i].attr[j].indexFileID==0){
-				indexID=DB->dataDict[i].fileID*100+j;							//新建索引文件
-				index=fopen("../data/indexID","wb+");
+				indexID = DB->dataDict[i].fileID + 10000;					//新建索引文件
+				snprintf(tmpStr, 16, "%d", i);
+				strcat(indexFilePath, attributeName);
+				strcat(indexFilePath, "_");
+				strcat(indexFilePath, tmpStr);
+				// printf("=========== indexFilePath: ========== %s\n", indexFilePath);
+				index=fopen(indexFilePath, "wb+");
 				DB->dataDict[i].attr[j].indexFileID=indexID;	
 				// strcpy(DB->dataDict[i].attr[j].indexFile.tableName, tableName);
-				// strcpy(DB->dataDict[i].attr[j].indexFile.attrName, Attributename);
+				// strcpy(DB->dataDict[i].attr[j].indexFile.attrName, attributeName);
 			}
 			else{
 				indexID=DB->dataDict[i].attr[j].indexFileID;				//获取索引文件
@@ -52,14 +60,13 @@ void create_index(char *tableName,char *Attributename){
 			for(j=0;j<pagehead.recordNum;j++){
 				indexRecord.posPage=pagehead.pageNo;
 
-				getrecordAttribute(pagehead.pageNo,j,tableName,Attributename, tmpKey, indexRecord.posOffset);
+				getrecordAttribute(pagehead.pageNo,j,tableName,attributeName, tmpKey, indexRecord.posOffset);
 				indexRecord.key = atoi(tmpKey);									//目前只支持key值类型为int的列进行建索引。
         		indexRecord.recordID = j;
 				int value=insert(index, indexRecord);							//建立B+树索引
 				if(value==-1){
 					printf("error:Insertion failed!\n");
 					break;
-
 				}
 			}
 		}
@@ -69,36 +76,53 @@ void create_index(char *tableName,char *Attributename){
 		else
 			CurpageNo = nextPno;
 	}
-	printf("-------  create_index success!  ------\n");
+	printf("---- create_index success! ----\n");
 }
 
-void drop_index(char *tableName,char *Attributename){						//删除索引文件
-for(int i=0;i<MAX_FILE_NUM;i++){
+void drop_index(char *tableName,char *attributeName)//删除索引文件
+{
+	char indexFilePath[50] = "./data/index/";
+	char tmpStr[16] = {0};
+	for(int i=0;i<MAX_FILE_NUM;i++)
+	{
 		if(strcmp(DB->dataDict[i].tableName,tableName)==0){
 			for(int j=0;j<DB->dataDict[i].attrNum;j++){
-				if(strcmp(DB->dataDict[i].attr[j].name,Attributename)==0){
-					if(DB->dataDict[i].attr[j].indexFileID==0){
-						printf("error:the indexfile is not exist!\n");	
+				if(strcmp(DB->dataDict[i].attr[j].name,attributeName)==0){
+					if(DB->dataDict[i].attr[j].indexFileID==0)
+					{
+						printf("error: the indexfile is not exist!\n");	
 					}
-					else{
+					else
+					{
 						DB->dataDict[i].attr[j].indexFileID=0;
-						const char *savePath = "../data/indexID";
-						int value=remove(savePath);
+
+						snprintf(tmpStr, 16, "%d", i);
+						strcat(indexFilePath, attributeName);
+						strcat(indexFilePath, "_");
+						strcat(indexFilePath, tmpStr);
+
+						int value=remove(indexFilePath);
 						if(value==EOF)
-							printf("error:delete failed!\n");
+						{
+							printf("error: delete failed!\n");
+						}
+						else
+						{
+							printf("---- drop_index success! ----\n");
+						}
 					}
 				}
 			}
 		}
-	}
-	printf("-------  drop_index success!  ------\n");
+	}	
 }
 
-int find_indexfile(char *tableName,char *Attributename){					//查找索引文件号
+int find_indexfile(char *tableName,char *attributeName){					//查找索引文件号
 	for(int i=0;i<MAX_FILE_NUM;i++){
 		if(strcmp(DB->dataDict[i].tableName,tableName)==0){
+
 			for(int j=0;j<DB->dataDict[i].attrNum;j++){
-				if(strcmp(DB->dataDict[i].attr[j].name,Attributename)==0){
+				if(strcmp(DB->dataDict[i].attr[j].name,attributeName)==0){
 					if(DB->dataDict[i].attr[j].indexFileID==0){
 						return -1;
 					}
@@ -111,8 +135,11 @@ int find_indexfile(char *tableName,char *Attributename){					//查找索引文�
 	}
 }
 
-void insert_index(char *tableName, char *Attributename, Record* record){		//索引插入结点
-	int value=find_indexfile(tableName,Attributename);
+void insert_index(char *tableName, char *attributeName, Record* record){		//索引插入结点
+	char indexFilePath[50] = "./data/index/";
+	char tmpStr[16] = {0};
+
+	int value = find_indexfile(tableName,attributeName);
 	char *tmpKey;
 	if(value==-1){
 		printf("error:the indexfile is not exist!\n");
@@ -121,11 +148,19 @@ void insert_index(char *tableName, char *Attributename, Record* record){		//索�
 		TreeRecord indexRecord;
 		indexRecord.posPage=record->pageNo;
 		indexRecord.recordID=record->recordID;
-		getrecordAttribute(record->pageNo,record->recordID,tableName,Attributename,tmpKey,indexRecord.posOffset);
+		getrecordAttribute(record->pageNo,record->recordID,tableName,attributeName,tmpKey,indexRecord.posOffset);
 		indexRecord.key = atoi(tmpKey);
+		indexRecord.pos = atoi(tmpKey);
 
 		FILE *index;
-		index=fopen("../data/indexID","rb+");
+
+		int dictID = getDictIDbyName(tableName);
+		snprintf(tmpStr, 16, "%d", dictID);
+		strcat(indexFilePath, attributeName);
+		strcat(indexFilePath, "_");
+		strcat(indexFilePath, tmpStr);
+
+		index=fopen(indexFilePath, "rb+");
 		int result=insert(index, indexRecord);							
 		if(result==-1){
 			printf("error:insert failed!\n");
@@ -133,34 +168,49 @@ void insert_index(char *tableName, char *Attributename, Record* record){		//索�
 	}
 }
 
-void delete_index(char *tableName, char *Attributename, Record* record){		//索引删除结点
-	int value=find_indexfile(tableName,Attributename);
+void delete_index(char *tableName, char *attributeName, Record* record){		//索引删除结点
+	char indexFilePath[50] = "./data/index/";
+	char tmpStr[16] = {0};
+
+	int value=find_indexfile(tableName,attributeName);
 	char *tmpKey;
 	if(value==-1){
 		printf("error:the indexfile is not exist!\n");
 	}
 	else{
 		TreeRecord indexRecord;
-		getrecordAttribute(record->pageNo,record->recordID,tableName,Attributename,tmpKey,indexRecord.posOffset);
+		getrecordAttribute(record->pageNo,record->recordID,tableName,attributeName,tmpKey,indexRecord.posOffset);
 		indexRecord.key = atoi(tmpKey);
 		FILE *index;
-		index=fopen("../data/indexID","rb+");
+
+		int dictID = getDictIDbyName(tableName);
+		snprintf(tmpStr, 16, "%d", dictID);
+		strcat(indexFilePath, attributeName);
+		strcat(indexFilePath, "_");
+		strcat(indexFilePath, tmpStr);
+
+		index=fopen(indexFilePath,"rb+");
 		int result=del(index, indexRecord.key);							
 		if(result==-1){
-			printf("error:delete failed!\n");
+			printf("error: delete failed! \n");
+		}else{
+			printf("info: delete record success! \n");
 		}
 	}
 }
 
-void update_index(char *tableName, char *Attributename, Record* oldRecord, Record* newRecord)
+void update_index(char *tableName, char *attributeName, Record* oldRecord, Record* newRecord)
 {
-	delete_index(tableName, Attributename, oldRecord);
-	insert_index(tableName, Attributename, newRecord);
+	delete_index(tableName, attributeName, oldRecord);
+	insert_index(tableName, attributeName, newRecord);
 }
 
 void search_index(char *tableName, char *attributeName, char* Attribute, Record* recordList)
 {
-	int value=find_indexfile(tableName,attributeName);
+	char indexFilePath[50] = "./data/index/";
+	char tmpStr[16] = {0};
+
+	int value=find_indexfile(tableName, attributeName);
 	if(value==-1)
 	{
 		printf("error:the indexfile is not exist!\n");
@@ -168,7 +218,14 @@ void search_index(char *tableName, char *attributeName, char* Attribute, Record*
 	else
 	{
 		FILE *index;
-		index=fopen("../data/indexID","rb");
+
+		int dictID = getDictIDbyName(tableName);
+		snprintf(tmpStr, 16, "%d", dictID);
+		strcat(indexFilePath, attributeName);
+		strcat(indexFilePath, "_");
+		strcat(indexFilePath, tmpStr);
+
+		index=fopen(indexFilePath, "rb");
 		int key = atoi(Attribute);
 		int result=search(index, key);
 		if(result==-1)
