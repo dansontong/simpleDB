@@ -18,13 +18,24 @@ void create_index(char *tableName,char *attributeName){
 	char tmpStr[16] = {0};
 	int indexID,FileID,i,j;
 	for(i=0;i<MAX_FILE_NUM;i++){												//查找表文件的文件号
-		if(strcmp(DB->dataDict[i].tableName,tableName)==0){
+		// if(strncmp(DB->dataDict[i].tableName, tableName, strlen(DB->dataDict[i].tableName)-1)==0){
+		if(strcmp(DB->dataDict[i].tableName, tableName)==0){
 			FileID=DB->dataDict[i].fileID;
 			break;
 		}
 	}
+	if(i == MAX_FILE_NUM){
+		printf("tableName:%s \n", tableName);
+		printf("error: table not exist, create index failed! \n");
+		return;
+	}
 	for(j=0;j<DB->dataDict[i].attrNum;j++){									//查找属性列
-		if(strcmp(DB->dataDict[i].attr[j].name,attributeName)==0){
+		// printf("attribute[%d] %s\n", j, DB->dataDict[i].attr[j].name);
+		// printf("sizeof: %d\n", sizeof(attributeName));
+		// printf("sizeof: %d\n", sizeof(DB->dataDict[i].attr[j].name));
+		// printf("strlen: %d\n", strlen(DB->dataDict[i].attr[j].name));
+		// 防止attributeName参数不带\0,长度不一样,导致对比不想等
+		if(strcmp(DB->dataDict[i].attr[j].name, attributeName)==0){
 			if(DB->dataDict[i].attr[j].indexFileID==0){
 				indexID = DB->dataDict[i].fileID + 10000;					//新建索引文件
 				snprintf(tmpStr, 16, "%d", i);
@@ -40,7 +51,12 @@ void create_index(char *tableName,char *attributeName){
 			else{
 				indexID=DB->dataDict[i].attr[j].indexFileID;				//获取索引文件
 			}
+			break;
 		}
+	}
+	if(j == DB->dataDict[i].attrNum){
+		printf("error: attribute %s not  exist, create index failed! \n",attributeName);
+		return;
 	}
 	for(i=0;i<MAX_FILE_NUM;i++){												//查找表文件的起始页号
 		if(DB->dbMeta.fileMeta[0].segList[i].id==FileID)						//
@@ -150,7 +166,7 @@ void insert_index(char *tableName, char *attributeName, Record* record){		//索�
 		indexRecord.recordID=record->recordID;
 		getrecordAttribute(record->pageNo,record->recordID,tableName,attributeName,tmpKey,indexRecord.posOffset);
 		indexRecord.key = atoi(tmpKey);
-		indexRecord.pos = atoi(tmpKey);
+		indexRecord.pos = atoi(tmpKey) * 2;
 
 		FILE *index;
 
@@ -213,7 +229,7 @@ void search_index(char *tableName, char *attributeName, char* Attribute, Record*
 	int value=find_indexfile(tableName, attributeName);
 	if(value==-1)
 	{
-		printf("error:the indexfile is not exist!\n");
+		printf("error: index file is not exist!\n");
 	}
 	else
 	{

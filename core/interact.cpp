@@ -50,6 +50,7 @@ void dosMain()
 		{
 			for (int i = 0; i < MAX_FILE_NUM; i++) {//数据字典
 				printf("dataDict[%d].fileID: %d\n", i, DB->dataDict[i].fileID);
+				printf("dataDict[%d].name: %s\n", i, DB->dataDict[i].tableName);
 			}
 		}
 		else if(strcmp(strIn, "exit\n")==0)
@@ -80,30 +81,30 @@ void dosMain()
 			attr_list[0].type = INT_TYPE;
 			attr_list[0].length = 4;
 			attr_list[0].notNull = true;
-			strcpy(attr_list[0].name, "S_NAME");
-			attr_list[0].type = CHAR_TYPE;
-			attr_list[0].length = 25;
-			attr_list[0].notNull = true;
-			strcpy(attr_list[0].name, "S_ADDRESS");
-			attr_list[0].type = VARCHAR_TYPE;
-			attr_list[0].length = 40;
-			attr_list[0].notNull = true;
-			strcpy(attr_list[0].name, "NATIONKEY");
-			attr_list[0].type = INT_TYPE;
-			attr_list[0].length = 4;
-			attr_list[0].notNull = true;
-			strcpy(attr_list[0].name, "S_PHONE");
-			attr_list[0].type = CHAR_TYPE;
-			attr_list[0].length = 15;
-			attr_list[0].notNull = true;
-			strcpy(attr_list[0].name, "S_ACCTBAL");
-			attr_list[0].type = FLOAT_TYPE;
-			attr_list[0].length = 8;
-			attr_list[0].notNull = true;
-			strcpy(attr_list[0].name, "S_COMMENT");
-			attr_list[0].type = VARCHAR_TYPE;
-			attr_list[0].length = 101;
-			attr_list[0].notNull = true;
+			strcpy(attr_list[1].name, "S_NAME");
+			attr_list[1].type = CHAR_TYPE;
+			attr_list[1].length = 25;
+			attr_list[1].notNull = true;
+			strcpy(attr_list[2].name, "S_ADDRESS");
+			attr_list[2].type = VARCHAR_TYPE;
+			attr_list[2].length = 40;
+			attr_list[2].notNull = true;
+			strcpy(attr_list[3].name, "NATIONKEY");
+			attr_list[3].type = INT_TYPE;
+			attr_list[3].length = 4;
+			attr_list[3].notNull = true;
+			strcpy(attr_list[4].name, "S_PHONE");
+			attr_list[4].type = CHAR_TYPE;
+			attr_list[4].length = 15;
+			attr_list[4].notNull = true;
+			strcpy(attr_list[5].name, "S_ACCTBAL");
+			attr_list[5].type = FLOAT_TYPE;
+			attr_list[5].length = 8;
+			attr_list[5].notNull = true;
+			strcpy(attr_list[6].name, "S_COMMENT");
+			attr_list[6].type = VARCHAR_TYPE;
+			attr_list[6].length = 101;
+			attr_list[6].notNull = true;
 			int sup_dictID = createTable("Supplier", attr_list, 7);//
 			//读入数据，插入记录
 			char tupleFile[30] = "./data/supplier.tbl";
@@ -126,18 +127,18 @@ void dosMain()
 			attr_list[0].type = INT_TYPE;
 			attr_list[0].length = 4;
 			attr_list[0].notNull = true;
-			strcpy(attr_list[0].name, "N_NAME");
-			attr_list[0].type = CHAR_TYPE;
-			attr_list[0].length = 25;
-			attr_list[0].notNull = true;
-			strcpy(attr_list[0].name, "N_REGIONKEY");
-			attr_list[0].type = INT_TYPE;
-			attr_list[0].length = 4;
-			attr_list[0].notNull = true;
-			strcpy(attr_list[0].name, "N_COMMENT");
-			attr_list[0].type = VARCHAR_TYPE;
-			attr_list[0].length = 101;
-			attr_list[0].notNull = true;
+			strcpy(attr_list[1].name, "N_NAME");
+			attr_list[1].type = CHAR_TYPE;
+			attr_list[1].length = 25;
+			attr_list[1].notNull = true;
+			strcpy(attr_list[2].name, "N_REGIONKEY");
+			attr_list[2].type = INT_TYPE;
+			attr_list[2].length = 4;
+			attr_list[2].notNull = true;
+			strcpy(attr_list[3].name, "N_COMMENT");
+			attr_list[3].type = VARCHAR_TYPE;
+			attr_list[3].length = 101;
+			attr_list[3].notNull = true;
 			int nation_dictID = createTable("nation", attr_list, 4);//
 			//读入数据，插入记录
 			char tupleFile2[30] = "./data/nation.tbl";
