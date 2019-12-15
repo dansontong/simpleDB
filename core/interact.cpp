@@ -184,7 +184,7 @@ void dosMain()
 			Record *recordList;
 			if(varNum < 2){
 				// printf("no enough parameters, at least 2.\n");
-				recordList = searchRecord("Supplier","S_SUPPKEY","Not_exist_for_test");
+				// recordList = searchRecord("Supplier","S_SUPPKEY","Not_exist_for_test");
 				recordList = searchRecord("Supplier","S_SUPPKEY","9980");
 			}
 			else
@@ -194,7 +194,8 @@ void dosMain()
 		}
 		else if(strcmp(strlist[0], "select-all")==0)
 		{
-			tableScanSelector(0, "S_SUPPKEY");
+			// tableScanSelector(0, "S_SUPPKEY");
+			tableScanSelector(0);
 		}
 		else if(strcmp(strlist[0], "drop-db")==0)
 		{
