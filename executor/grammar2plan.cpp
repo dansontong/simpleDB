@@ -385,10 +385,8 @@ PerformPlan *insert2plan(trivialtree * root)
         printf("current data: %s\n", cur->data().c_str());
         if (strcmp(cur->data().c_str(), "<DATA_LIST>") == 0){
             cur = cur->Child();
-            printf("[debug] %s;\n", cur->data().c_str());
             // plan->val_list.push_back( strdup(cur->data().c_str()));
             plan->val_list[plan->val_index++] = cur->data().c_str();
-            printf("[debug] %s;\n", cur->data().c_str());
 
             cur = cur->Brother();
         }else{
