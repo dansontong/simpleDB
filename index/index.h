@@ -8,6 +8,9 @@
 #include "b_plus_tree.h"
 
 
+// 索引文件名：./data/index/attributeName_dictID
+
+
 // typedef struct
 // {
 // 	char* key;        //索引的列值
