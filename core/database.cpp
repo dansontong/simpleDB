@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "database.h"
+#include <assert.h>
 // include the sql parser
 // #include "SQLParser.h"
 // contains printing utilities
@@ -11,11 +12,15 @@ struct DataBase *DB = NULL; /* 模块内共享 */
 //====================    function     ====================
 void initDB(struct DataBase *db, char *fileName)
 {
+	// check 
+	assert(BIT_MAP_ADDR == sizeof(struct Table) * MAX_FILE_NUM + sizeof(struct DbMeta));
+
+	// initialize DB
 	DB = db;
 	DB->dbFile = fopen(fileName, "rb+");
 	if(DB->dbFile == NULL)
 	{
-		printf("DataBase isn't exist, creating new dataBase.\n");
+		printf("default database isn't exist, creating new database.\n");
 		createDbFile(fileName);
 		DB->dbFile = fopen(fileName, "rb+");
 	}
@@ -25,11 +30,7 @@ void initDB(struct DataBase *db, char *fileName)
 	// rewind(DB->dbFile);
 	fseek(DB->dbFile, sizeof(struct DbMeta), SEEK_SET);
 	fread(&(DB->dataDict), sizeof(struct Table), MAX_FILE_NUM, DB->dbFile);// 从文件中读取bitMap的内容
-	for (int i = 0; i < MAX_FILE_NUM; i++) {//数据字典
-		printf("dataDict[%d].fileID: %d\n", i, DB->dataDict[i].fileID);
-	}
-	printf("====================:%ld\n", sizeof(struct Table) * MAX_FILE_NUM + sizeof(struct DbMeta));
-	printf("====================:%ld\n", sizeof(struct DbMeta));
+	
 
 	// 为空闲空间的位示图bitMap分配空间
 	DB->freeSpaceBitMap = (unsigned long *)malloc(BIT_MAP_SIZE);
@@ -57,7 +58,7 @@ void initDB(struct DataBase *db, char *fileName)
 	// 	DB->dataDict[i].fileID = -1;
 	// }
 	
-	printf("initDB done.\n");
+	printf("database init done.\n");
 	//建立表
 	//插入数据
 }
@@ -193,18 +194,4 @@ int saveDbHead(){
 	// fread(DB->freeSpaceBitMap, BIT_MAP_SIZE, 1, DB->dbFile);// 从文件中读取bitMap的内容
 	return 0;
 }
-
-// get DictID by tableName, -1 means fail
-int getDictIDbyTableName(char *tableName)
-{
-	for(int i=0; i<MAX_FILE_NUM; i++)
-	{
-		if(strcmp(DB->dataDict[i].tableName, tableName) == 0)
-		{
-			return i;
-		}
-	}
-	return -1;
-}
-
 

@@ -17,7 +17,7 @@ void dosMain()
 	while(1)
 	{
 		char strIn[512];
-		printf(">> ");
+		printf("sql>> ");
 		// gets(strIn); // deprecated
 		fgets(strIn, 512, stdin);
 		// scanf("%s",strIn); // stop by 'space'
@@ -26,12 +26,14 @@ void dosMain()
 		{
 			printf("usage:\n");
 			printf("- %-15s get help.\n","help");
-			printf("- %-15s delete database.\n","delete db");
+			printf("- %-15s delete database.\n","del db");
 			printf("- %-15s create database.\n","create db");
 			printf("- %-15s show data dictionary.\n","data dict");
 			printf("- %-15s insert tuple of supplier.tbl.\n","insert");
 			printf("- %-15s select all from table supplier.\n","select all");
 			printf("- %-15s Memory to disk.\n","memtodisk");
+			printf("- %-15s find 2 record.\n","find");
+			printf("- %-15s create index on S_SUPPKEY of Supplier.\n","create index");
 			printf("- %-15s exit DBMS.\n","exit");
 		}
 		else if(strcmp(strIn, "del db\n")==0 || strcmp(strIn, "delete db\n")==0)
@@ -107,6 +109,16 @@ void dosMain()
 				printf("----- end insert line No.%d -----\n", count++);
 				//printf("%s\n", buff);
 			}
+		}
+		else if(strcmp(strIn, "create index\n")==0)
+		{
+			create_index("Supplier","S_SUPPKEY");
+		}
+		else if(strcmp(strIn, "find\n")==0)
+		{
+			Record *recordList;
+			recordList = searchRecord("Supplier","S_SUPPKEY","Not_exist_for_test");
+			recordList = searchRecord("Supplier","S_SUPPKEY","9840");
 		}
 		else if(strcmp(strIn, "select all\n")==0)
 		{
