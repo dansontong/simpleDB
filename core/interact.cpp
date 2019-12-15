@@ -44,7 +44,7 @@ void dosMain()
 			printf("- %-15s delete database.\n","del-db");
 			printf("- %-15s create database.\n","create-db");
 			printf("- %-15s show data dictionary.\n","data-dict");
-			printf("- %-15s insert tuple of supplier.tbl.\n","insert");
+			printf("- %-15s insert tuple of supplier.tbl.\n","insert-sup");
 			printf("- %-15s select all from table supplier.\n","select-all");
 			printf("- %-15s Memory to disk.\n","memtodisk");
 			printf("- %-15s find record of key.\n","find key");
@@ -87,7 +87,7 @@ void dosMain()
 		{
             initDB(DB, DB_FILE);
 		}
-		else if(strcmp(strlist[0], "insert")==0)
+		else if(strcmp(strlist[0], "insert-sup")==0)
 		{
 			//创建表
 			char tableFile[30] = "./data/table_list";
@@ -206,7 +206,8 @@ void dosMain()
 		}
 		else
 		{
-			printf("unknown command. try help.\n");
+			execute_sql(sql, strlen(sql));
+			// printf("unknown command. try help.\n");
 		}
 	}
 	return;

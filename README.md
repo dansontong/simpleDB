@@ -42,4 +42,8 @@ TODO:mnb
 ~~2, file.cpp168行放开注释后，buffer会在start schedule输出后卡住，原因跑的太快了，大家时间戳都一样……~~  
 3, 其他地方需要增加dirty标记，以便buffer调出时写回磁盘。  
   
+TODO:index-module: lh & ly  
+1, 索引需要存键值和对应的位置，目前只存了键值，相当于索引没有任何用处  
+
+  
   https://github.com/dansontong/simpleDB/invitations 邀请链接

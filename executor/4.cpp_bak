@@ -547,6 +547,8 @@ void Down_filterandproject(Plannode headplan){
 	
 
 }
+
+
 int main(){
 	char sql[100] = "select * from a,b where a.a1 = b.a1 and num != (select1 num from b1,a1 where a=0);";
 	
