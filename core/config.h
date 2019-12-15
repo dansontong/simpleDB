@@ -26,6 +26,7 @@ using namespace std;
 #define MAX_NAME_LENGTH 50              //表名,属性名等名字的最大长度
 #define MAX_ATTRIBUTE_NUM 20            //表中属性个数上限
 
+
 // file 配置参数
 #define MAX_FILE_NUM     100  //最大文件数量
 
@@ -44,7 +45,7 @@ using namespace std;
 #define BUCKET_NUM 101
 
 // file 配置参数
-#define RECORD_MAX_SIZE 400 //记录最长长度
+#define RECORD_MAX_SIZE 500 //记录最长长度
 
 typedef enum{
 	INT_TYPE = 0,

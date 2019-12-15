@@ -137,8 +137,8 @@ long getLogicID(int fileID, long pageNo,int recordNo){
 	int i;
 	int querypage=-1;
 	for( i=0;i<MAX_FILE_NUM;i++){                                           //这一块是查找文件是否存在
-		if(DB->dbMeta.fileMeta[i].segList[i].id==fileID){					//
-			querypage=DB->dbMeta.fileMeta[i].segList[i].firstPageNo;		//
+		if(DB->dbMeta.fileMeta[i].id==fileID){					//
+			querypage=DB->dbMeta.fileMeta[i].firstPageNo;		//
 			break;															//
 		}																	//
 	}
@@ -171,8 +171,8 @@ bool getRecordByLogicID(int fileID,long logicID,char* result){  // logicID is ma
 	int querypage=-1;
 	int i;
 	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
-		if(DB->dbMeta.fileMeta[i].segList[i].id==fileID){						//
-			querypage=DB->dbMeta.fileMeta[i].segList[i].firstPageNo;			//
+		if(DB->dbMeta.fileMeta[i].id==fileID){						//
+			querypage=DB->dbMeta.fileMeta[i].firstPageNo;			//
 			break;																//
 		}																		//
 	}
@@ -262,7 +262,7 @@ bool getRecord(long pageNo,int recordID,char *record)
 }
 
 bool getrecordAttribute(long pageNo,int recordID,char* tablename,char* Attributename,char* Attribute,char* posOffset){
-	char *record;
+	char *record = (char *)malloc(RECORD_MAX_SIZE);;
 	bool flag;
 
 	if(getRecord(pageNo,recordID,record)){//返回该条记录
@@ -275,11 +275,15 @@ bool getrecordAttribute(long pageNo,int recordID,char* tablename,char* Attribute
 				if(strcmp(DB->dataDict[i].tableName,tablename)==0){//查找表
 					int j=0;
 					for(j=0;j<DB->dataDict[i].attrNum;j++){//查找属性，根据属性名找到属性在记录中的具体位置
-						if(strcmp(DB->dataDict[i].attr[j].name,Attributename)==0){
-							if(getValueByAttrID(record, j, Attribute)>0){
+						if(strcmp(DB->dataDict[i].attr[j].name,Attributename)==0)
+						{							
+							if(getValueByAttrID(record, j, Attribute)>0)
+							{
+								free(record);
 								return true;
 							}
 							else{
+								free(record);
 								return false;
 							}
 							
@@ -290,6 +294,7 @@ bool getrecordAttribute(long pageNo,int recordID,char* tablename,char* Attribute
 		}
 	}
 	else{
+		free(record);
 		return false;
 	}
 }
@@ -318,7 +323,7 @@ void insertRecord(int dictID, char *str)
 	// write data_dictionary
 	DB->dataDict[dictID].recordNum += 1;
 	
-	char recordStr[1000]; //假设记录最长1000个字节
+	char recordStr[RECORD_MAX_SIZE]; //假设记录最长1000个字节
 	// char *attribute;
 	getRecord(record.pageNo,record.recordID, recordStr);
 	int i;

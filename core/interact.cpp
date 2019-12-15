@@ -17,26 +17,41 @@ void dosMain()
 	while(1)
 	{
 		char strIn[512];
-		printf("sql>> ");
+		printf("\033[32msql>> \033[0m");
 		// gets(strIn); // deprecated
 		fgets(strIn, 512, stdin);
 		// scanf("%s",strIn); // stop by 'space'
 
-		if(strcmp(strIn, "help\n")==0)
+		// split strIn to list
+		char strlist[50][50]={""};/*指定分隔后子字符串存储的位置，这里定义二维字符串数组*/
+		char seg[] = " ";
+		char *substr;
+		int varNum = 0;
+		substr = strtok(strIn, "\n");
+		substr = strtok(substr, seg);
+		while(substr){
+			strcpy(strlist[varNum], substr);
+			// printf("varNum-%d:, %s, length:%d\n", varNum, substr,strlen(substr));
+			varNum++;
+		    substr = strtok(NULL, seg);
+		}
+		// printf("cmd: %s\n", strlist[0]);
+
+		if(strcmp(strlist[0], "help")==0)
 		{
 			printf("usage:\n");
 			printf("- %-15s get help.\n","help");
-			printf("- %-15s delete database.\n","del db");
-			printf("- %-15s create database.\n","create db");
-			printf("- %-15s show data dictionary.\n","data dict");
+			printf("- %-15s delete database.\n","del-db");
+			printf("- %-15s create database.\n","create-db");
+			printf("- %-15s show data dictionary.\n","data-dict");
 			printf("- %-15s insert tuple of supplier.tbl.\n","insert");
-			printf("- %-15s select all from table supplier.\n","select all");
+			printf("- %-15s select all from table supplier.\n","select-all");
 			printf("- %-15s Memory to disk.\n","memtodisk");
-			printf("- %-15s find 2 record.\n","find");
-			printf("- %-15s create index on S_SUPPKEY of Supplier.\n","create index");
+			printf("- %-15s find record of key.\n","find key");
+			printf("- %-15s create index on S_SUPPKEY of Supplier.\n","create-index");
 			printf("- %-15s exit DBMS.\n","exit");
 		}
-		else if(strcmp(strIn, "del-db\n")==0 || strcmp(strIn, "delete-db\n")==0)
+		else if(strcmp(strlist[0], "del-db")==0 || strcmp(strlist[0], "delete-db")==0)
 		{
 			printf("are you sure to \"drop database\"? yes/no: \n");
 			fgets(strIn, 10, stdin);
@@ -46,33 +61,33 @@ void dosMain()
 				deleteDB();
 			}
 		}
-		else if(strcmp(strIn, "data-dict\n")==0)
+		else if(strcmp(strlist[0], "data-dict")==0)
 		{
 			for (int i = 0; i < MAX_FILE_NUM; i++) {//数据字典
 				printf("dataDict[%d].fileID: %d\n", i, DB->dataDict[i].fileID);
 				printf("dataDict[%d].name: %s\n", i, DB->dataDict[i].tableName);
 			}
 		}
-		else if(strcmp(strIn, "exit\n")==0)
+		else if(strcmp(strlist[0], "exit")==0)
 		{			
 			closeDB();
 			exit(0);
 		}
-		else if(strcmp(strIn, "memtodisk\n")==0)
+		else if(strcmp(strlist[0], "memtodisk")==0)
 		{			
 			memToDisk();
 		}
-		else if(strcmp(strIn, "reset-db\n")==0)
+		else if(strcmp(strlist[0], "reset-db")==0)
 		{			
 			closeDB();
 			deleteDB();
 			initDB(DB, DB_FILE);
 		}
-		else if(strcmp(strIn, "create-db\n")==0)
+		else if(strcmp(strlist[0], "create-db")==0)
 		{
             initDB(DB, DB_FILE);
 		}
-		else if(strcmp(strIn, "insert\n")==0)
+		else if(strcmp(strlist[0], "insert")==0)
 		{
 			//创建表
 			char tableFile[30] = "./data/table_list";
@@ -156,29 +171,36 @@ void dosMain()
 				//printf("%s\n", buff);
 			}
 		}
-		else if(strcmp(strIn, "create-index\n")==0)
+		else if(strcmp(strlist[0], "create-index")==0)
 		{
 			create_index("Supplier","S_SUPPKEY");
 		}
-		else if(strcmp(strIn, "drop-index\n")==0)
+		else if(strcmp(strlist[0], "drop-index")==0)
 		{
 			drop_index("Supplier","S_SUPPKEY");
 		}
-		else if(strcmp(strIn, "find\n")==0)
+		else if(strcmp(strlist[0], "find")==0)
 		{
 			Record *recordList;
-			recordList = searchRecord("Supplier","S_SUPPKEY","Not_exist_for_test");
-			recordList = searchRecord("Supplier","S_SUPPKEY","9840");
+			if(varNum < 2){
+				// printf("no enough parameters, at least 2.\n");
+				recordList = searchRecord("Supplier","S_SUPPKEY","Not_exist_for_test");
+				recordList = searchRecord("Supplier","S_SUPPKEY","9980");
+			}
+			else
+			{
+				recordList = searchRecord("Supplier","S_SUPPKEY",strlist[1]);
+			}
 		}
-		else if(strcmp(strIn, "select-all\n")==0)
+		else if(strcmp(strlist[0], "select-all")==0)
 		{
 			tableScanSelector(0, "S_SUPPKEY");
 		}
-		else if(strcmp(strIn, "drop database\n")==0)
+		else if(strcmp(strlist[0], "drop-db")==0)
 		{
 			printf("drop.\n");
 		}
-		else if(strcmp(strIn, "\n")==0)
+		else if(varNum==0)
 		{
 		}
 		else

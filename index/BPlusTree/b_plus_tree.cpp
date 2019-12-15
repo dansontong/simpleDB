@@ -55,11 +55,10 @@ int search(FILE *index, int key)//找出给定的键值在 B+树中的位置
 		cout << "node.pair[pos].key " << node.pair[pos].key<<endl; 
 		cout << "node.pair[pos].pos " << node.pair[pos].pos << endl;
 		cout << "node.pair[pos].posPage " << node.pair[pos].posPage << endl;
-		cout << "node.pair[pos].posOffset" << node.pair[pos].posOffset << endl;
+		// cout << "node.pair[pos].posOffset" << node.pair[pos].posOffset << endl;
 		cout << "node.pair[pos].recordID " << node.pair[pos].recordID << endl;
-	return node.pair[pos].pos;
-	}
-		
+		return node.pair[pos].pos;
+	}		
 }
 
 int searchTreeRecord(Node &node, int key)
@@ -73,6 +72,7 @@ int searchTreeRecord(Node &node, int key)
 //寻找叶节点
 void searchNode(FILE *index, Node &node, int key)
 {
+	// printf("key: %d\n", key);
 	int pos, offset;
 	if (node.type == LEAF){//节点类型为叶节点时返回
 		return;
@@ -143,8 +143,10 @@ void splitNode(FILE *index, Node &nodea, TreeRecord record, int pos)
 	nodeb.count = (MAX + 1) / 2;//把总共要分裂的键值的数目分一半给新增节点。
 	nodea.count = nodea.count - nodeb.count + 1;//剩下的数目留给原来的节点。
 	for (cur = MAX; cur > pos && cur >= nodea.count; cur--)
+	{
 		cout << "test1" << endl;
 		nodeb.pair[cur - nodea.count] = nodea.pair[cur - 1];
+	}
 	if (cur < nodea.count)
 	{
 		cout << "test2" << endl;

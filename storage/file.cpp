@@ -57,9 +57,9 @@ int file_newFile(FILE_TYPE fileType, long NeededPageNum){
 		DB->dbMeta.fileMeta[i].fileType=fileType;
 		DB->dbMeta.fileMeta[i].firstPageNo=NewPages;
 		DB->dbMeta.fileMeta[i].pageNum=NeededPageNum;
-		DB->dbMeta.fileMeta[i].segList[i].id=id;
-		DB->dbMeta.fileMeta[i].segList[i].firstPageNo=NewPages;
-		DB->dbMeta.fileMeta[i].segList[i].pageNum=NeededPageNum;
+		DB->dbMeta.fileMeta[i].id=id;
+		DB->dbMeta.fileMeta[i].firstPageNo=NewPages;
+		DB->dbMeta.fileMeta[i].pageNum=NeededPageNum;
 		DB->dbMeta.blockFree=DB->dbMeta.blockFree-NeededPageNum;
 		file_print_freepace();
 		
@@ -77,11 +77,11 @@ struct Record file_writeFile(int FileID, int length,char *str){
 
 	int querypage=-1;
 	int i;
-	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
-		if(DB->dbMeta.fileMeta[i].segList[i].id==FileID){						//
-			querypage=DB->dbMeta.fileMeta[i].segList[i].firstPageNo;			//
-			break;																//
-		}																		//
+	for( i=0;i<MAX_FILE_NUM;i++){                                   //这一块是查找文件是否存在
+		if(DB->dbMeta.fileMeta[i].id==FileID){						//
+			querypage=DB->dbMeta.fileMeta[i].firstPageNo;			//
+			break;													//
+		}															//
 	}
 	if(querypage==-1){
 		printf("该文件id对应的文件不存在！");
@@ -178,14 +178,14 @@ struct Record file_writeFile(int FileID, int length,char *str){
 void file_readFile(int FileID,char *str){
 	int i;
 	for(i=0;i<MAX_FILE_NUM;i++){
-		if(DB->dbMeta.fileMeta[0].segList[i].id==FileID){
+		if(DB->dbMeta.fileMeta[0].id==FileID){
 			break;
 		}
 	}
 	int sizeofpageMeta = sizeof(struct PageMeta);
 	int sizeofrecord = sizeof(struct OffsetInPage);
-	long pagenum = DB->dbMeta.fileMeta[0].segList[i].pageNum;
-	long CurpageNo = DB->dbMeta.fileMeta[0].segList[i].firstPageNo;
+	long pagenum = DB->dbMeta.fileMeta[0].pageNum;
+	long CurpageNo = DB->dbMeta.fileMeta[0].firstPageNo;
 	OffsetInPage preoffset,curoffset;
 	struct PageMeta pageMeta;
 	for(i=0;i<pagenum;i++){					
@@ -232,12 +232,12 @@ void file_readFile(int FileID,char *str){
 void file_deleteFile(int FileID){
 	int i;
 	for(i=0;i<MAX_FILE_NUM;i++){
-		if(DB->dbMeta.fileMeta[0].segList[i].id==FileID){			//找到文件对应的页
+		if(DB->dbMeta.fileMeta[0].id==FileID){			//找到文件对应的页
 			break;
 		}
 	}
-	long pagenum = DB->dbMeta.fileMeta[0].segList[i].pageNum;			//读取第一页的信息
-	long CurpageNo = DB->dbMeta.fileMeta[0].segList[i].firstPageNo;
+	long pagenum = DB->dbMeta.fileMeta[0].pageNum;			//读取第一页的信息
+	long CurpageNo = DB->dbMeta.fileMeta[0].firstPageNo;
 	long pageAddr = FILE_DATA_ADDR + CurpageNo * PAGE_SIZE;
 	int sizeofpageMeta = sizeof(struct PageMeta);
 	int sizeofrecord = sizeof(struct OffsetInPage);
@@ -258,10 +258,10 @@ void file_deleteFile(int FileID){
 	}
 	DB->dbMeta.blockFree += pagenum;
 	DB->dbMeta.currFileNum--;
-	DB->dbMeta.fileMeta[0].segList[i].type = -1;
-	DB->dbMeta.fileMeta[0].segList[i].id = -1;
-	DB->dbMeta.fileMeta[0].segList[i].firstPageNo = -1;
-	DB->dbMeta.fileMeta[0].segList[i].pageNum = -1;
+	// DB->dbMeta.fileMeta[0].segList[i].type = -1;
+	DB->dbMeta.fileMeta[0].id = -1;
+	DB->dbMeta.fileMeta[0].firstPageNo = -1;
+	DB->dbMeta.fileMeta[0].pageNum = -1;
 	
 }
 void file_read_sd(long pageno,char *bufferpath){
