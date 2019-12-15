@@ -49,7 +49,7 @@ int createTable(char *str)
 int deleteTable(char *tableName)
 {
 	// delete from bitmap, mark page be free in bitMap
-	int dictID = getDictIDbyTableName(tableName);
+	int dictID = getDictIDbyName(tableName);
 	int fileID = DB->dataDict[dictID].fileID;
 	long pageNo = DB->dbMeta.fileMeta[fileID].firstPageNo;
 	struct PageMeta ph;
