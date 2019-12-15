@@ -23,3 +23,4 @@ simpleDb
 supplier.tbl
 table_list
 *.dat
+./data/index/*
