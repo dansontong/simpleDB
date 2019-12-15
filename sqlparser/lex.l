@@ -102,8 +102,8 @@ str \".*\"
 
 "." {BeginToken(yytext); yylval.string = strdup(yytext); return SEP_PERIOD;}
 
-{date} {BeginToken(yytext); yylval.string = strdup(yytext); return DATA;}
-{str} {BeginToken(yytext); yylval.string = strdup(yytext); return DATA;}
+{date} {BeginToken(yytext); yytext[strlen(yytext)-1]='\0'; yylval.string = strdup(yytext+1);  return DATA;}
+{str} {BeginToken(yytext); yytext[strlen(yytext)-1]='\0'; yylval.string = strdup(yytext+1); return DATA;}
 {data} {BeginToken(yytext); yylval.string = strdup(yytext); return DATA;}
 
 "*" { 
