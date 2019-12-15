@@ -938,12 +938,12 @@ YY_RULE_SETUP
 case 9:
 YY_RULE_SETUP
 #line 105 "lex.l"
-{BeginToken(yytext); yylval.string = strdup(yytext); return DATA;}
+{BeginToken(yytext); yytext[strlen(yytext)-1]='\0'; yylval.string = strdup(yytext+1);  return DATA;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
 #line 106 "lex.l"
-{BeginToken(yytext); yylval.string = strdup(yytext); return DATA;}
+{BeginToken(yytext); yytext[strlen(yytext)-1]='\0'; yylval.string = strdup(yytext+1); return DATA;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
