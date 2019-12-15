@@ -9,15 +9,15 @@ ifeq ($(ver), debug)
 target = database_d
 CXXFLAGS = -pthread -g -Ddebug
 else
-# ALL: database_r
+# ALL: database_r $(head)
 target = database_r
 CXXFLAGS = -pthread -O3
 endif
 
 head = $(shell find ./log ./core ./storage -name "*.h")
-src = $(shell find ./log ./core ./storage ./operator ./index -name "*.cpp")  ./main.cpp
+src = $(shell find ./log ./core ./storage ./operator ./index ./executor -name "*.cpp")  ./main.cpp
 
-$(target): $(src) $(head)
+$(target): $(src)
 	$(cc) $(CXXFLAGS) $(INCLUDE) $(src) -o $(target)
 	# ./$(target)
 	# rm $(target)
