@@ -15,7 +15,8 @@ int tableScanRangeSelector(int dictID,char* attri_name,char* min,char* max);//�
 int tableScanMaxRangeSelector(int dictID,char* attri_name,char* max);//只有max值
 int tableScanMinRangeSelector(int dictID,char* attri_name,char* min);//只有最小值
 int tableScanUnEqualSelector(int dictID,char* attri_name,char* value);//非等值连接
-int tableScanSelector(int dictID,char* attri_name);//select*
+// int tableScanSelector(int dictID,char* attri_name);//select*
+int tableScanSelector(int dictID);//select*
 
 
 // ==================== projection.cpp ==================
