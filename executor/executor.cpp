@@ -104,8 +104,8 @@ void selectRecord(Selectnode *plan)
         attr = plan->attribute[1];
         tmp_table_id = tableScanEqualSelector(did, attrName, attr);
     }else{
-        // 为什么select *还会有attr_name的传值？？
-        tmp_table_id = tableScanSelector(did, plan->projectionattribute[0]);
+        tmp_table_id = tableScanSelector(did);
+        return;
     }
     printf("select tmp table id: %d\n", tmp_table_id);
 
@@ -115,6 +115,9 @@ void selectRecord(Selectnode *plan)
         printf("project tmp table id: %d\n", tmp_table_id);
     }
     printf("res tmp table id: %d\n", tmp_table_id);
+    if (tmp_table_id >= 0){
+        tmp_table_id = tableScanSelector(did);  
+    }
 }
 
 /*--------------------------------------------------------------------
