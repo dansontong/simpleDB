@@ -95,7 +95,7 @@ Plannode *make_project_node(int start_pro,int end_pro,Plannode* cur){//生成投
 	return project;
 }
 
-void init(Selectnode select1,Plannode* cur){//根据select1生成初始查询计划
+void lp_init(Selectnode select1,Plannode* cur){//根据select1生成初始查询计划
 	int countnode=0;
 	//Plannode *cur = &headplan;
 	
