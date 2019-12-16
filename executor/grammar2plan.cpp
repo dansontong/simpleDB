@@ -249,7 +249,7 @@ PerformPlan *insert2plan(trivialtree * root)
         if (strcmp(cur->data().c_str(), "<DATA_LIST>") == 0){
             cur = cur->Child();
             // plan->val_list.push_back( strdup(cur->data().c_str()));
-            plan->val_list[plan->val_index++] = cur->data().c_str();
+            plan->val_list[plan->val_index++] = strdup(cur->data().c_str());
 
             cur = cur->Brother();
         }else{

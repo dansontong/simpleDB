@@ -71,72 +71,72 @@ int tableScanEqualSelector(int dictID,char* attri_name,char* value){
 	return tmptable;
 }
 
-// int tableScanSelector(int dictID,char* attri_name){
-// 	Table table1 = DB->dataDict[dictID];
-// 	int fileID = table1.fileID;
-// 	printf("%d\n", fileID);
-// 	long querypage=-1;
-// 	int i;
-// 	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
-// 		if(DB->dbMeta.fileMeta[i].id==fileID){						//
-// 			querypage=DB->dbMeta.fileMeta[i].firstPageNo;			//
-// 			break;																//
-// 		}																		//
-// 	}
-// 	if(querypage==-1){
-// 		printf("该表应的文件不存在！\n");
-// 		return -1;
-// 		// exit(0);
-// 	}
-// 	long pageNo = DB->dbMeta.fileMeta[i].firstPageNo;
-// 	long pageNum = DB->dbMeta.fileMeta[i].pageNum;
-// 	int tmptable = create_tmptable(table1);
-// 	if(tmptable<0){
-// 		printf("创建临时表失败！\n");
-// 		return -1;  //返回-1表示投影失败
-// 	}
-// 	int index=-1;
-// 	for(int j=0;j<DB->dataDict[dictID].attrNum;j++){//在table1表中查找属性名：attri_name
-// 		if(strcmp(attri_name,DB->dataDict[dictID].attr[j].name)==0){
-// 			index=j;
-// 		}
-// 	}
-// 	int attrIndex = getAttrIndexByName(dictID, attri_name);
-// 	if(attrIndex<0){
-// 		printf("在表%s中不含有属性%s\n",table1.tableName,attri_name);
-// 	}
-// 	char *record = (char*)malloc(RECORD_MAX_SIZE);
-// 	char *attrValue = (char*)malloc(RECORD_MAX_SIZE);
-// 	struct PageMeta pageMeta;
-// 	struct BufTag buftag;
-// 	for(i=0;i<pageNum;i++)
-// 	{
-// 		buftag = Buf_GenerateTag(pageNo);
-// 		memcpy(&pageMeta,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
-// 		// printf("======================== pageMeta.recordNum: %d, pageNo: %d, CurpageNo:%d. \n", pageMeta.recordNum, pageMeta.pageNo, pageNo);
-// 		for(int j=0;j<pageMeta.recordNum;j++){
-// 			getRecord(pageNo,j,record);
-// 			memset(attrValue, 0, RECORD_MAX_SIZE);
-// 			int flag = getValueByAttrID(record,index,attrValue);
-// 			if(flag<0){
-// 				printf("获取表中属性值失败！\n");
-// 				return -1;
-// 			}
-// 			insertRecord(tmptable,record);
-// 			printf("=== tmp-record: %.60s\n", record);
-// 		}
-// 		if(pageMeta.nextPageNo<0){
-// 			break;
-// 		}
-// 		else{
-// 			pageNo=pageMeta.nextPageNo;
-// 		}
-// 		// break; // temp: if-not, there're  too many records
-// 	}
-// 	// free(record);
-// 	// free(attrValue);
-// 	return tmptable;
-// }
+int tableScanSelector(int dictID,char* attri_name){
+	Table table1 = DB->dataDict[dictID];
+	int fileID = table1.fileID;
+	printf("%d\n", fileID);
+	long querypage=-1;
+	int i;
+	for( i=0;i<MAX_FILE_NUM;i++){                                               //这一块是查找文件是否存在
+		if(DB->dbMeta.fileMeta[i].id==fileID){						//
+			querypage=DB->dbMeta.fileMeta[i].firstPageNo;			//
+			break;																//
+		}																		//
+	}
+	if(querypage==-1){
+		printf("该表应的文件不存在！\n");
+		return -1;
+		// exit(0);
+	}
+	long pageNo = DB->dbMeta.fileMeta[i].firstPageNo;
+	long pageNum = DB->dbMeta.fileMeta[i].pageNum;
+	int tmptable = create_tmptable(table1);
+	if(tmptable<0){
+		printf("创建临时表失败！\n");
+		return -1;  //返回-1表示投影失败
+	}
+	int index=-1;
+	for(int j=0;j<DB->dataDict[dictID].attrNum;j++){//在table1表中查找属性名：attri_name
+		if(strcmp(attri_name,DB->dataDict[dictID].attr[j].name)==0){
+			index=j;
+		}
+	}
+	int attrIndex = getAttrIndexByName(dictID, attri_name);
+	if(attrIndex<0){
+		printf("在表%s中不含有属性%s\n",table1.tableName,attri_name);
+	}
+	char *record = (char*)malloc(RECORD_MAX_SIZE);
+	char *attrValue = (char*)malloc(RECORD_MAX_SIZE);
+	struct PageMeta pageMeta;
+	struct BufTag buftag;
+	for(i=0;i<pageNum;i++)
+	{
+		buftag = Buf_GenerateTag(pageNo);
+		memcpy(&pageMeta,Buf_ReadBuffer(buftag),PAGEMETA_SIZE);
+		// printf("======================== pageMeta.recordNum: %d, pageNo: %d, CurpageNo:%d. \n", pageMeta.recordNum, pageMeta.pageNo, pageNo);
+		for(int j=0;j<pageMeta.recordNum;j++){
+			getRecord(pageNo,j,record);
+			memset(attrValue, 0, RECORD_MAX_SIZE);
+			int flag = getValueByAttrID(record,index,attrValue);
+			if(flag<0){
+				printf("获取表中属性值失败！\n");
+				return -1;
+			}
+			insertRecord(tmptable,record);
+			printf("=== tmp-record: %.60s\n", record);
+		}
+		if(pageMeta.nextPageNo<0){
+			break;
+		}
+		else{
+			pageNo=pageMeta.nextPageNo;
+		}
+		// break; // temp: if-not, there're  too many records
+	}
+	// free(record);
+	// free(attrValue);
+	return tmptable;
+}
 
 int tableScanSelector(int dictID){
 	Table table1 = DB->dataDict[dictID];

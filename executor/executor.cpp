@@ -103,7 +103,7 @@ void selectRecord(Selectnode *plan)
         attr = plan->attribute[1];
         tmp_table_id = tableScanEqualSelector(did, attrName, attr);
     }else{
-        tmp_table_id = tableScanSelector(did);
+        tmp_table_id = tableScanSelector(did, attrName);
         return;
     }
     printf("select tmp table id: %d\n", tmp_table_id);
