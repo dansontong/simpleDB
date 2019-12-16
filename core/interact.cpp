@@ -3,6 +3,7 @@
 #include "operator.h"
 #include <stdio.h>
 #include <string.h>
+#include "executor.h"
 
 extern DataBase* DB;
 
@@ -16,10 +17,12 @@ void dosMain()
 {
 	while(1)
 	{
+		char sql[512];
 		char strIn[512];
 		printf("\033[32msql>> \033[0m");
 		// gets(strIn); // deprecated
 		fgets(strIn, 512, stdin);
+		strcpy(sql, strIn);
 		// scanf("%s",strIn); // stop by 'space'
 
 		// split strIn to list
@@ -206,6 +209,7 @@ void dosMain()
 		}
 		else
 		{
+			printf("sql:%s\n", sql);
 			execute_sql(sql, strlen(sql));
 			// printf("unknown command. try help.\n");
 		}
