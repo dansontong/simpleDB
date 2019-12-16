@@ -25,7 +25,7 @@ void createTable(PerformPlan *plan){
     Attribute *attr_list;
 
     if (plan->val_index>0){
-        attr_list = malloc(sizeof(Attribute)*plan->val_index);
+        attr_list = (Attribute *)malloc(sizeof(Attribute)*plan->val_index);
         memset(attr_list, 0, plan->val_index);
         printf("val_list size: %d\n", plan->val_index);
         for (int i=0; i<plan->val_index ; i++ )
@@ -104,8 +104,7 @@ void selectRecord(Selectnode *plan)
         attr = plan->attribute[1];
         tmp_table_id = tableScanEqualSelector(did, attrName, attr);
     }else{
-        // 为什么select *还会有attr_name的传值？？
-        tmp_table_id = tableScanSelector(did, plan->projectionattribute[0]);
+        tmp_table_id = tableScanSelector(did);
     }
     printf("select tmp table id: %d\n", tmp_table_id);
 

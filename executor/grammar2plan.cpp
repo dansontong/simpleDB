@@ -6,7 +6,7 @@
 /*--------------------------------------------------------------------
  * 全局变量
  *------------------------------------------------------------------*/
-int count_tab = 49;
+extern int count_tab;
 
 
 /*--------------------------------------------------------------------
@@ -15,7 +15,7 @@ int count_tab = 49;
  * 初始化一个select节点
  *------------------------------------------------------------------*/
 Selectnode *InitSelectNode(){
-    Selectnode *node = malloc(sizeof(Selectnode));
+    Selectnode *node = (Selectnode *)malloc(sizeof(Selectnode));
     node->num_attri = 0;
     node->num_tab = 0;
     node->num_attri = 0 ;
@@ -121,7 +121,7 @@ Plannode *make_project_node(int start_pro, int end_pro, Plannode *cur, Selectnod
 
 Plannode* plan_init(Selectnode *select1)
 {
-    Plannode *headplan = malloc(sizeof(Plannode));
+    Plannode *headplan = (Plannode *)malloc(sizeof(Plannode));
 
     int countnode = 0;
     Plannode *cur = headplan;
@@ -255,7 +255,7 @@ Selectnode* select2plan(trivialtree * root){
                         }else if (condition_tuple->data().find("ATTR:")==0){
                             strcpy(node->attribute[node->num_attri++], condition_tuple->data().c_str()+5);
                             // TODO 查询数据字典，判断属性是否存在
-                            char *strtmp = malloc(sizeof(char)* (1+strlen(condition_tuple->data().c_str())));
+                            char *strtmp = (char *)malloc(sizeof(char)* (1+strlen(condition_tuple->data().c_str())));
                             memcpy(strtmp, condition_tuple->data().c_str(), 1+strlen(condition_tuple->data().c_str()));
                             char * res = strtok(strtmp, ".");
                             printf("attr: %s; res: %s\n", strtmp, res);
@@ -386,7 +386,7 @@ PerformPlan *insert2plan(trivialtree * root)
         if (strcmp(cur->data().c_str(), "<DATA_LIST>") == 0){
             cur = cur->Child();
             // plan->val_list.push_back( strdup(cur->data().c_str()));
-            plan->val_list[plan->val_index++] = cur->data().c_str();
+            plan->val_list[plan->val_index++] = const_cast<char*>(cur->data().c_str());
 
             cur = cur->Brother();
         }else{
