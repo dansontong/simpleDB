@@ -78,7 +78,7 @@ typedef struct FlagNode *Flag;
 Plannode *make_join_node(int start_table,int end_table,Plannode *cur);
 Plannode *make_filter_node(int start_op,int end_op,int start_attri,int end_attri,Plannode *cur);
 Plannode *make_project_node(int start_pro,int end_pro,Plannode* cur);
-void init(Selectnode select1,Plannode* cur);
+void lp_init(Selectnode select1,Plannode* cur);
 Result ergodic(Plannode *head,char a[10]);
 void aaa(Plannode *head);
 int AllNodes(Plannode *T);

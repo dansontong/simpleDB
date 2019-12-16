@@ -163,7 +163,8 @@ void execute_sql(char *sql, int strlen){
     if (root->data().find("<SELECT>")!=root->data().npos){
         // 生成查询计划&优化
         f = select2plan(root);
-        logicplan = plan_init(f);
+        logicplan = malloc(sizeof(Plannode));
+        // lp_init(*f, logicplan);
     }else if (root->data().find("<CREATE>") != root->data().npos) {
         plan = create2plan(root);
     }else if (root->data().find("<INSERT>") != root->data().npos) {
