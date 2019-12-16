@@ -19,8 +19,7 @@ extern DataBase *DB;
  *------------------------------------------------------------------*/
 void createTable(PerformPlan *plan){
     char table_name[100];
-    strcat(table_name, plan->table_name);
-
+    strcpy(table_name, plan->table_name);
 
     Attribute *attr_list;
 
