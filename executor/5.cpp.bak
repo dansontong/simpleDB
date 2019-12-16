@@ -25,7 +25,6 @@ struct Tablenode{//表节点
 	char tablename[10];
 };
 
-
 struct Filternode{//过滤节点
 	char attribute[10][100];//属性名
 	char attrioftable[10][100];//属性所属的表

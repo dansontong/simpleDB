@@ -1,6 +1,9 @@
-
+#include "optimize.h"
 
 int main(){
+	struct Selectnode select1;
+	struct Plannode headplan;
+
 	char sql[100] = "select * from a,b where a.a1 = b.a1 and num != (select1 num from b1,a1 where a=0);";
 	
 	select1.subselect = 0;

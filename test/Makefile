@@ -7,11 +7,11 @@ LIB_SRC =  -L../storage/*.cpp -L../core/*.cpp
 src = ../core ../storage ../index
 src_buf = $(shell find ../log ../core ../storage -name "*.cpp")
 src_bPtree = $(shell find ../log ../index/BPlusTree  -name "*.cpp")
-src_index = $(shell find ../log ../core ../storage ../index ../executor ../sqlparser -name "*.cpp")
-# src_executor = $(shell find ../log ../core ../storage ../index ../executor  -name "*.cpp")
+src_index = $(shell find ../log ../core ../storage ../index ../sqlparser -name "*.cpp")
+src_operator = $(shell find ../log ../core ../storage ../index ../operator  -name "*.cpp")
 src_parser = $(shell find ../log ../sqlparser ../lib  -name "*.cpp")
-
-src_executor = $(shell find ../log ../core ../storage ../sqlparser ../operator ../index ../lib -name "*.cpp")
+src_executor = $(shell find ../log ../core ../storage ../sqlparser ../operator ../index ../lib -name "*.cpp") ../executor/executor.cpp ../executor/grammar2plan.cpp
+src_optimizer = ../executor/logicOptimize.cpp
 
 buffer: 
 	# $(cc) $(CXXFLAGS) $(INCLUDE) storage/buffer_test.cpp $(src_buf) -o buffer_test.o
@@ -21,9 +21,10 @@ buffer:
 	# $(cc) $(CXXFLAGS) $(INCLUDE) index/index_test.cpp $(src_index) -o index_test.o
 	# $(cc) $(CXXFLAGS)  -I ../index/BPlusTree index/bPlusTree_test.cpp $(src_bPtree) -o bPlusTree_test.o
 	# $(cc) $(CXXFLAGS) $(INCLUDE) index/bPlusTree_test.cpp $(src_bPtree) -o bPlusTree_test.o
-	# $(cc) $(CXXFLAGS) $(INCLUDE) executor/executor_test.cpp $(src_executor) -o executor_test.o
-	$(cc) $(CXXFLAGS) $(INCLUDE) parser/sqlparser_test.cpp $(src_parser) -o parser_test.o
-	$(cc) $(CXXFLAGS) $(INCLUDE) executor/executor_test.cpp $(src_executor) ../executor/executor.cpp ../executor/grammar2plan.cpp -o executor_test.o
+	# $(cc) $(CXXFLAGS) $(INCLUDE) operator/operator_test.cpp $(src_operator) -o operator_test.o
+	# $(cc) $(CXXFLAGS) $(INCLUDE) parser/sqlparser_test.cpp $(src_parser) -o parser_test.o
+	$(cc) $(CXXFLAGS) $(INCLUDE) executor/executor_test.cpp $(src_executor)  -o executor_test.o
+	# $(cc) $(CXXFLAGS) $(INCLUDE) executor/logicOpti_test.cpp $(src_optimizer)  -o logicOpti_test.o
 	# ./buffer_test.o
 	# ./log_test.o
 	# ./pageBitMap_test.o
@@ -31,6 +32,7 @@ buffer:
 	# ./index_test.o
 	# ./bPlusTree_test.o
 	./executor_test.o
+	# ./logicOpti_test.o
 	# rm -rf *_test.o *.log
 
 # make clear: clear runnable file 

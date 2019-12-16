@@ -1,9 +1,15 @@
+#include "optimize.h"
 
+extern struct Selectnode select1;
+extern struct Plannode headplan;
 
 int main(){
+	// Selectnode select1;
+	// Plannode headplan;
+
 	char sql[100] = "select * from a,b where a.a1 = b.a1 and num != (select1 num from b1,a1 where a=0);";
 	
-	select1.subselect = 0;
+	select1.subselect = 1;
 	strcpy(select1.tablename[0],"a");
 	strcpy(select1.tablename[1],"b");
 	strcpy(select1.tablename[2],"b1");
@@ -40,25 +46,30 @@ int main(){
 	strcpy(select1.op[3],"=");
 	select1.subop[0]=0;
 	select1.subop[1]=2;
-	select1.num_tab=2;
-	select1.num_attri=4;
-	select1.num_attri_tab =4;
-	select1.num_op = 2;
-	select1.num_pro = 1;
-	init(select1);
+	select1.num_tab=4;
+	select1.num_attri=8;
+	select1.num_attri_tab =8;
+	select1.num_op = 4;
+	select1.num_pro = 3;
+	init(select1,&headplan);
+	Plannode *cur = headplan.left;
+	//DisplayTree(headplan.left);
 	Selectnode *select = &select1;
 	////printf("%d",select->num_op);
 	//////printf("%s",headplan.parents->parents->parents->right->kind);
 	
-	Plannode *cur = headplan.left;
-	Plannode* last = headplan.parents;
-	last->left=NULL;
-	//Eliminate_subquery(headplan,select);
+	
+	
+	Eliminate_subquery(headplan,select);
+	aaa(cur);
+	DisplayTree(headplan.left);
 	//printf("%s->",cur->left->left->right->left->left->kind);
 	//ergodic(cur);
 	Down_filterandproject(headplan);
 	bool flag=false;
 	aaa(cur);
+	DisplayTree(headplan.left);
+	//printf("%s",headplan.left->kind);
 	/*while(1){
 		if(cur==&headplan)break;
 		else{

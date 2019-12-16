@@ -1,6 +1,10 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include "optimize.h"
+
+struct Selectnode select1;
+struct Plannode headplan;
+int count_tab=49;
+static int count = 0;
+
 
 Plannode *make_join_node(int start_table,int end_table,Plannode *cur){//生成table节点或join节点，若只有一张表就是一个table节点，多于一张表，就两辆结成一个join节点
 	for(int j=0;j<end_table-start_table;j++){
@@ -38,6 +42,7 @@ Plannode *make_join_node(int start_table,int end_table,Plannode *cur){//生成ta
 	Plannode *result = cur;
 	return result;
 }
+
 Plannode *make_filter_node(int start_op,int end_op,int start_attri,int end_attri,Plannode *cur){//where节点，选择过滤
 	Plannode *filter = (Plannode *)malloc(sizeof(Plannode));
 	filter->filternode.is_subquery=false;
@@ -60,6 +65,7 @@ Plannode *make_filter_node(int start_op,int end_op,int start_attri,int end_attri
 	cur = filter;
 	return cur;
 }
+
 Plannode *make_project_node(int start_pro,int end_pro,Plannode* cur){//生成投影节点
 	Plannode *project = (Plannode*)malloc(sizeof(Plannode));
 	strcpy(project->kind,"project");
@@ -88,9 +94,10 @@ Plannode *make_project_node(int start_pro,int end_pro,Plannode* cur){//生成投
 	////printf("%s\n",project->projectionnode.tablename);
 	return project;
 }
-void init(Selectnode select1){//根据select1生成初始查询计划
+
+void init(Selectnode select1,Plannode* cur){//根据select1生成初始查询计划
 	int countnode=0;
-	Plannode *cur = &headplan;
+	//Plannode *cur = &headplan;
 	
 	int i = select1.subselect;
 	int end_table = select1.num_tab;//找到每个查询中（主查询或子查询）各个属性在各数组的起始和最终位置的下标
@@ -117,11 +124,14 @@ void init(Selectnode select1){//根据select1生成初始查询计划
 		start_attri = select1.subattribute[i];	
 		start_pro = select1.sub_pro[i];
 	}
-	headplan.left = cur;		
+	headplan.left = cur;
+	Plannode* last = headplan.parents;
+	last->left=NULL;	
 		
 		
 	
 }
+
 Result ergodic(Plannode *head,char a[10]){//根据当前的节点对查询树进行遍历
 	Plannode* stack[20];
 	int top = -1;
@@ -145,7 +155,9 @@ Result ergodic(Plannode *head,char a[10]){//根据当前的节点对查询树进
 	result.number = counter;
 	return result;
 	
-}void aaa(Plannode *head){
+}
+
+void aaa(Plannode *head){
 	Plannode* stack[20];
 	int top = -1;
 	Plannode* cur=head;
@@ -160,21 +172,201 @@ Result ergodic(Plannode *head,char a[10]){//根据当前的节点对查询树进
 			cur = stack[top--];
 			if(strcmp(cur->kind,"join")==0){
 				if(cur->joinnode.is_equijoin==true){
-					printf("  equijoin  ");
+					strcpy(cur->kind,"con_join");
 				}
-				else{
-					printf("%s	",cur->kind);
-				}
+				
 			}
-			else{
-				printf("%s	",cur->kind);
-			}
+			printf("%s	",cur->kind);
+			
 			
 			cur = cur->right;
 		}
 	}
 	printf("\n");
 }
+
+int AllNodes(Plannode *T)
+{
+    if (T==NULL)
+        return 0;
+    else if (T->left == NULL && T->right == NULL)
+        return 1;
+    else
+        return AllNodes(T->left) + AllNodes(T->right) + 1; //加1等于是每次返回 加一个根结点
+}
+void OutSpace(int n)
+{
+    for (int i = 0; i < pow(2, n); i++)
+        printf(" ");
+    printf("\b");
+}
+int TotalDepth(Plannode *T) //输出的是整个二叉树的深度
+{
+    int DepthOfLeft = 0;
+    int DepthOfRight = 0;
+    if (NULL == T)
+        return 0;
+    else
+    {
+        DepthOfLeft = TotalDepth(T->left);
+        DepthOfRight = TotalDepth(T->right);
+        return (DepthOfLeft > DepthOfRight) ? DepthOfLeft + 1 : DepthOfRight + 1;
+    }
+}
+void MarkTreeNode(Plannode *T, Flag Array, int No)
+{
+    if (T != NULL)
+    {
+        Array[count].SerialNumber = No;
+        strcpy(Array[count++].kind,T->kind);
+        MarkTreeNode(T->left, Array, No * 2);
+        MarkTreeNode(T->right, Array, No * 2 + 1);
+    }
+}
+/*可变长树枝"┌─────┴─────┐"*/
+void OutBranch(int haveLeft, int haveRight, int interval)
+{
+    if (haveLeft)
+    {
+        printf("┌");
+        for (int i = 0; i < pow(2, interval) / 2 - 1; i++)
+            printf("─");
+        if (haveRight)
+        {
+            /*"┌─────┴─────┐"*/
+            printf("┴");
+            for (int i = 0; i < pow(2, interval) / 2 - 1; i++)
+                printf("──");
+            printf("┐");
+        }
+        else
+        {
+            /*"┌────┘        "*/
+            printf("┘");
+            for (int i = 0; i < pow(2, interval) / 2 - 1; i++)
+                printf("  ");
+            printf("  ");
+        }
+    }
+    else
+    {
+        printf("  ");
+            for (int i = 0; i < pow(2, interval) / 2 - 1; i++)
+                printf("  ");
+        if(haveRight)
+        {
+            /*"      └──────┐"*/
+            printf("└");
+            for (int i = 0; i < pow(2, interval) / 2 - 1; i++)
+                printf("──");
+            printf("┐");
+        }
+        else
+        {
+            /*"              "*/
+            printf(" ");
+            for (int i = 0; i < pow(2, interval) / 2 - 1; i++)
+                printf(" ");
+            printf(" ");
+        }
+    }
+}
+
+void Display(Flag Array, int ArraySize, int depth)
+{
+    int lineStart, lineEnd;
+    int spaceInFront = depth - 1;
+    int interval = depth;//节点之间的间隔指数
+    for (int level = 0; level < depth; level++)
+    {
+        /*    level:0    ___1                    */
+        /*    level:1    _2___3                 */
+        /*    level:2    4_5_6_7               */
+        lineStart = pow(2, level);
+        lineEnd = lineStart * 2;
+        OutSpace(spaceInFront); //输出每行前面的空格
+        for (int start = lineStart; start < lineEnd; start++)
+        {
+            /*eg:从4，5，6，7按顺序检测该标志是否存在，存在输出节点，不存在则输出"0"*/
+            int exist = 0;
+            for (int i = 0; i < ArraySize; i++)
+            {
+                if (start == Array[i].SerialNumber)
+                {
+                    printf("%s", Array[i].kind);
+                    exist = 1;
+                }
+            }
+            if (exist == 0)
+                printf(" ");
+            OutSpace(interval); //输出一个节点后的空格
+        }
+        printf("\n");
+        spaceInFront--;
+        interval--;
+        OutSpace(spaceInFront);
+        for (int parent = lineStart; parent < lineEnd; parent++)
+        {
+            int exist = 0;
+            for (int i = 0; i < ArraySize; i++)
+            {
+                if (parent == Array[i].SerialNumber)
+                {
+                    int haveLeft = 0, haveRight = 0; //记录当前节点是否有左右孩子 0 为无
+                    int leftChild = parent * 2;
+                    int rightChild = parent * 2 + 1;
+                    for (int last = i; last < ArraySize; last++)
+                    {
+                        if (Array[last].SerialNumber == leftChild)
+                            haveLeft = 1;
+                        if (Array[last].SerialNumber == rightChild)
+                            haveRight = 1;
+                    }
+                    OutBranch(haveLeft, haveRight, interval);
+                    OutSpace(interval);
+                    exist = 1;
+                }
+            }
+            if (!exist)
+            {
+                OutBranch(0, 0, interval);
+                OutSpace(interval);
+            }
+        }
+        printf("\n");
+
+    }
+}
+
+
+void DisplayTree(Plannode *T)
+{
+    int allNodes = AllNodes(T);
+    int depth = TotalDepth(T);
+    Flag A = (Flag)malloc(sizeof(struct FlagNode) * allNodes);
+    if (A == NULL){
+		printf("1");
+        return;
+	}
+		
+    MarkTreeNode(T, A, 1);
+    //PrintFlag(A, allNodes);
+    printf("The binary tree is look like:\n");
+    Display(A, allNodes, depth);
+	count=0;
+}
+
+//给树结点做标记，按理论完全二叉树的序号标记
+
+
+
+//辅助debug函数
+void PrintFlag(Flag Array, int ArraySize)
+{
+    for (int i = 0; i < ArraySize; i++)
+        printf("%s-->%d\n", Array[i].kind, Array[i].SerialNumber);
+}
+
 void Eliminate_subquery(Plannode headplan,Selectnode *select){//消除子查询
 	Plannode* cur = headplan.left;
 	bool is_related = false;//判断是否是相关子查询
@@ -351,7 +543,6 @@ void Eliminate_subquery(Plannode headplan,Selectnode *select){//消除子查询
 			cur = cur->left;
 		}
 	}
-	
 }
 
 void Down_filterandproject(Plannode headplan){
@@ -481,9 +672,5 @@ void Down_filterandproject(Plannode headplan){
 			tmp->parents = cur->parents;
 			cur->parents->left=tmp;
 		}
-		
-		
 	}
-	
-
 }
