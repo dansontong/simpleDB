@@ -48,12 +48,9 @@ Selectnode* select2plan(trivialtree * root){
 
     // 遍历语法树，遍历树根的所有孩子节点，cur初始值为树根的第一个孩子
     while (cur){
-        printf("current data: %s\n", cur->data().c_str());
         if (strcmp(cur->data().c_str(), "select") == 0){
             // 处理投影
-            printf("处理select\n");
             tmp = cur->Child();
-            printf("[debug] %s\n", tmp->data().c_str());
             if (strcmp(tmp->data().c_str(), "<SEL_LIST>") != 0){
                 printf("语法树格式错误！没有<SEL_LIST>\n");
                 goto END;
@@ -63,12 +60,9 @@ Selectnode* select2plan(trivialtree * root){
                 strcpy(node->projectionattribute[node->num_pro++], tmp->data().c_str());
                 tmp = tmp->Brother();
             }
-            printf("投影处理完毕，一共有: %d\n", node->num_pro);
         }else if (strcmp(cur->data().c_str(), "from") == 0){
             // 处理from
-            printf("处理from\n");
             tmp = cur->Child();
-            printf("[debug] %s\n", tmp->data().c_str());
             if (strcmp(tmp->data().c_str(), "<VAL_LIST>") != 0){
                 printf("语法树格式错误！没有<VAL_LIST>\n");
                 goto END;
@@ -78,10 +72,8 @@ Selectnode* select2plan(trivialtree * root){
                 strcpy(node->tablename[node->num_tab++], tmp->data().c_str());
                 tmp = tmp->Brother();
             }
-            printf("from处理完毕，一共有: %d\n", node->num_tab);
         }else if (strcmp(cur->data().c_str(), "<WHERE>") == 0){
             // 处理where字句
-            printf("处理where\n");
             tmp = cur->Child();
             // 匹配WHER
             if (strcmp(tmp->data().c_str(), "where") != 0){
@@ -103,10 +95,8 @@ Selectnode* select2plan(trivialtree * root){
                     goto END;
                 }
                 condition_tuple = condition->Child();
-                printf("处理三元组\n");
                 // 处理condition三元组
                 for (int i=0;i<3;i++){
-                    printf("condition data: %s\n", condition_tuple->data().c_str());
                     if (i==1){
                         // 处理op
                         strcpy(node->op[node->num_op++], condition_tuple->data().c_str());
@@ -121,7 +111,6 @@ Selectnode* select2plan(trivialtree * root){
                             char *strtmp = malloc(sizeof(char)* (1+strlen(condition_tuple->data().c_str())));
                             memcpy(strtmp, condition_tuple->data().c_str(), 1+strlen(condition_tuple->data().c_str()));
                             char * res = strtok(strtmp, ".");
-                            printf("attr: %s; res: %s\n", strtmp, res);
                             if (res == NULL){
                                 strcpy(node->attrioftable[node->num_attri_tab++], "NULL");
                             }else{
@@ -136,7 +125,6 @@ Selectnode* select2plan(trivialtree * root){
                     tmp = tmp->Brother();
                 }
             }
-            printf("where处理完毕，一共有: %d\t%d\t%d\n", node->num_op, node->num_attri_tab, node->num_attri) ;
         }else{
             printf("未知的语句: %s\n", cur->data().c_str());
         }
@@ -236,7 +224,6 @@ PerformPlan *insert2plan(trivialtree * root)
         return NULL;
     }
     cur = cur->Brother();
-    printf("%s\n", cur->data().c_str());
     plan->table_name = strdup(cur->data().c_str());
     
     // 切换到values
@@ -245,7 +232,6 @@ PerformPlan *insert2plan(trivialtree * root)
     // 切换到<DATA_LIST>
     cur = cur->Brother();
     while (cur){
-        printf("current data: %s\n", cur->data().c_str());
         if (strcmp(cur->data().c_str(), "<DATA_LIST>") == 0){
             cur = cur->Child();
             // plan->val_list.push_back( strdup(cur->data().c_str()));
