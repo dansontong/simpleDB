@@ -26,7 +26,6 @@ void createTable(PerformPlan *plan){
     if (plan->val_index>0){
         attr_list = malloc(sizeof(Attribute)*plan->val_index);
         memset(attr_list, 0, plan->val_index);
-        printf("val_list size: %d\n", plan->val_index);
         for (int i=0; i<plan->val_index ; i++ )
         {
             DATA_TYPE data_type;
@@ -80,11 +79,6 @@ void insertRecord(PerformPlan *plan)
     free(record);
 }
 
-/*--------------------------------------------------------------------
- * execute_sql
- * select 直接hardcode了，已经没有耐心去写了-_-
- * 对外接口，执行sql语句，将结果打印
- *------------------------------------------------------------------*/
 void selectRecord(Selectnode *plan)
 {
     char *table_name = plan->tablename[0];
@@ -98,32 +92,34 @@ void selectRecord(Selectnode *plan)
         return ;
     }
 
+    // 先做选择
     if (plan->num_attri>0){
         attrName = plan->attribute[0];
         attr = plan->attribute[1];
+        printf("做选择操作（等值） %s = %s\n", attrName, attr);
         tmp_table_id = tableScanEqualSelector(did, attrName, attr);
-    }else{
-        tmp_table_id = tableScanSelector(did, attrName);
-        return;
     }
-    printf("select tmp table id: %d\n", tmp_table_id);
+    else{
+        tmp_table_id = tableScanSelector(did);
+    }
 
+    // 做投影操作
     if (tmp_table_id >= 0){
-        printf("|%s|\n", plan->projectionattribute[0]);
+        int i=0;
+        printf("|");
+        for (i=0;i<plan->num_pro;i++){
+            printf("%s|", plan->projectionattribute[i]);
+        }
+        printf("\n");
         tmp_table_id = projection(tmp_table_id, plan->projectionattribute[0]);
-        printf("project tmp table id: %d\n", tmp_table_id);
     }
-    printf("res tmp table id: %d\n", tmp_table_id);
-    if (tmp_table_id >= 0){
+    if (plan->projectionattribute[0][0] == "*"){
         tmp_table_id = tableScanSelector(did);  
+    }else{
+        tableScanSelector(tmp_table_id,plan->projectionattribute[0]);//select*
     }
 }
 
-/*--------------------------------------------------------------------
- * execute_sql
- * 
- * 对外接口，执行sql语句，将结果打印
- *------------------------------------------------------------------*/
 void executePlan(PerformPlan *plan)
 {
     switch (plan->sql_type){
@@ -140,6 +136,35 @@ void executePlan(PerformPlan *plan)
             break;
     }
     return;
+}
+/*--------------------------------------------------------------------
+ * checkPlan
+ * 
+ * 内部接口，语义检查
+ *------------------------------------------------------------------*/
+bool checkPlan(PerformPlan *plan)
+{
+    int did = -1;
+    switch (plan->sql_type){
+        case CREATE_SQL:
+            did = getDictIDbyName(plan->table_name);
+            if (did != -1){
+                printf("table: %s already exist.\n", plan->table_name);
+                return false;
+            }
+            break;
+        case INSERT_SQL:
+            did = getDictIDbyName(plan->table_name);
+            if (did == -1){
+                printf("table: %s not exist.\n", plan->table_name);
+                return false;
+            }
+            break;
+        default:
+            printf("unhandle type.\n");
+            break;
+    }
+    return true;
 }
 
 /*--------------------------------------------------------------------
@@ -174,6 +199,10 @@ void execute_sql(char *sql, int strlen){
         // 执行select
         selectRecord(f);
     }else if (plan!=NULL) {
+        bool res = checkPlan(plan);
+        if (res == false){
+            return;    
+        }
         executePlan(plan);
     }
     return;

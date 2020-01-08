@@ -10,7 +10,7 @@ src_bPtree = $(shell find ../log ../index/BPlusTree  -name "*.cpp")
 src_index = $(shell find ../log ../core ../storage ../index ../sqlparser -name "*.cpp")
 src_operator = $(shell find ../log ../core ../storage ../index ../operator  -name "*.cpp")
 src_parser = $(shell find ../log ../sqlparser ../lib  -name "*.cpp")
-src_executor = $(shell find ../log ../core ../storage ../sqlparser ../operator ../index ../lib -name "*.cpp") ../executor/executor.cpp ../executor/grammar2plan.cpp
+src_executor = $(shell find ../log ../core ../storage ../sqlparser ../operator ../index ../lib -name "*.cpp") ../executor/executor.cpp ../executor/grammar2plan.cpp ../executor/logicOptimize.cpp
 src_optimizer = ../executor/logicOptimize.cpp
 
 buffer: 
