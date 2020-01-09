@@ -19,6 +19,7 @@ void dosMain()
 	{
 		char sql[512];
 		char strIn[512];
+		memset(strIn, 0, 512);
 		printf("\033[32msql>> \033[0m");
 		// gets(strIn); // deprecated
 		fgets(strIn, 512, stdin);
