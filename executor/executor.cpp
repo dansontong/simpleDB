@@ -58,13 +58,11 @@ void createTable(PerformPlan *plan){
 void insertRecord(PerformPlan *plan)
 {
     char *table_name = plan->table_name;
-    // char table_name[] = "supplier";
     int did = getDictIDbyName(table_name);
     if (did == 1){
         printf("table not exist.\n");
         return ;
     }
-    printf("table %s did: %d\n", table_name, did);
 
     char *record = (char *)malloc(sizeof(char) * 1000);
 //10000|Supplier#000010000|aTGLEusCiL4F PDBdv665XBJhPyCOB0i|19|29-578-432-2146|8968.42|ly regular foxes boost slyly. quickly special waters boost carefully ironi
@@ -100,9 +98,14 @@ void selectRecord(Selectnode *plan)
         tmp_table_id = tableScanEqualSelector(did, attrName, attr);
     }
     else{
-        tmp_table_id = tableScanSelector(did);
+        tmp_table_id = did;
     }
 
+
+    if (plan->projectionattribute[0][0] == '*'){
+        tmp_table_id = tableScanSelector(tmp_table_id);  
+        return;
+    }
     // 做投影操作
     if (tmp_table_id >= 0){
         int i=0;
@@ -112,12 +115,10 @@ void selectRecord(Selectnode *plan)
         }
         printf("\n");
         tmp_table_id = projection(tmp_table_id, plan->projectionattribute[0]);
-    }
-    if (plan->projectionattribute[0][0] == "*"){
-        tmp_table_id = tableScanSelector(did);  
     }else{
         tableScanSelector(tmp_table_id,plan->projectionattribute[0]);//select*
     }
+    tableScanSelector(tmp_table_id);
 }
 
 void executePlan(PerformPlan *plan)
