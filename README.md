@@ -55,5 +55,5 @@ TODO:index-module: lh & ly
 2, 数据库元数据中，数据字典应组织为普通表;其他数据库的基本信息DataBase这个结构体，不能直接将结构体写入文件，否则可能因为虚函数、对齐等原因导致数据出错。  
 3, 索引模块该对了，但还没能使用sql语句直接测试。  
 4, 可视化界面make执行还有问题，使用的qt，应先qmake -project，然后qmake **.pro,再make。目前在make前手动修改Makefile，企图整合系统其他所有模块，但尚未调通。  
-5, test文件下要使用index_test.cpp主要看该文件中的说明。  
+5, test文件夹下要使用index_test.o主要看index_test.cpp中的说明。  
 6, 目前工程根目录下，直接make, 然后./database_d即可运行。  
