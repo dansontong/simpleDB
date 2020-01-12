@@ -5,16 +5,41 @@
 #include <string.h>
 #include "executor.h"
 
+// #include "mainwindow.h"
+// #include <QApplication>
+
 extern DataBase* DB;
 
-void winMain()
+
+void winMain(int argc, char* argv[])
 {
 	// windowApp();
-	printf("not implement yet.TODO.\n");
+    // QApplication a(argc, argv);
+    // MainWindow w;
+    // w.show();
+
+    // return a.exec();
+}
+
+void print_help()
+{
+	printf("usage:\n");
+	printf("- %-15s get help.\n","help");
+	printf("- %-15s delete database.\n","del-db");
+	printf("- %-15s create database.\n","create-db");
+	printf("- %-15s show data dictionary.\n","data-dict");
+	printf("- %-15s insert tuple of supplier.tbl.\n","insert-sup");
+	printf("- %-15s select all from table supplier.\n","select-all");
+	printf("- %-15s Memory to disk.\n","memtodisk");
+	printf("- %-15s find record of key.\n","find key");
+	printf("- %-15s create index on S_SUPPKEY of Supplier.\n","create-index");
+	printf("- %-15s exit DBMS.\n","exit");
 }
 
 void dosMain()
 {
+	print_help();
+	
 	while(1)
 	{
 		char sql[512];
@@ -42,17 +67,7 @@ void dosMain()
 
 		if(strcmp(strlist[0], "help")==0)
 		{
-			printf("usage:\n");
-			printf("- %-15s get help.\n","help");
-			printf("- %-15s delete database.\n","del-db");
-			printf("- %-15s create database.\n","create-db");
-			printf("- %-15s show data dictionary.\n","data-dict");
-			printf("- %-15s insert tuple of supplier.tbl.\n","insert-sup");
-			printf("- %-15s select all from table supplier.\n","select-all");
-			printf("- %-15s Memory to disk.\n","memtodisk");
-			printf("- %-15s find record of key.\n","find key");
-			printf("- %-15s create index on S_SUPPKEY of Supplier.\n","create-index");
-			printf("- %-15s exit DBMS.\n","exit");
+			print_help();
 		}
 		else if(strcmp(strlist[0], "del-db")==0 || strcmp(strlist[0], "delete-db")==0)
 		{

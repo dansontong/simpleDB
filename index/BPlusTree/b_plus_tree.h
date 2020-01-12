@@ -21,9 +21,12 @@ typedef struct
 {
 	int key;//记录的键值
 	int pos;//节点里面记录的相对位置
-	int posPage;//页号
+//	int posPage;//页号
 	char* posOffset;//偏移量
+	long posPage;   //页号
+	int offset;     //偏移量
 	int recordID;   //记录ID
+	bool searchfaild=0;
 }TreeRecord;//B+树节点上的记录
 
 typedef struct Node
@@ -36,7 +39,7 @@ typedef struct Node
 }Node;//B+树的节点
 
 void getRoot(FILE *index, Node &node);
-int search(FILE *index, int key);
+TreeRecord search(FILE *index, int key);
 void searchNode(FILE *index, Node &node, int key);
 int searchTreeRecord(Node &node, int key);
 int insert(FILE *index, TreeRecord record);

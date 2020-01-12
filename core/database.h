@@ -81,6 +81,6 @@ int saveDbHead();
 
 //交互相关interact
 void dosMain();
-void winMain();
+void winMain(int argc, char* argv[]);
 
 #endif

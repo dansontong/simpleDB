@@ -86,7 +86,7 @@ void OutSpace(int n);
 int TotalDepth(Plannode *T);
 void MarkTreeNode(Plannode *T, Flag Array, int No);
 void OutBranch(int haveLeft, int haveRight, int interval);
-void Display(Flag Array, int ArraySize, int depth);
+void Opti_Display(Flag Array, int ArraySize, int depth);
 void DisplayTree(Plannode *T);
 void PrintFlag(Flag Array, int ArraySize);
 void Eliminate_subquery(Plannode headplan,Selectnode *select);

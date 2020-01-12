@@ -38,15 +38,20 @@ void getRoot(FILE *index, Node &node)
 	
 }
 
-int search(FILE *index, int key)//找出给定的键值在 B+树中的位置
+TreeRecord search(FILE *index, int key)//找出给定的键值在 B+树中的位置
 {
 	Node node;
+	Node emptynode;
+	//emptynode.pair[0].searchfaild=1;
 	int pos;
 	getRoot(index, node);
 	searchNode(index, node, key);
 	pos = searchTreeRecord(node, key);
 	if (pos == node.count || node.pair[pos].key != key)
-		return -1;
+	{
+		emptynode.pair[0].searchfaild=1;
+		return emptynode.pair[0];
+	}
 	else
 	{
 		cout << "node.type " << node.type << endl;
@@ -57,7 +62,7 @@ int search(FILE *index, int key)//找出给定的键值在 B+树中的位置
 		cout << "node.pair[pos].posPage " << node.pair[pos].posPage << endl;
 		// cout << "node.pair[pos].posOffset" << node.pair[pos].posOffset << endl;
 		cout << "node.pair[pos].recordID " << node.pair[pos].recordID << endl;
-		return node.pair[pos].pos;
+		return node.pair[pos];
 	}		
 }
 
