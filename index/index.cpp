@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 //==================== file global variable ====================
 extern struct DataBase *DB; /* 全局共享 */
 
@@ -68,18 +69,22 @@ void create_index(char *tableName,char *attributeName){
 	int sizeofpagehead = sizeof(struct PageMeta);								//读取文件信息
 	int sizeofrecord = sizeof(struct OffsetInPage);								//
 	TreeRecord indexRecord;
-	PageMeta pagehead;
+	struct PageMeta pagehead;
+	struct OffsetInPage curoffset;
 	for(i=0;i<pagenum;i++){					
 		struct BufTag buftag = Buf_GenerateTag(CurpageNo);						//根据页号从缓冲区调取页的内容
 		memcpy(&pagehead, Buf_ReadBuffer(buftag),sizeofpagehead);				//读取第一页的内容并存放在pagehead里
 		if(pagehead.recordNum>0){
 			for(j=0;j<pagehead.recordNum;j++){
-				indexRecord.posPage=pagehead.pageNo;
+				memcpy(&curoffset,Buf_ReadBuffer(buftag)+sizeofpagehead+sizeofrecord*j,sizeofrecord);
+				indexRecord.offset = curoffset.offset;							//记录偏移量
+
+				indexRecord.posPage=pagehead.pageNo;							//记录所在页号
 
 				getrecordAttribute(pagehead.pageNo,j,tableName,attributeName, tmpKey, indexRecord.posOffset);
 				indexRecord.key = atoi(tmpKey);									//目前只支持key值类型为int的列进行建索引。
 				printf("tmpKey:%s, key:%d\n", tmpKey, indexRecord.key);
-        		indexRecord.recordID = j;
+        		indexRecord.recordID = j;										//记录ID
 				int value=insert(index, indexRecord);							//建立B+树索引
 				if(value==-1){
 					printf("error:Insertion failed!\n");
@@ -248,10 +253,37 @@ void search_index(char *tableName, char *attributeName, char* Attribute, Record*
 
 		index=fopen(indexFilePath, "rb");
 		int key = atoi(Attribute);
-		int result=search(index, key);
-		if(result==-1)
+		TreeRecord indexRecord = search(index, key);
+		if(indexRecord.searchfaild == 1)
 		{
 			printf("error:search failed!\n");
+		}
+		else
+		{
+			int sizeofpageMeta = sizeof(struct PageMeta);
+			int sizeofrecord = sizeof(struct OffsetInPage);
+			OffsetInPage preoffset;
+			int readlength,recordID;
+			char* str;
+			BufTag buftag = Buf_GenerateTag(indexRecord.posPage);	//根据页号从缓冲区调取页的内容
+			if(indexRecord.recordID == 0)									//打印记录
+			{																	
+				readlength = indexRecord.offset;
+				memcpy(&str,Buf_ReadBuffer(buftag)+PAGE_SIZE-indexRecord.offset,readlength);
+				str[readlength] = '\0';
+				printf("%s文件中属性%s为%s的记录：\n",tableName,attributeName,Attribute);
+				printf("%s\n",str);
+			}
+			else
+			{
+				recordID = indexRecord.recordID-1;
+				memcpy(&preoffset,Buf_ReadBuffer(buftag)+sizeofpageMeta+sizeofrecord*recordID,sizeofrecord);
+				readlength = indexRecord.offset-preoffset.offset;
+				memcpy(&str,Buf_ReadBuffer(buftag)+PAGE_SIZE-indexRecord.offset,readlength);
+				str[readlength] = '\0';
+				printf("%s文件中属性%s为%s的记录：\n",tableName,attributeName,Attribute);
+				printf("%s\n",str);
+			}
 		}
 	}
 }

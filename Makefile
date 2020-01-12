@@ -1,7 +1,7 @@
 #不生成.o文件，一步到位得到可执行文件
 cc = g++
 target = database
-INCLUDE = -I ./log -I ./core -I ./index -I ./index/BPlusTree -I ./storage -I ./operator -I ./executor -I ./lib -I ./sqlparser
+INCLUDE = -I ./log -I ./core -I ./index -I ./index/BPlusTree -I ./storage -I ./operator -I ./executor -I ./lib -I ./sqlparser -I ./window
 # debug mode default
 ver = debug
 ifeq ($(ver), debug)

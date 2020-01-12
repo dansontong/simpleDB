@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 	//进入交互,dos或window界面	
 	if(argc > 1 && strcmp(argv[1], "win") == 0)
 	{
-		winMain();
+		winMain(argc, argv);
 	}else
 	{
 		dosMain();

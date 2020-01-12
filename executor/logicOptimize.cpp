@@ -272,7 +272,7 @@ void OutBranch(int haveLeft, int haveRight, int interval)
     }
 }
 
-void Display(Flag Array, int ArraySize, int depth)
+void Opti_Display(Flag Array, int ArraySize, int depth)
 {
     int lineStart, lineEnd;
     int spaceInFront = depth - 1;
@@ -352,7 +352,7 @@ void DisplayTree(Plannode *T)
     MarkTreeNode(T, A, 1);
     //PrintFlag(A, allNodes);
     printf("The binary tree is look like:\n");
-    Display(A, allNodes, depth);
+    Opti_Display(A, allNodes, depth);
 	count=0;
 }
 
